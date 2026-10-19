@@ -117,6 +117,8 @@ p { color: var(--muted); }
 .result-line { display: flex; justify-content: space-between; gap: 15px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.12); font-size: .86rem; }
 .result-line span { color: #bdcbc3; }
 .result-line strong { text-align: right; }
+.result-line-total { margin-top: 4px; border-top: 1px solid rgba(201,243,107,.35); font-weight: 800; }
+.result-line-total span, .result-line-total strong { color: var(--green); }
 .disclaimer { padding: 13px 14px; margin-top: 20px; background: rgba(255,255,255,.07); border-radius: 8px; color: #c7d5cd; font-size: .78rem; }
 .content-narrow { max-width: 780px; margin: 0 auto; }
 .prose h2 { margin-top: 38px; font-size: 1.7rem; }
