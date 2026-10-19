@@ -27,6 +27,17 @@ export default function CalculatorPage() {
   const [other, setOther] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
+  const changeCurrency = (nextCurrency: string) => {
+    if (nextCurrency === currency) return;
+    setCurrency(nextCurrency);
+    setGoods(0);
+    setShipping(0);
+    setInsurance(0);
+    setCustoms(0);
+    setHandling(0);
+    setOther(0);
+  };
+
   const result = useMemo(() => {
     const subtotal = goods + shipping + insurance + customs + handling + other;
     return { subtotal, perItem: quantity > 0 ? subtotal / quantity : subtotal };
@@ -49,14 +60,14 @@ export default function CalculatorPage() {
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="currency">Currency</label>
-                <select id="currency" value={currency} onChange={(event) => setCurrency(event.target.value)}>
+                <select id="currency" value={currency} onChange={(event) => changeCurrency(event.target.value)}>
                   <option value="USD">USD · US dollar</option>
                   <option value="EUR">EUR · Euro</option>
                   <option value="GBP">GBP · British pound</option>
                   <option value="GEL">GEL · Georgian lari</option>
                   <option value="JPY">JPY · Japanese yen</option>
                 </select>
-                <small>All amounts below use this currency.</small>
+                <small>Changing currency clears the amounts to prevent accidental relabeling. Enter all costs in the selected currency.</small>
               </div>
               <NumberField id="goods" label="Goods / purchase value" value={goods} onChange={setGoods} hint="Total amount paid to the seller." />
               <NumberField id="shipping" label="Shipping / freight" value={shipping} onChange={setShipping} hint="Use a carrier quote where possible." />
