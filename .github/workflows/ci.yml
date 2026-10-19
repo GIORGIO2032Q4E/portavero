@@ -18,6 +18,10 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
+      - name: Summarize dependency audit
+        run: |
+          npm audit --json > audit-report.json || true
+          node -e 'const a=require("./audit-report.json"); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, advisories:Object.values(a.vulnerabilities||{}).map(v=>({name:v.name,severity:v.severity,range:v.range,fixAvailable:v.fixAvailable,via:v.via.map(x=>typeof x === "string" ? x : x.title)}))},null,2))'
       - name: Lint
         run: npm run lint
       - name: Type-check
