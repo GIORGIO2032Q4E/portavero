@@ -5,13 +5,13 @@ import { useMemo, useState } from "react";
 const money = (value: number, currency: string) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(value);
 
-function NumberField({ label, value, onChange, hint, min = 0, step = "0.01" }: {
-  label: string; value: number; onChange: (value: number) => void; hint?: string; min?: number; step?: string;
+function NumberField({ id, label, value, onChange, hint, min = 0, step = "0.01" }: {
+  id: string; label: string; value: number; onChange: (value: number) => void; hint?: string; min?: number; step?: string;
 }) {
   return (
     <div className="field">
-      <label>{label}</label>
-      <input type="number" min={min} step={step} value={value} onChange={(event) => onChange(Math.max(0, Number(event.target.value) || 0))} />
+      <label htmlFor={id}>{label}</label>
+      <input id={id} type="number" min={min} step={step} value={value} onChange={(event) => onChange(Math.max(0, Number(event.target.value) || 0))} />
       {hint && <small>{hint}</small>}
     </div>
   );
@@ -20,10 +20,10 @@ function NumberField({ label, value, onChange, hint, min = 0, step = "0.01" }: {
 export default function CalculatorPage() {
   const [currency, setCurrency] = useState("USD");
   const [goods, setGoods] = useState(1000);
-  const [shipping, setShipping] = useState(250);
-  const [insurance, setInsurance] = useState(20);
+  const [shipping, setShipping] = useState(0);
+  const [insurance, setInsurance] = useState(0);
   const [customs, setCustoms] = useState(0);
-  const [handling, setHandling] = useState(75);
+  const [handling, setHandling] = useState(0);
   const [other, setOther] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
@@ -58,13 +58,13 @@ export default function CalculatorPage() {
                 </select>
                 <small>All amounts below use this currency.</small>
               </div>
-              <NumberField label="Goods / purchase value" value={goods} onChange={setGoods} hint="Total amount paid to the seller." />
-              <NumberField label="Shipping / freight" value={shipping} onChange={setShipping} hint="Use a carrier quote where possible." />
-              <NumberField label="Insurance" value={insurance} onChange={setInsurance} />
-              <NumberField label="Customs and taxes" value={customs} onChange={setCustoms} hint="Enter a verified figure, or leave at zero until known." />
-              <NumberField label="Handling / port charges" value={handling} onChange={setHandling} hint="Illustrative starting value. Replace with a quote." />
-              <NumberField label="Other costs" value={other} onChange={setOther} hint="Broker, inland delivery, storage or other fees." />
-              <NumberField label="Number of items" value={quantity} onChange={setQuantity} min={1} step="1" hint="Used to estimate average cost per item." />
+              <NumberField id="goods" label="Goods / purchase value" value={goods} onChange={setGoods} hint="Total amount paid to the seller." />
+              <NumberField id="shipping" label="Shipping / freight" value={shipping} onChange={setShipping} hint="Use a carrier quote where possible." />
+              <NumberField id="insurance" label="Insurance" value={insurance} onChange={setInsurance} />
+              <NumberField id="customs" label="Customs and taxes" value={customs} onChange={setCustoms} hint="Enter a verified figure, or leave at zero until known." />
+              <NumberField id="handling" label="Handling / port charges" value={handling} onChange={setHandling} hint="Enter a provider quote when available." />
+              <NumberField id="other" label="Other costs" value={other} onChange={setOther} hint="Broker, inland delivery, storage or other fees." />
+              <NumberField id="quantity" label="Number of items" value={quantity} onChange={setQuantity} min={1} step="1" hint="Used to estimate average cost per item." />
             </div>
           </section>
           <aside className="panel result-panel" aria-live="polite">
