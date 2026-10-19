@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://portavero.com";
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\\/$/, "");
   const routes = [
     "", "/calculator", "/vehicle-import", "/shipping",
     "/how-it-works", "/about", "/privacy-policy", "/terms"
