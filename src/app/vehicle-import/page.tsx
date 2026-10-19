@@ -76,7 +76,7 @@ export default function VehicleImportPage() {
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
           <h1>Price the journey, not just the car.</h1>
-          <p>Build a Georgia-bound vehicle budget using your known costs and a preliminary excise estimate based on the Revenue Service's published rates effective from April 2, 2026.</p>
+          <p>Build a Georgia-bound vehicle budget using your known costs and a preliminary excise estimate based on the Revenue Service&apos;s published rates effective from April 2, 2026.</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/how-it-works" className="button button-dark">How estimates work</Link>
