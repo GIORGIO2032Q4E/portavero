@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 const money = (value: number, currency: string) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(value);
+  new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: currency === "JPY" ? 0 : 2 }).format(value);
 
 function NumberField({ id, label, value, onChange, hint, min = 0, step = "0.01" }: {
   id: string; label: string; value: number; onChange: (value: number) => void; hint?: string; min?: number; step?: string;
@@ -19,7 +19,7 @@ function NumberField({ id, label, value, onChange, hint, min = 0, step = "0.01" 
 
 export default function CalculatorPage() {
   const [currency, setCurrency] = useState("USD");
-  const [goods, setGoods] = useState(1000);
+  const [goods, setGoods] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [insurance, setInsurance] = useState(0);
   const [customs, setCustoms] = useState(0);
@@ -64,7 +64,7 @@ export default function CalculatorPage() {
               <NumberField id="customs" label="Customs and taxes" value={customs} onChange={setCustoms} hint="Enter a verified figure, or leave at zero until known." />
               <NumberField id="handling" label="Handling / port charges" value={handling} onChange={setHandling} hint="Enter a provider quote when available." />
               <NumberField id="other" label="Other costs" value={other} onChange={setOther} hint="Broker, inland delivery, storage or other fees." />
-              <NumberField id="quantity" label="Number of items" value={quantity} onChange={setQuantity} min={1} step="1" hint="Used to estimate average cost per item." />
+              <NumberField id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value)))} min={1} step="1" hint="Used to estimate average cost per item." />
             </div>
           </section>
           <aside className="panel result-panel" aria-live="polite">
