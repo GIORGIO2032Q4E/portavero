@@ -58,7 +58,6 @@ export default function VehicleImportPage() {
   const currentYear = new Date().getFullYear();
   const vehicleAge = currentYear - year;
   const eligibleYear = vehicleAge >= 0 && year <= currentYear;
-  const ageBandValid = vehicleAge >= 0 && vehicleAge <= 6;
   const validEngine = Number.isFinite(engineCc) && engineCc > 0;
 
   const result = useMemo(() => {
@@ -166,7 +165,7 @@ export default function VehicleImportPage() {
           <h2>Important rules and verification</h2>
           <p>The Georgian Revenue Service announced a changed excise model effective April 2, 2026. Its published summary states a rate of GEL 1.50 per cm³ for passenger vehicles aged up to and including six years, and GEL 4.50 per cm³ for older vehicles. Right-hand-drive or converted vehicles use three times the applicable rate. For left-hand-drive hybrids aged up to and including six years, the rate is reduced by 60%.</p>
           <p>Some vehicles may qualify for transitional treatment based on registration or transport documentation dated before April 2, 2026. The formula here does not decide whether those exceptions apply. It also does not calculate import duty, service fees, VAT treatment for unusual classifications, or special cases.</p>
-          <p><strong>Before bidding or shipping, verify the exact vehicle in the official <a href={revenueServiceUrl} target="_blank" rel="noreferrer">Revenue Service Auto/Moto Levy Calculator</a>.</strong> If the vehicle's classification or transitional status is unclear, contact the Revenue Service.</p>
+          <p><strong>Before bidding or shipping, verify the exact vehicle in the official <a href={revenueServiceUrl} target="_blank" rel="noreferrer">Revenue Service Auto/Moto Levy Calculator</a>.</strong> If the vehicle&apos;s classification or transitional status is unclear, contact the Revenue Service.</p>
           <p>Source: <a href="https://voice.rs.ge/Default.aspx?id=3874" target="_blank" rel="noreferrer">Revenue Service notice on the April 2, 2026 tax-code change</a>. This estimate is informational, not a binding customs assessment.</p>
         </div>
       </section>
