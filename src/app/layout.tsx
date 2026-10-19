@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://portavero.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
     default: "Portavero | Know the full cost before you import",
     template: "%s | Portavero"
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description:
     "Plan cross-border imports with a clearer view of product, shipping, insurance and other costs. Start with a transparent import estimate for Georgia.",
   applicationName: "Portavero",
+  icons: { icon: "/favicon.svg" },
   keywords: ["import cost calculator", "shipping estimator", "Georgia imports", "vehicle import"],
   openGraph: {
     title: "Portavero | Know the full cost before you import",
