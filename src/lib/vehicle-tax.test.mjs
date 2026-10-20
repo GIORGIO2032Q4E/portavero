@@ -55,10 +55,12 @@ test("right-hand-drive electric car uses the current fixed GEL 3,000 excise", ()
 });
 
 test("previous regime uses the historical age table for eligible transitional cases", () => {
-  const result = calculate({ manufactureYear: 2020, preAprilRegime: true });
-  assert.equal(result.rate, 1.5);
-  const older = calculate({ manufactureYear: 2020 - 6, preAprilRegime: true });
-  assert.equal(older.rate, 0.8);
+  const newCar = calculate({ manufactureYear: 2026, preAprilRegime: true });
+  assert.equal(newCar.rate, 1.5);
+  const sixYearsOld = calculate({ manufactureYear: 2020, preAprilRegime: true });
+  assert.equal(sixYearsOld.rate, 0.8);
+  const twelveYearsOld = calculate({ manufactureYear: 2014, preAprilRegime: true });
+  assert.equal(twelveYearsOld.rate, 1.5);
 });
 
 test("classic car rate applies only above 30 years", () => {
