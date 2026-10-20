@@ -1328,3 +1328,93 @@ p,
     flex: 1;
   }
 }
+
+
+/* Vehicle import: editorial, utility-first UI. Distinctive without decorative card clutter. */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 88% 14%, rgba(201,243,107,.22), transparent 31%),
+    linear-gradient(115deg, #f7f8f4 0%, #f0f3eb 100%);
+  border-bottom: 1px solid #dfe6df;
+}
+.page-hero::after {
+  content: "PORTAVERO / 01";
+  position: absolute;
+  right: max(24px, calc((100vw - 1160px) / 2));
+  bottom: 20px;
+  color: #9aa79b;
+  font: 700 .65rem/1 'DM Sans', sans-serif;
+  letter-spacing: .18em;
+}
+.page-hero h1 { max-width: 760px; letter-spacing: -.065em; }
+.page-hero p { max-width: 620px; line-height: 1.8; }
+.page-hero .hero-actions { gap: 14px; }
+.button { border-radius: 999px; }
+.tool-layout { grid-template-columns: minmax(0, 1.12fr) minmax(330px, .78fr); gap: clamp(20px, 3vw, 38px); }
+.vehicle-panel {
+  padding: clamp(24px, 3vw, 38px);
+  border: 0;
+  border-radius: 28px 8px 28px 8px;
+  box-shadow: 0 22px 60px rgba(23,43,41,.055);
+  position: relative;
+}
+.vehicle-section-heading { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.vehicle-section-heading h2 { margin: 9px 0 0; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+.step-chip {
+  flex: 0 0 43px; height: 43px; display: grid; place-items: center;
+  border-radius: 50% 50% 50% 12%;
+  background: var(--green); color: var(--dark);
+  font: 800 .8rem/1 'Manrope', sans-serif;
+}
+.vehicle-panel .panel-intro { max-width: 650px; line-height: 1.75; margin-bottom: 24px; }
+.vehicle-panel .form-grid { gap: 20px 16px; }
+.vehicle-panel .field { min-width: 0; }
+.vehicle-panel .field label { color: #273c35; font-size: .78rem; letter-spacing: .015em; }
+.vehicle-panel .field input, .vehicle-panel .field select {
+  min-height: 52px; padding: 0 15px; border: 1px solid #d9e2d9;
+  border-radius: 12px 12px 12px 4px; background: #fbfcf9;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.vehicle-panel .field input:hover, .vehicle-panel .field select:hover { border-color: #a7b8a8; background: white; }
+.vehicle-panel .field input:focus, .vehicle-panel .field select:focus {
+  border-color: #426e55; outline: none; box-shadow: 0 0 0 4px rgba(66,110,85,.12); background: white;
+}
+.vehicle-panel .field select:disabled { opacity: .5; cursor: not-allowed; background: #f1f3ef; }
+.vehicle-panel .notice { margin-top: 19px; border-left: 0; border-radius: 4px 14px 14px 4px; background: #f8f4eb; color: #64523b; }
+.vehicle-panel .notice strong { color: #3e4d3d; }
+.result-panel {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px 28px 8px 28px;
+  padding: clamp(24px, 3vw, 34px);
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(201,243,107,.13), transparent 38%),
+    #172b29;
+  box-shadow: 0 24px 58px rgba(23,43,41,.17);
+}
+.result-panel::before {
+  content: ""; display: block; width: 48px; height: 4px; border-radius: 4px;
+  background: var(--green); margin-bottom: 24px;
+}
+.result-total { font-size: clamp(2.6rem, 4.6vw, 3.8rem); letter-spacing: -.07em; }
+.result-lines { border-top-color: rgba(255,255,255,.12); }
+.result-line { padding: 15px 0; font-size: .82rem; }
+.result-line strong { font-variant-numeric: tabular-nums; }
+.disclaimer { border-radius: 4px 14px 14px 4px; line-height: 1.7; }
+.section-tint { background: #edf0e8; }
+.section-tint .panel { border: 0; border-radius: 8px 26px 8px 26px; box-shadow: 0 16px 40px rgba(23,43,41,.045); }
+.section-tint .field input { border-radius: 12px 12px 12px 4px; min-height: 52px; }
+.section-heading h2 { letter-spacing: -.06em; }
+.notice { line-height: 1.7; }
+@media (max-width: 900px) {
+  .tool-layout { grid-template-columns: 1fr; }
+  .result-panel { position: static; }
+}
+@media (max-width: 600px) {
+  .page-hero::after { display: none; }
+  .vehicle-panel { border-radius: 22px 6px 22px 6px; padding: 22px 18px; }
+  .vehicle-panel .form-grid { gap: 17px; }
+  .vehicle-section-heading h2 { font-size: 1.8rem; }
+  .result-panel { border-radius: 6px 22px 6px 22px; }
+}
