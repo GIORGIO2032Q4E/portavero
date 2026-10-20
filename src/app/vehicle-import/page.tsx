@@ -117,6 +117,43 @@ export default function VehicleImportPage() {
             <div className="notice"><strong>Electric vehicles:</strong> This estimator does not calculate the special excise rule for fully electric vehicles. Use the official Revenue Service calculator for electric vehicles and any vehicle with uncertain classification or transitional status.</div>
             <div className="form-grid">
               <div className="field">
+                <label htmlFor="source-country">Country of purchase</label>
+                <select id="source-country" value={sourceCountry} onChange={(event) => setSourceCountry(event.target.value)}>
+                  {importCountries.map((country) => <option key={country} value={country}>{country}</option>)}
+                </select>
+                <small>Where the vehicle is bought, not necessarily where it was built.</small>
+              </div>
+              <div className="field">
+                <label htmlFor="make">Make</label>
+                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); }}>
+                  <option value="">Choose a make</option>
+                  {vehicleCatalog.map((make) => <option key={make.name} value={make.name}>{make.name}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="model">Model</label>
+                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); }}>
+                  <option value="">Choose a model</option>
+                  {selectedMake?.models.map((model) => <option key={model.name} value={model.name}>{model.name}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="engine-variant">Engine / powertrain</label>
+                <select id="engine-variant" value={engineId} disabled={!selectedModel} onChange={(event) => {
+                  const id = event.target.value;
+                  setEngineId(id);
+                  const engine = selectedModel?.engines.find((item) => item.id === id);
+                  if (engine) {
+                    setEngineCc(engine.cc);
+                    setHybrid(engine.fuel === "Hybrid" || engine.fuel === "Plug-in hybrid");
+                  }
+                }}>
+                  <option value="">Choose an engine variant</option>
+                  {selectedModel?.engines.map((engine) => <option key={engine.id} value={engine.id}>{engine.label} · {engine.cc ? engine.cc.toLocaleString("en-US") + " cm³" : "EV"}</option>)}
+                </select>
+                <small>{selectedEngine ? `${selectedEngine.fuel} · ${selectedEngine.years}` : "Variants are a starting guide; confirm the exact engine code."}</small>
+              </div>
+              <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
                 <select id="manufacture-year" value={year} onChange={(event) => setYear(Number(event.target.value))}>
                   {Array.from({ length: currentYear - 1960 + 1 }, (_, index) => currentYear - index).map((value) => (
@@ -124,7 +161,7 @@ export default function VehicleImportPage() {
                   ))}
                 </select>
               </div>
-              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); }} hint="Auto-filled from a selected variant. You can edit it to match the vehicle documents." />
+              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
               <div className="field">
                 <label htmlFor="steering">Steering configuration</label>
                 <select id="steering" value={steering} onChange={(event) => setSteering(event.target.value)}>
