@@ -8,6 +8,8 @@ import {
   isAuthConfigured,
   listCloudEstimates,
   sendPasswordReset,
+  setRecoverySessionFromUrlHash,
+  updatePassword,
   signIn,
   signOut,
   signUp,
@@ -25,6 +27,9 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [resetMode, setResetMode] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [recoverySession, setRecoverySession] = useState<PortaveroSession | null>(null);
+  const [newPassword, setNewPassword] = useState("");
   const configured = isAuthConfigured();
 
   const refreshAccount = useCallback(async () => {
@@ -42,10 +47,18 @@ export default function AccountPage() {
   }, []);
 
   useEffect(() => {
-    void refreshAccount();
-    if (new URLSearchParams(window.location.search).get("reset") === "1") {
-      setMessage("If the email address matches an account, a password reset link will arrive shortly.");
+    async function initialise() {
+      const recovery = await setRecoverySessionFromUrlHash();
+      if (recovery) {
+        setRecoverySession(recovery);
+        setRecoveryMode(true);
+        setMessage("Choose a new password for your account.");
+      } else if (new URLSearchParams(window.location.search).get("reset") === "1") {
+        setMessage("If the email address matches an account, a password reset link will arrive shortly.");
+      }
+      await refreshAccount();
     }
+    void initialise();
   }, [refreshAccount]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -54,7 +67,15 @@ export default function AccountPage() {
     setError("");
     setMessage("");
     try {
-      if (resetMode) {
+      if (recoveryMode && recoverySession) {
+        await updatePassword(newPassword, recoverySession.access_token);
+        setRecoveryMode(false);
+        setRecoverySession(null);
+        setNewPassword("");
+        await signOut();
+        setSession(null);
+        setMessage("Password updated. Sign in with your new password.");
+      } else if (resetMode) {
         await sendPasswordReset(email.trim());
         setMessage("If the email address matches an account, a password reset link will arrive shortly.");
       } else if (mode === "signup") {
@@ -152,18 +173,19 @@ export default function AccountPage() {
             </section>
           ) : (
             <section className="panel account-panel">
-              <div className="account-heading"><div><span className="eyebrow">Secure access</span><h2>{resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to keep your saved import estimates available across devices." : "Sign in to access your Portavero workspace."}</p>
+              <div className="account-heading"><div><span className="eyebrow">Secure access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to keep your saved import estimates available across devices." : "Sign in to access your Portavero workspace."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
-                <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>
-                {!resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
+                {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
+                {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
                 {error && <p className="account-error" role="alert">{error}</p>}
                 {message && <p className="account-message" role="status">{message}</p>}
-                <button type="submit" className="button button-dark" disabled={busy}>{busy ? "Please wait…" : resetMode ? "Send reset link" : mode === "signup" ? "Create account" : "Sign in"}</button>
+                <button type="submit" className="button button-dark" disabled={busy}>{busy ? "Please wait…" : recoveryMode ? "Update password" : resetMode ? "Send reset link" : mode === "signup" ? "Create account" : "Sign in"}</button>
               </form>
               <div className="account-switches">
-                {!resetMode && <button type="button" className="text-button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setMessage(""); setError(""); }}>{mode === "signin" ? "New to Portavero? Create an account" : "Already have an account? Sign in"}</button>}
-                <button type="button" className="text-button" onClick={() => { setResetMode(!resetMode); setMessage(""); setError(""); }}>{resetMode ? "Back to sign in" : "Forgot your password?"}</button>
+                {!resetMode && !recoveryMode && <button type="button" className="text-button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setMessage(""); setError(""); }}>{mode === "signin" ? "New to Portavero? Create an account" : "Already have an account? Sign in"}</button>}
+                {!recoveryMode && <button type="button" className="text-button" onClick={() => { setResetMode(!resetMode); setMessage(""); setError(""); }}>{resetMode ? "Back to sign in" : "Forgot your password?"}</button>}
+                {recoveryMode && <button type="button" className="text-button" onClick={() => { setRecoveryMode(false); setRecoverySession(null); setResetMode(false); setMessage(""); }}>Back to sign in</button>}
               </div>
               <p className="account-privacy">By creating an account, you agree to the <Link href="/terms">Terms</Link> and acknowledge the <Link href="/privacy-policy">Privacy Policy.</Link></p>
             </section>
