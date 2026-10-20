@@ -92,6 +92,7 @@ export default function VehicleImportPage() {
           <section className="panel">
             <h2>Vehicle details</h2>
             <p className="panel-intro">This preliminary excise calculation is for passenger vehicles classified under HS 8703 and assumes the rate regime effective from April 2, 2026.</p>
+            <div className="notice"><strong>Electric vehicles:</strong> This estimator does not calculate the special excise rule for fully electric vehicles. Use the official Revenue Service calculator for electric vehicles and any vehicle with uncertain classification or transitional status.</div>
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
