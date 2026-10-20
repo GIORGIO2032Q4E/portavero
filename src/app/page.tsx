@@ -17,8 +17,8 @@ const tools = [
   },
   {
     number: "03",
-    title: "Shipping cost planner",
-    description: "Compare quotes you already have and spot the cost details that still need confirming.",
+    title: "Shipping quote checklist",
+    description: "Review the charges a freight quote should cover and identify details to confirm before booking.",
     href: "/shipping",
     link: "Explore shipping costs"
   }
