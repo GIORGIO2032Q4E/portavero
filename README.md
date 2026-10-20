@@ -24,6 +24,19 @@ The calculators organize amounts you enter yourself. They do not provide carrier
 
 Use the [official Revenue Service vehicle calculator](https://www.rs.ge/CarClearance-en) to check a specific vehicle.
 
+## Where the code lives
+
+- `src/app/`: website pages and page-specific UI.
+- `src/components/SiteHeader.tsx`: the shared site navigation.
+- `src/data/vehicle-catalog.ts`: the curated vehicle and engine list.
+- `src/lib/vehicle-tax.mjs`: the vehicle-tax estimate calculations.
+- `src/lib/vehicle-tax.test.mjs`: tests for the tax calculations.
+- `src/lib/auth.ts`: Supabase sign-in and saved-estimate requests.
+- `supabase/schema.sql`: saved-estimate table and row-level access rules.
+- `src/app/globals.css`: the site's styles.
+
+A useful starting point when learning the project is to follow one feature from its page in `src/app/` to any helper it imports in `src/lib/` or data it imports from `src/data/`.
+
 ## Run locally
 
 Requirements: Node.js 22 and npm.
@@ -45,15 +58,20 @@ Copy `.env.example` to `.env.local`.
 
 Apply `supabase/schema.sql` in the Supabase SQL Editor to create the saved-estimates table and its Row Level Security policies. Add the environment variables to Vercel and redeploy after changing them. Configure Supabase Authentication's site URL and allowed redirect URLs for local development and the deployed site.
 
-Only the publishable/anon key belongs in browser-accessible environment variables. Never put a Supabase secret or service-role key in `NEXT_PUBLIC_*` variables or commit it to the repository.
+Only the publishable/anon key belongs in browser-accessible environment variables. Never put a Supabase secret or service-role key in `NEXT_PUBLIC_*` variables or commit secrets to the repository.
 
 ## Checks
+
+Run these before proposing a change:
 
 ```bash
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
+
+The CI workflow runs these checks on pull requests and pushes to `main`, and also checks for high-severity dependency vulnerabilities.
 
 ## Stack
 
