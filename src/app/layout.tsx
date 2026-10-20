@@ -44,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-mark" aria-hidden="true">P</span>
                 <span>porta<span className="brand-light">vero</span></span>
               </Link>
-              <p>Know the full cost before you import.</p>
+              <p>A small tool for planning import costs.</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>
@@ -54,7 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </div>
           </div>
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} Portavero. Built for clearer decisions.</span>
+            <span>© {new Date().getFullYear()} Portavero. Independent project.</span>
             <span>Estimates are planning tools, not customs declarations or binding quotes.</span>
           </div>
         </footer>
