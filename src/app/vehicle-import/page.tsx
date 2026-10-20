@@ -114,7 +114,7 @@ export default function VehicleImportPage() {
                   ))}
                 </select>
               </div>
-              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => setEngineCc(Math.round(value))} hint="Use the engine capacity shown in the vehicle documents." />
+              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => setEngineCc(Math.round(value ?? 0))} hint="Use the engine capacity shown in the vehicle documents." />
               <div className="field">
                 <label htmlFor="steering">Steering configuration</label>
                 <select id="steering" value={steering} onChange={(event) => setSteering(event.target.value)}>
