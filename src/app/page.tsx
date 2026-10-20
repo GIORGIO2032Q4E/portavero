@@ -17,6 +17,13 @@ const tools = [
   },
   {
     number: "03",
+    title: "Vehicle catalogue",
+    description: "Browse supported makes, models and common engine variants before estimating import costs.",
+    href: "/vehicles",
+    link: "Browse vehicles"
+  },
+  {
+    number: "04",
     title: "Shipping checklist",
     description: "A short list of questions to ask before accepting a shipping quote.",
     href: "/shipping",
