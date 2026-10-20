@@ -5,7 +5,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `h
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteUrl.replace(/\/$/, "");
   const routes = [
-    "", "/calculator", "/vehicle-import", "/shipping",
+    "", "/calculator", "/vehicle-import", "/vehicles", "/shipping",
     "/how-it-works", "/about", "/privacy-policy", "/terms"
   ];
   return routes.map((route) => ({
