@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of use",
+  description: "Review the limits of Portavero's import estimates, user responsibilities, and the terms that need legal review."
+};
+
 export default function TermsPage() {
   return (
     <>
