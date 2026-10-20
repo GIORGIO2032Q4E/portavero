@@ -854,3 +854,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .feature-card { padding: 22px; }
   .result-panel { box-shadow: 4px 4px 0 #d9ddcb; }
 }
+
+
+@media (max-width: 380px) {
+  .header-inner { gap: 7px; padding-inline: 12px; }
+  .brand { gap: 7px; font-size: 1.05rem; }
+  .brand-mark { width: 28px; height: 28px; }
+  .menu-toggle { width: 36px; height: 36px; flex: 0 0 36px; }
+  .header-cta { padding-inline: 7px; font-size: .68rem; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-glyph span,
+  .tool-index-link span { transition: none !important; }
+}
