@@ -127,6 +127,19 @@ export default function AccountPage() {
     }
   }
 
+  function handleLoad(item: CloudEstimate) {
+    try {
+      const raw = window.localStorage.getItem("portavero-saved-estimates");
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      const localEstimates = Array.isArray(parsed) ? parsed.filter((entry) => entry && typeof entry === "object") as Record<string, unknown>[] : [];
+      const snapshot = { ...item.data, id: Date.now(), name: item.name, savedAt: item.updated_at };
+      window.localStorage.setItem("portavero-saved-estimates", JSON.stringify([snapshot, ...localEstimates].slice(0, 10)));
+      window.location.assign("/calculator");
+    } catch {
+      setError("Could not load this estimate into the current browser.");
+    }
+  }
+
   return (
     <>
       <section className="page-hero">
@@ -164,7 +177,10 @@ export default function AccountPage() {
                   {estimates.map((item) => (
                     <div className="account-estimate" key={item.id}>
                       <div><strong>{item.name}</strong><small>Updated {new Date(item.updated_at).toLocaleDateString()}</small></div>
-                      <button type="button" className="button button-outline button-small" onClick={() => void handleDelete(item.id)}>Delete</button>
+                      <div className="account-estimate-actions">
+                        <button type="button" className="button button-outline button-small" onClick={() => handleLoad(item)}>Load</button>
+                        <button type="button" className="button button-outline button-small" onClick={() => void handleDelete(item.id)}>Delete</button>
+                      </div>
                     </div>
                   ))}
                 </div>
