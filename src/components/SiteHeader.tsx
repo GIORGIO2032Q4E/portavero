@@ -24,7 +24,7 @@ export default function SiteHeader() {
       <div className="header-inner">
         <Link href="/" className="brand" aria-label="Portavero home" onClick={closeMenu}>
           <span className="brand-mark" aria-hidden="true">P</span>
-          <span>porta<span className="brand-light">vero</span></span>
+          <span>Portavero</span>
         </Link>
 
         <button
