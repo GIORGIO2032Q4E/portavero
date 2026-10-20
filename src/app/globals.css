@@ -1418,3 +1418,35 @@ p,
   .vehicle-section-heading h2 { font-size: 1.8rem; }
   .result-panel { border-radius: 6px 22px 6px 22px; }
 }
+
+
+/* Account and authentication screens */
+.account-layout { max-width: 760px; margin-inline: auto; }
+.account-panel { padding: clamp(22px, 4vw, 38px); }
+.account-panel h2 { margin: 8px 0 14px; overflow-wrap: anywhere; }
+.account-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
+.account-form { display: grid; gap: 20px; margin-top: 24px; }
+.account-form .button { width: 100%; }
+.account-form .field input { min-height: 50px; }
+.account-switches { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 20px; }
+.text-button { border: 0; padding: 0; color: var(--green-deep); background: transparent; font: inherit; font-size: .88rem; font-weight: 700; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.text-button:hover { color: var(--dark); }
+.account-privacy { margin: 24px 0 0; padding-top: 18px; border-top: 1px solid var(--line); font-size: .78rem; }
+.account-privacy a { color: var(--green-deep); text-decoration: underline; text-underline-offset: 3px; }
+.account-error, .account-message { margin: 0; padding: 12px 14px; border-radius: 8px; font-size: .88rem; }
+.account-error { color: #8b2f21; background: #fff0ed; border: 1px solid #f0c7bf; }
+.account-message { color: #24523c; background: #eef5e4; border: 1px solid #d8e5c8; }
+.account-estimate-list { margin: 14px 0 24px; border-top: 1px solid var(--line); }
+.account-estimate { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.account-estimate > div { min-width: 0; }
+.account-estimate strong, .account-estimate small { display: block; overflow-wrap: anywhere; }
+.account-estimate small { margin-top: 4px; color: var(--muted); font-size: .78rem; }
+.account-panel ol { padding-left: 22px; margin: 18px 0 24px; }
+.account-panel li { padding: 0 0 10px 4px; color: var(--muted); }
+.account-panel li a { color: var(--green-deep); text-decoration: underline; text-underline-offset: 3px; }
+.account-panel .notice { margin: 20px 0 24px; }
+@media (max-width: 600px) {
+  .account-heading { flex-direction: column; }
+  .account-estimate { align-items: flex-start; }
+  .account-estimate .button { flex-shrink: 0; }
+}
