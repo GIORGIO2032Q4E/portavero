@@ -112,7 +112,8 @@ export default function VehicleImportPage() {
           <p>Enter your car details and known costs to estimate excise and import duty for Georgia. Check the result with the official Revenue Service calculator.</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
-            <Link href="/how-it-works" className="button button-dark">How estimates work</Link>
+            <Link href="/vehicles" className="button button-dark">Browse vehicle catalogue</Link>
+            <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
           </div>
         </div>
       </section>
