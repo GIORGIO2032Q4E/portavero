@@ -12,6 +12,11 @@ const money = (value: number) =>
     maximumFractionDigits: 2
   }).format(value);
 
+const enteredGroup = (values: Array<number | null>) =>
+  values.every((value) => value === null)
+    ? "Not entered"
+    : money(values.reduce<number>((sum, value) => sum + (value ?? 0), 0));
+
 function CostField({
   id,
   label,
@@ -138,10 +143,10 @@ export default function VehicleImportPage() {
             <p>{eligibleYear && validEngine ? `${year} model year · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³` : "Enter valid vehicle details."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rate</span><strong>{money(result.rate)} / cm³</strong></div>
-              <div className="result-line"><span>Purchase and auction</span><strong>{money((purchase ?? 0) + (auction ?? 0))}</strong></div>
-              <div className="result-line"><span>Transport and insurance</span><strong>{money((inland ?? 0) + (shipping ?? 0) + (insurance ?? 0))}</strong></div>
+              <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
+              <div className="result-line"><span>Transport and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
               <div className="result-line"><span>Import duty entered by you</span><strong>{importDuty === null ? "Not entered" : money(importDuty)}</strong></div>
-              <div className="result-line"><span>Port and local delivery</span><strong>{money((port ?? 0) + (delivery ?? 0))}</strong></div>
+              <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
               <div className="result-line"><span>Other entered costs subtotal</span><strong>{money(result.knownCosts)}</strong></div>
               <div className="result-line result-line-total"><span>Known costs + estimated excise</span><strong>{money(result.total)}</strong></div>
             </div>
