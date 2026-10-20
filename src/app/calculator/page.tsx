@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
 type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
 
 type CostValues = Record<CostKey, number | null>;
+type SavedEstimate = { id: number; name: string; savedAt: string; currency: Currency; category: string; origin: string; destination: string; destinationPort: string; shippingMethod: string; quantity: number; costs: CostValues };
 
 const costFields: { key: CostKey; label: string; hint: string }[] = [
   { key: "purchase", label: "Purchase price", hint: "Price paid to the seller." },
@@ -86,6 +87,56 @@ export default function CalculatorPage() {
   const [shippingMethod, setShippingMethod] = useState("Ocean freight");
   const [quantity, setQuantity] = useState(1);
   const [costs, setCosts] = useState<CostValues>(emptyCosts);
+  const [estimateName, setEstimateName] = useState("");
+  const [savedEstimates, setSavedEstimates] = useState<SavedEstimate[]>([]);
+  const [saveMessage, setSaveMessage] = useState("");
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("portavero-saved-estimates");
+      if (stored) setSavedEstimates(JSON.parse(stored) as SavedEstimate[]);
+    } catch {
+      setSaveMessage("Saved estimates could not be read in this browser.");
+    }
+  }, []);
+
+  function persistEstimates(next: SavedEstimate[]) {
+    setSavedEstimates(next);
+    try {
+      localStorage.setItem("portavero-saved-estimates", JSON.stringify(next));
+      setSaveMessage("");
+    } catch {
+      setSaveMessage("Could not save in this browser. Check available storage.");
+    }
+  }
+
+  function saveEstimate() {
+    const name = estimateName.trim();
+    if (!name) {
+      setSaveMessage("Enter a name for this estimate first.");
+      return;
+    }
+    const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, destination, destinationPort, shippingMethod, quantity, costs: { ...costs } };
+    persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
+    setEstimateName("");
+    setSaveMessage("Estimate saved in this browser.");
+  }
+
+  function loadEstimate(saved: SavedEstimate) {
+    setCurrency(saved.currency);
+    setCategory(saved.category);
+    setOrigin(saved.origin);
+    setDestination(saved.destination);
+    setDestinationPort(saved.destinationPort);
+    setShippingMethod(saved.shippingMethod);
+    setQuantity(saved.quantity);
+    setCosts(saved.costs);
+    setSaveMessage(`Loaded “${saved.name}”.`);
+  }
+
+  function deleteEstimate(id: number) {
+    persistEstimates(savedEstimates.filter((saved) => saved.id !== id));
+  }
 
   const result = useMemo(() => {
     const enteredCosts = costFields.filter(({ key }) => costs[key] !== null);
@@ -199,7 +250,29 @@ export default function CalculatorPage() {
                 />
               ))}
             </div>
-            <button type="button" className="button button-outline" onClick={resetCalculator} style={{ marginTop: 24 }}>Reset calculator</button>
+            <div className="calculator-actions print-hide" style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
+              <button type="button" className="button button-outline" onClick={resetCalculator}>Reset calculator</button>
+              <button type="button" className="button button-dark" onClick={() => window.print()}>Print / Save as PDF</button>
+            </div>
+            <section className="saved-estimates print-hide" style={{ marginTop: 30, borderTop: "1px solid var(--border, #ddd)", paddingTop: 22 }}>
+              <h2>Save this estimate</h2>
+              <p className="panel-intro">Saved estimates stay in this browser on this device. They are not uploaded to an account or synced across devices.</p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <input aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} style={{ flex: "1 1 220px" }} />
+                <button type="button" className="button button-dark" onClick={saveEstimate}>Save estimate</button>
+              </div>
+              {saveMessage && <p role="status" style={{ marginTop: 10 }}>{saveMessage}</p>}
+              {savedEstimates.length > 0 && <div style={{ marginTop: 18 }}>
+                <h3>Saved in this browser ({savedEstimates.length}/10)</h3>
+                {savedEstimates.map((saved) => <div key={saved.id} className="result-line" style={{ gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                  <span><strong>{saved.name}</strong><br /><small>{new Date(saved.savedAt).toLocaleString()}</small></span>
+                  <span style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+                    <button type="button" className="button button-outline" onClick={() => loadEstimate(saved)}>Load</button>
+                    <button type="button" className="button button-outline" onClick={() => deleteEstimate(saved.id)} aria-label={`Delete ${saved.name}`}>Delete</button>
+                  </span>
+                </div>)}
+              </div>}
+            </section>
           </section>
 
           <aside className="panel result-panel" aria-live="polite">
