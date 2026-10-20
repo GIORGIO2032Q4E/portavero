@@ -143,15 +143,15 @@ export async function setRecoverySessionFromUrlHash() {
   if (typeof window === "undefined") return null;
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   if (params.get("type") !== "recovery") return null;
-  const result: Record<string, unknown> = {
-    access_token: params.get("access_token"),
-    refresh_token: params.get("refresh_token"),
+  const accessToken = params.get("access_token");
+  if (!accessToken) return null;
+  const session: PortaveroSession = {
+    access_token: accessToken,
+    refresh_token: params.get("refresh_token") ?? "",
+    expires_at: Math.floor(Date.now() / 1000) + Number(params.get("expires_in") ?? 3600),
     token_type: params.get("token_type") ?? "bearer",
-    expires_in: Number(params.get("expires_in") ?? 3600),
     user: { id: params.get("user_id") ?? "recovery" }
   };
-  const session = normaliseSession(result);
-  if (!session) return null;
   storeSession(null);
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
   return session;
