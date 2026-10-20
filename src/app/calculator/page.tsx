@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { saveCloudEstimate } from "@/lib/auth";
 
 type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
 type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
@@ -110,7 +111,7 @@ export default function CalculatorPage() {
     }
   }
 
-  function saveEstimate() {
+  async function saveEstimate() {
     const name = estimateName.trim();
     if (!name) {
       setSaveMessage("Enter a name for this estimate first.");
@@ -120,6 +121,12 @@ export default function CalculatorPage() {
     persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
     setEstimateName("");
     setSaveMessage("Estimate saved in this browser.");
+    try {
+      const savedToAccount = await saveCloudEstimate(name, snapshot as unknown as Record<string, unknown>);
+      if (savedToAccount) setSaveMessage("Estimate saved to your account and this browser.");
+    } catch {
+      setSaveMessage("Saved in this browser, but account sync failed. Check your connection and try again.");
+    }
   }
 
   function loadEstimate(saved: SavedEstimate) {
