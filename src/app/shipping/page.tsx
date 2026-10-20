@@ -13,8 +13,8 @@ export default function ShippingPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Shipping guide</span>
-          <h1>Understand the full cost of shipping.</h1>
-          <p>Shipping costs change with route, dimensions, weight, service level, season and carrier. Portavero currently provides a checklist for reviewing the quote you receive rather than a live rate feed or quote comparison tool.</p>
+          <h1>Questions to ask before shipping.</h1>
+          <p>Shipping prices depend on the route, size and weight of the cargo, timing and provider. This page is a checklist, not a live price comparison.</p>
         </div>
       </section>
       <section className="section">
