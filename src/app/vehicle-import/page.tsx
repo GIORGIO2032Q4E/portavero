@@ -261,7 +261,7 @@ export default function VehicleImportPage() {
               <CostField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} />
               <CostField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} />
               <CostField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
-              <CostField id="delivery" label="Local delivery / registration (GEL)" value={delivery} onChange={setDelivery} />
+              <CostField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
             </div>
           </div>
         </div>
