@@ -20,7 +20,7 @@ export default function SiteHeader() {
   }
 
   return (
-    <header className="site-header">
+    <header className="site-header" onKeyDown={(event) => { if (event.key === "Escape") closeMenu(); }}>
       <div className="header-inner">
         <Link href="/" className="brand" aria-label="Portavero home" onClick={closeMenu}>
           <span className="brand-mark" aria-hidden="true">P</span>
