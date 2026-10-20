@@ -39,7 +39,7 @@ A useful starting point when learning the project is to follow one feature from 
 
 ## Run locally
 
-Requirements: Node.js 22 and npm.
+Requirements: Node.js 24 and npm.
 
 ```bash
 npm ci
