@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy policy",
+  description: "Read how the current Portavero prototype handles calculator inputs, hosting data, external fonts, and privacy limitations."
+};
+
 export default function PrivacyPolicyPage() {
   return (
     <>
