@@ -111,8 +111,8 @@ export default function VehicleImportPage() {
 
       <section className="section">
         <div className="container tool-layout">
-          <section className="panel">
-            <h2>Vehicle details</h2>
+          <section className="panel vehicle-panel">
+            <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
             <p className="panel-intro">This estimate uses a limited set of rules for passenger vehicles classified under HS 8703. Check the official calculator if you are unsure about your vehicle.</p>
             <div className="notice"><strong>Electric vehicles:</strong> This estimator does not calculate the special excise rule for fully electric vehicles. Use the official Revenue Service calculator for electric vehicles and any vehicle with uncertain classification or transitional status.</div>
             <div className="form-grid">
