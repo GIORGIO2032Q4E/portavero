@@ -155,7 +155,7 @@ export default function VehicleImportPage() {
           <div className="section-heading">
             <span className="eyebrow">Your known costs</span>
             <h2>Add the rest of the journey.</h2>
-            <p>Enter each amount in GEL. Convert foreign-currency quotes using an exchange rate you have verified, then enter the GEL equivalent. Unconfirmed charges can stay at zero until you know them.</p>
+            <p>Enter confirmed amounts in GEL. Convert foreign-currency quotes using an exchange rate you have verified. Leave unknown charges blank so the planner does not mistake them for free.</p>
           </div>
           <div className="panel">
             <div className="form-grid">
