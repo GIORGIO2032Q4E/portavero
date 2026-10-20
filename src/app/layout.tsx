@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
@@ -30,33 +31,11 @@ export const viewport: Viewport = {
   themeColor: "#f7f7f3"
 };
 
-const navigation = [
-  { href: "/calculator", label: "Import calculator" },
-  { href: "/vehicle-import", label: "Vehicle import" },
-  { href: "/shipping", label: "Shipping" },
-  { href: "/how-it-works", label: "How it works" }
-];
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body>
-        <header className="site-header">
-          <div className="header-inner">
-            <Link href="/" className="brand" aria-label="Portavero home">
-              <span className="brand-mark" aria-hidden="true">P</span>
-              <span>porta<span className="brand-light">vero</span></span>
-            </Link>
-            <nav className="main-nav" aria-label="Main navigation">
-              {navigation.map((item) => (
-                <Link href={item.href} key={item.href}>{item.label}</Link>
-              ))}
-            </nav>
-            <Link href="/calculator" className="button button-small button-dark header-cta">
-              Calculate cost <span aria-hidden="true">↗</span>
-            </Link>
-          </div>
-        </header>
+        <SiteHeader />
         <main>{children}</main>
         <footer className="site-footer">
           <div className="footer-top">
