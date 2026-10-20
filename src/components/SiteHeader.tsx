@@ -35,7 +35,7 @@ export default function SiteHeader() {
           aria-controls="primary-navigation"
           onClick={() => setMenuOpen((open) => !open)}
         >
-          <span aria-hidden="true">{menuOpen ? "×" : "☰"}</span>
+          <span className={`menu-glyph${menuOpen ? " is-open" : ""}`} aria-hidden="true"><span /><span /></span>
         </button>
 
         <nav
