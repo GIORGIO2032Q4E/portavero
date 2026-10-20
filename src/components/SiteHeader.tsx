@@ -5,12 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const navigation = [
-  { href: "/calculator", label: "Import calculator" },
+  { href: "/calculator", label: "Calculator" },
   { href: "/vehicle-import", label: "Vehicle import" },
-  { href: "/vehicles", label: "Vehicle catalogue" },
-  { href: "/shipping", label: "Shipping" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/account", label: "Account" }
+  { href: "/vehicles", label: "Vehicles" },
+  { href: "/shipping", label: "Shipping guide" }
 ];
 
 export default function SiteHeader() {
