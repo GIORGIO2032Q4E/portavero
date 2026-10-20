@@ -21,8 +21,8 @@ function CostField({
 }: {
   id: string;
   label: string;
-  value: number;
-  onChange: (value: number) => void;
+  value: number | null;
+  onChange: (value: number | null) => void;
   hint?: string;
 }) {
   return (
@@ -33,10 +33,15 @@ function CostField({
         type="number"
         min="0"
         step="0.01"
-        value={value}
+        value={value ?? ""}
         onChange={(event) => {
-          const parsed = Number(event.target.value);
-          onChange(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
+          const raw = event.target.value;
+          if (raw === "") {
+            onChange(null);
+            return;
+          }
+          const parsed = Number(raw);
+          onChange(Number.isFinite(parsed) && parsed >= 0 ? parsed : null);
         }}
       />
       {hint && <small>{hint}</small>}
@@ -49,14 +54,14 @@ export default function VehicleImportPage() {
   const [engineCc, setEngineCc] = useState(2000);
   const [steering, setSteering] = useState("left");
   const [hybrid, setHybrid] = useState(false);
-  const [purchase, setPurchase] = useState(0);
-  const [auction, setAuction] = useState(0);
-  const [inland, setInland] = useState(0);
-  const [shipping, setShipping] = useState(0);
-  const [insurance, setInsurance] = useState(0);
-  const [importDuty, setImportDuty] = useState(0);
-  const [port, setPort] = useState(0);
-  const [delivery, setDelivery] = useState(0);
+  const [purchase, setPurchase] = useState<number | null>(null);
+  const [auction, setAuction] = useState<number | null>(null);
+  const [inland, setInland] = useState<number | null>(null);
+  const [shipping, setShipping] = useState<number | null>(null);
+  const [insurance, setInsurance] = useState<number | null>(null);
+  const [importDuty, setImportDuty] = useState<number | null>(null);
+  const [port, setPort] = useState<number | null>(null);
+  const [delivery, setDelivery] = useState<number | null>(null);
 
   const currentYear = new Date().getFullYear();
   const vehicleAge = currentYear - year;
@@ -69,8 +74,10 @@ export default function VehicleImportPage() {
     if (steering === "right") rate *= 3;
     else if (hybrid && vehicleAge >= 0 && vehicleAge <= 6) rate *= 0.4;
     const excise = eligibleYear && validEngine ? engineCc * rate : 0;
-    const nonTaxCosts = purchase + auction + inland + shipping + insurance + importDuty + port + delivery;
-    return { excise, nonTaxCosts, total: excise + nonTaxCosts, rate };
+    const enteredCosts = [purchase, auction, inland, shipping, insurance, importDuty, port, delivery];
+    const knownCosts = enteredCosts.reduce<number>((sum, value) => sum + (value ?? 0), 0);
+    const unknownCosts = enteredCosts.filter((value) => value === null).length;
+    return { excise, knownCosts, unknownCosts, total: excise + knownCosts, rate };
   }, [vehicleAge, steering, hybrid, engineCc, eligibleYear, validEngine, purchase, auction, inland, shipping, insurance, importDuty, port, delivery]);
 
   return (
@@ -131,13 +138,14 @@ export default function VehicleImportPage() {
             <p>{eligibleYear && validEngine ? `${year} model year · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³` : "Enter valid vehicle details."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rate</span><strong>{money(result.rate)} / cm³</strong></div>
-              <div className="result-line"><span>Purchase and auction</span><strong>{money(purchase + auction)}</strong></div>
-              <div className="result-line"><span>Transport and insurance</span><strong>{money(inland + shipping + insurance)}</strong></div>
-              <div className="result-line"><span>Import duty entered by you</span><strong>{money(importDuty)}</strong></div>
-              <div className="result-line"><span>Port and local delivery</span><strong>{money(port + delivery)}</strong></div>
-              <div className="result-line result-line-total"><span>Budget including entered costs</span><strong>{money(result.total)}</strong></div>
+              <div className="result-line"><span>Purchase and auction</span><strong>{money((purchase ?? 0) + (auction ?? 0))}</strong></div>
+              <div className="result-line"><span>Transport and insurance</span><strong>{money((inland ?? 0) + (shipping ?? 0) + (insurance ?? 0))}</strong></div>
+              <div className="result-line"><span>Import duty entered by you</span><strong>{importDuty === null ? "Not entered" : money(importDuty)}</strong></div>
+              <div className="result-line"><span>Port and local delivery</span><strong>{money((port ?? 0) + (delivery ?? 0))}</strong></div>
+              <div className="result-line"><span>Other entered costs subtotal</span><strong>{money(result.knownCosts)}</strong></div>
+              <div className="result-line result-line-total"><span>Known costs + estimated excise</span><strong>{money(result.total)}</strong></div>
             </div>
-            <div className="disclaimer">A zero means no amount was included, not that the charge is waived or free. Import duty and service charges are not calculated here.</div>
+            <div className="disclaimer"><strong>{result.unknownCosts} of 8 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount. Confirm applicable taxes and fees with official sources."} Import duty and service charges are not calculated here. The excise figure is preliminary.</div>
           </aside>
         </div>
       </section>
