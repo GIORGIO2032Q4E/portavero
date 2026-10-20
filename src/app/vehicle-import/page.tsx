@@ -109,7 +109,8 @@ export default function VehicleImportPage() {
       unknownCosts,
       officialFees: standardStateFees,
       total: taxes.excise + taxes.importDuty + standardStateFees + knownCosts,
-      rate: taxes.rate
+      rate: taxes.rate,
+      registrationRestricted: taxes.registrationRestricted
     };
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
 
@@ -221,7 +222,7 @@ export default function VehicleImportPage() {
               </div>
             </div>
             {preAprilRegime && <div className="notice" role="status"><strong>Transitional-rate warning:</strong> selecting the previous rules does not establish eligibility. The Revenue Service requires qualifying registration, transport, or shipping documents and applies different deadlines to different transport methods. Confirm eligibility before relying on this result.</div>}
-            {declarationYear >= 2026 && vehicleAge > 6 && !isElectric && <div className="notice" role="alert"><strong>Registration eligibility warning:</strong> from 1 April 2026, initial and temporary registration in Georgia is generally restricted for M1 passenger vehicles older than 6 years. Exceptions may apply to electric vehicles, re-export/transit cases, vehicles already registered or imported before the cutoff, and qualifying transport that began before the cutoff. This calculator estimates taxes only and cannot confirm registration eligibility. Check the official rules before buying or shipping.</div>}
+            {result.registrationRestricted && <div className="notice" role="alert"><strong>Registration eligibility warning:</strong> from 1 April 2026, initial and temporary registration in Georgia is generally restricted for M1 passenger vehicles older than 6 years. Exceptions may apply to electric vehicles, re-export/transit cases, vehicles already registered or imported before the cutoff, and qualifying transport that began before the cutoff. This calculator estimates taxes only and cannot confirm registration eligibility. Check the official rules before buying or shipping.</div>}
             {(!eligibleYear || !validEngine || !validVehicleType || isElectric) && <div className="notice" role="status">{isElectric ? "Electric-vehicle excise and import-duty rules are included for passenger cars. Verify classification and special cases with the official calculator." : !validVehicleType ? "The classic-car rate is available only when the vehicle is more than 30 years old and qualifies under the legal classification." : "Check the manufacture year and engine capacity before using this estimate."}</div>}
             <div className="notice">
               <strong>Rule used:</strong> {preAprilRegime ? "Previous age-based excise table (transitional cases only)" : "Current rates from 2 April 2026"}. {isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rule: age-based rate × 2,000 for right-hand-drive/converted EVs" : "GEL 3,000 fixed excise for right-hand-drive/converted EVs") : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label} · purchase/shipping country: ${sourceCountry}.` : "Choose a vehicle variant if available, or enter the engine capacity manually."} The catalogue lists common variants only, not every year/market configuration. Transitional cases and vehicle classification need official verification.
