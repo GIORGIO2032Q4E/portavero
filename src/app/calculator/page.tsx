@@ -11,7 +11,10 @@ function NumberField({ id, label, value, onChange, hint, min = 0, step = "0.01" 
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      <input id={id} type="number" min={min} step={step} value={value} onChange={(event) => onChange(Math.max(0, Number(event.target.value) || 0))} />
+      <input id={id} type="number" min={min} step={step} value={value} onChange={(event) => {
+          const parsed = Number(event.target.value);
+          onChange(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
+        }} />
       {hint && <small>{hint}</small>}
     </div>
   );
