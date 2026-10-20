@@ -90,8 +90,8 @@ export default function VehicleImportPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
-          <h1>Price the journey, not just the car.</h1>
-          <p>Build a Georgia-bound vehicle budget using your known costs and a preliminary excise estimate based on the Revenue Service&apos;s published rates effective from April 2, 2026.</p>
+          <h1>Estimate the cost of importing a car.</h1>
+          <p>Enter your car details and known costs to get a preliminary excise estimate for Georgia. Check the result with the official Revenue Service calculator.</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/how-it-works" className="button button-dark">How estimates work</Link>
@@ -103,7 +103,7 @@ export default function VehicleImportPage() {
         <div className="container tool-layout">
           <section className="panel">
             <h2>Vehicle details</h2>
-            <p className="panel-intro">This preliminary excise calculation is for passenger vehicles classified under HS 8703 and assumes the rate regime effective from April 2, 2026.</p>
+            <p className="panel-intro">This estimate uses a limited set of rules for passenger vehicles classified under HS 8703. Check the official calculator if you are unsure about your vehicle.</p>
             <div className="notice"><strong>Electric vehicles:</strong> This estimator does not calculate the special excise rule for fully electric vehicles. Use the official Revenue Service calculator for electric vehicles and any vehicle with uncertain classification or transitional status.</div>
             <div className="form-grid">
               <div className="field">
