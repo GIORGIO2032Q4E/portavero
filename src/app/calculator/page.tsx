@@ -8,7 +8,7 @@ type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
 type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
 
 type CostValues = Record<CostKey, number | null>;
-type SavedEstimate = { id: number; name: string; savedAt: string; currency: Currency; category: string; origin: string; destination: string; destinationPort: string; shippingMethod: string; quantity: number; costs: CostValues; dutyRate?: number | null; vatRate?: number | null };
+type SavedEstimate = { id: number; name: string; savedAt: string; currency: Currency; category: string; origin: string; countryOfOrigin?: string; hsCode?: string; importDate?: string; destination: string; destinationPort: string; shippingMethod: string; quantity: number; costs: CostValues; dutyRate?: number | null; vatRate?: number | null };
 
 const costFields: { key: CostKey; label: string; hint: string }[] = [
   { key: "purchase", label: "Purchase price", hint: "Price paid to the seller." },
@@ -84,6 +84,9 @@ export default function CalculatorPage() {
   const [currency, setCurrency] = useState<Currency>("USD");
   const [category, setCategory] = useState("Vehicle");
   const [origin, setOrigin] = useState("United States");
+  const [countryOfOrigin, setCountryOfOrigin] = useState("United States");
+  const [hsCode, setHsCode] = useState("");
+  const [importDate, setImportDate] = useState("");
   const [destination, setDestination] = useState("Georgia");
   const [destinationPort, setDestinationPort] = useState("Poti");
   const [shippingMethod, setShippingMethod] = useState("Ocean freight");
@@ -120,7 +123,7 @@ export default function CalculatorPage() {
       setSaveMessage("Enter a name for this estimate first.");
       return;
     }
-    const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
+    const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, countryOfOrigin, hsCode, importDate, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
     persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
     setEstimateName("");
     setSaveMessage("Estimate saved in this browser.");
@@ -136,6 +139,9 @@ export default function CalculatorPage() {
     setCurrency(saved.currency);
     setCategory(saved.category);
     setOrigin(saved.origin);
+    setCountryOfOrigin(saved.countryOfOrigin ?? saved.origin);
+    setHsCode(saved.hsCode ?? "");
+    setImportDate(saved.importDate ?? "");
     setDestination(saved.destination);
     setDestinationPort(saved.destinationPort);
     setShippingMethod(saved.shippingMethod);
@@ -183,6 +189,9 @@ export default function CalculatorPage() {
     setCurrency("USD");
     setCategory("Vehicle");
     setOrigin("United States");
+    setCountryOfOrigin("United States");
+    setHsCode("");
+    setImportDate("");
     setDestination("Georgia");
     setDestinationPort("Poti");
     setShippingMethod("Ocean freight");
@@ -240,6 +249,21 @@ export default function CalculatorPage() {
                 <input id="origin" value={origin} onChange={(event) => setOrigin(event.target.value)} maxLength={100} />
               </div>
               <div className="field">
+                <label htmlFor="country-of-origin">Country of origin (where goods were made)</label>
+                <input id="country-of-origin" value={countryOfOrigin} onChange={(event) => setCountryOfOrigin(event.target.value)} maxLength={100} />
+                <small>Origin can differ from the country you buy or ship the goods from and may affect preferential duty.</small>
+              </div>
+              <div className="field">
+                <label htmlFor="hs-code">HS / tariff code</label>
+                <input id="hs-code" value={hsCode} onChange={(event) => setHsCode(event.target.value)} maxLength={20} placeholder="e.g. 8703.23" />
+                <small>Use the destination customs authority’s exact code before selecting a rate.</small>
+              </div>
+              <div className="field">
+                <label htmlFor="import-date">Expected import / declaration date</label>
+                <input id="import-date" type="date" value={importDate} onChange={(event) => setImportDate(event.target.value)} />
+                <small>Rates and exemptions can change over time. This date is recorded for your reference; it does not fetch historical rates.</small>
+              </div>
+              <div className="field">
                 <label htmlFor="destination">Destination country</label>
                 <input id="destination" value={destination} onChange={(event) => setDestination(event.target.value)} maxLength={100} />
               </div>
@@ -281,7 +305,7 @@ export default function CalculatorPage() {
                 <a href="https://hts.usitc.gov/" target="_blank" rel="noreferrer">United States Harmonized Tariff Schedule ↗</a>
               ) : (
                 <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>
-              )}. Enter only rates confirmed for the destination, HS code, country of origin and import date. This tool does not fetch tariff rates automatically. EU TARIC does not include national VAT rates, and special taxes or exemptions may require separate checks.
+              )}. Check rates for destination: {destination.trim() || "not specified"}; tariff code: {hsCode.trim() || "not entered"}; origin: {countryOfOrigin.trim() || "not specified"}; import date: {importDate || "not entered"}. This tool does not fetch tariff rates automatically. EU TARIC does not include national VAT rates, and special taxes or exemptions may require separate checks.
             </div>
             <h2 style={{ marginTop: 34 }}>Known costs</h2>
             <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
@@ -348,7 +372,7 @@ export default function CalculatorPage() {
                 : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
             </div>
             <p style={{ marginTop: 18, fontSize: ".78rem" }}>
-              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. No live freight rates, currency conversion or automatic tariff lookup is connected. This calculator applies the rates you enter and does not replace the destination country’s official customs calculation.
+              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. Goods origin: {countryOfOrigin.trim() || "not specified"} · HS code: {hsCode.trim() || "not entered"} · import date: {importDate || "not entered"}. No live freight rates, currency conversion or automatic tariff lookup is connected. This calculator applies the rates you enter and does not replace the destination country’s official customs calculation.
             </p>
           </aside>
         </div>
