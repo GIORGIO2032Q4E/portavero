@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 
@@ -56,6 +57,10 @@ function CostField({
 
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
+  const [makeName, setMakeName] = useState("");
+  const [modelName, setModelName] = useState("");
+  const [engineId, setEngineId] = useState("");
+  const [sourceCountry, setSourceCountry] = useState("United States");
   const [engineCc, setEngineCc] = useState(2000);
   const [steering, setSteering] = useState("left");
   const [hybrid, setHybrid] = useState(false);
@@ -67,6 +72,11 @@ export default function VehicleImportPage() {
   const [importDuty, setImportDuty] = useState<number | null>(null);
   const [port, setPort] = useState<number | null>(null);
   const [delivery, setDelivery] = useState<number | null>(null);
+
+  const selectedMake = vehicleCatalog.find((make) => make.name === makeName);
+  const selectedModel = selectedMake?.models.find((model) => model.name === modelName);
+  const selectedEngine = selectedModel?.engines.find((engine) => engine.id === engineId);
+  const isElectric = selectedEngine?.fuel === "Electric";
 
   const currentYear = new Date().getFullYear();
   const vehicleAge = currentYear - year;
@@ -114,7 +124,7 @@ export default function VehicleImportPage() {
                   ))}
                 </select>
               </div>
-              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => setEngineCc(Math.round(value ?? 0))} hint="Use the engine capacity shown in the vehicle documents." />
+              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); }} hint="Auto-filled from a selected variant. You can edit it to match the vehicle documents." />
               <div className="field">
                 <label htmlFor="steering">Steering configuration</label>
                 <select id="steering" value={steering} onChange={(event) => setSteering(event.target.value)}>
@@ -131,16 +141,16 @@ export default function VehicleImportPage() {
                 <small>The published 60% reduction applies to left-hand-drive hybrids aged 0–6 years inclusive.</small>
               </div>
             </div>
-            {(!eligibleYear || !validEngine) && <div className="notice" role="alert">Check the manufacture year and engine capacity before using this estimate.</div>}
+            {(!eligibleYear || !validEngine || isElectric) && <div className="notice" role="alert">{isElectric ? "This selected vehicle is electric. This estimator does not calculate electric-vehicle tax treatment. Use the official Revenue Service calculator." : "Check the manufacture year and engine capacity before using this estimate."}</div>}
             <div className="notice">
-              <strong>Rate used:</strong> {money(result.rate)} per cm³. The estimate does not determine import eligibility or handle every vehicle classification and transitional exception.
+              <strong>Rate used:</strong> {money(result.rate)} per cm³. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label} · purchase/shipping country: ${sourceCountry}.` : "Choose a vehicle variant if available, or enter the engine capacity manually."} The catalogue lists common variants only, not every year/market configuration. Verify your exact vehicle documents and use the official calculator for a final check.
             </div>
           </section>
 
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
-            <div className="result-total">{eligibleYear && validEngine ? money(result.excise) : "Check details"}</div>
-            <p>{eligibleYear && validEngine ? `${year} model year · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³` : "Enter valid vehicle details."}</p>
+            <div className="result-total">{eligibleYear && validEngine && !isElectric ? money(result.excise) : "Check details"}</div>
+            <p>{eligibleYear && validEngine && !isElectric ? `${year} model year · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³` : "Enter valid details and verify special cases."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rate</span><strong>{money(result.rate)} / cm³</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
