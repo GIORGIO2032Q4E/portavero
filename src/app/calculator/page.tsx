@@ -125,15 +125,15 @@ export default function CalculatorPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Import cost calculator</span>
-          <h1>Build an import budget from real numbers.</h1>
-          <p>Add the charges you know, leave unknown costs blank, and see a transparent subtotal. Portavero does not invent freight quotes or silently count missing charges as free.</p>
+          <h1>Estimate your import costs.</h1>
+          <p>Enter the amounts you know to get a subtotal. Leave anything unknown blank and add it later when you have a quote.</p>
         </div>
       </section>
       <section className="section">
         <div className="container tool-layout">
           <section className="panel">
             <h2>Shipment details</h2>
-            <p className="panel-intro">For a meaningful estimate, use the same currency for every amount. This tool does not convert currencies or fetch live rates.</p>
+            <p className="panel-intro">Use the same currency for every amount. Currency conversion and live shipping prices are not connected.</p>
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="category">What are you importing?</label>
