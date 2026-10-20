@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Portavero",
+  description: "Learn about Portavero, an independent import-planning project focused on transparent costs and honest estimates."
+};
+
 export default function AboutPage() {
   return (
     <>
