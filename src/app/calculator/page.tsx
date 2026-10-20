@@ -280,7 +280,7 @@ export default function CalculatorPage() {
               ) : /^(us|usa|united states|united states of america)$/i.test(destination.trim()) ? (
                 <a href="https://hts.usitc.gov/" target="_blank" rel="noreferrer">United States Harmonized Tariff Schedule ↗</a>
               ) : (
-                <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff.aspx" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>
+                <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>
               )}. Enter only rates confirmed for the destination, HS code, country of origin and import date. This tool does not fetch tariff rates automatically. EU TARIC does not include national VAT rates, and special taxes or exemptions may require separate checks.
             </div>
             <h2 style={{ marginTop: 34 }}>Known costs</h2>
