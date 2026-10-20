@@ -5,9 +5,9 @@ export default function ShippingPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">Shipping planner</span>
-          <h1>Compare real quotes, side by side.</h1>
-          <p>Shipping costs change with route, dimensions, weight, service level, season and carrier. Portavero currently helps you organize the quote you receive rather than inventing a live market rate.</p>
+          <span className="eyebrow">Shipping guide</span>
+          <h1>Understand the full cost of shipping.</h1>
+          <p>Shipping costs change with route, dimensions, weight, service level, season and carrier. Portavero currently provides a checklist for reviewing the quote you receive rather than a live rate feed or quote comparison tool.</p>
         </div>
       </section>
       <section className="section">
