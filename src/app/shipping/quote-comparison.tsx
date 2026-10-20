@@ -9,7 +9,7 @@ const blankQuote = (): Quote => ({ provider: "", price: "", currency: "USD", day
 export default function QuoteComparison() {
   const [quotes, setQuotes] = useState<Quote[]>([blankQuote(), blankQuote(), blankQuote()]);
   const validQuotes = useMemo(() => quotes
-    .map((quote, index) => ({ ...quote, index, amount: Number(quote.price), transitDays: Number(quote.days) }))
+    .map((quote, index) => ({ ...quote, index, amount: Number(quote.price) }))
     .filter((quote) => quote.provider.trim() && quote.price.trim() && Number.isFinite(quote.amount) && quote.amount >= 0), [quotes]);
 
   function updateQuote(index: number, changes: Partial<Quote>) {
