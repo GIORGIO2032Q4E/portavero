@@ -1587,7 +1587,7 @@ h3 { font-size: 1.15rem; }
 .simple-example { background: #fff; }
 .simple-how-section { background: #eff1eb; }
 .site-footer { background: #fff; }
-.route-card, .float-note, .hero-art { display: none; }
+.route-card, .float-note { display: none; }
 
 @media (max-width: 760px) {
   .container { width: min(100% - 32px, 1120px); }
