@@ -165,7 +165,7 @@ export default function VehicleImportPage() {
               <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
                 <select id="manufacture-year" value={year} onChange={(event) => setYear(Number(event.target.value))}>
-                  {Array.from({ length: currentYear - 1960 + 1 }, (_, index) => currentYear - index).map((value) => currentYear - value).map((value) => (
+                  {Array.from({ length: currentYear - 1960 + 1 }, (_, index) => currentYear - index).map((value) => (
                     <option key={value} value={value}>{value}</option>
                   ))}
                 </select>
