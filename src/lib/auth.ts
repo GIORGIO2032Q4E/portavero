@@ -152,7 +152,7 @@ export async function setRecoverySessionFromUrlHash() {
   };
   const session = normaliseSession(result);
   if (!session) return null;
-  storeSession(session);
+  storeSession(null);
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
   return session;
 }
