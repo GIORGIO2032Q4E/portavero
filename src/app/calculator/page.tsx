@@ -8,7 +8,7 @@ type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
 type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
 
 type CostValues = Record<CostKey, number | null>;
-type SavedEstimate = { id: number; name: string; savedAt: string; currency: Currency; category: string; origin: string; destination: string; destinationPort: string; shippingMethod: string; quantity: number; costs: CostValues };
+type SavedEstimate = { id: number; name: string; savedAt: string; currency: Currency; category: string; origin: string; destination: string; destinationPort: string; shippingMethod: string; quantity: number; costs: CostValues; dutyRate?: number | null; vatRate?: number | null };
 
 const costFields: { key: CostKey; label: string; hint: string }[] = [
   { key: "purchase", label: "Purchase price", hint: "Price paid to the seller." },
@@ -16,7 +16,7 @@ const costFields: { key: CostKey; label: string; hint: string }[] = [
   { key: "inland", label: "Origin inland transport", hint: "Transport to the export port or warehouse." },
   { key: "freight", label: "International freight", hint: "Use a carrier quote where possible." },
   { key: "insurance", label: "Cargo insurance", hint: "Leave blank until confirmed if you do not know it." },
-  { key: "customs", label: "Customs duties and taxes", hint: "Enter a verified estimate from an official source or professional." },
+  { key: "customs", label: "Excise and other taxes (excluding duty/VAT)", hint: "Enter verified excise or other taxes here. Do not include the import duty or VAT calculated below." },
   { key: "port", label: "Port and clearance charges", hint: "Destination handling, broker and documentation fees." },
   { key: "delivery", label: "Final delivery", hint: "Transport from the port to the final destination." },
   { key: "other", label: "Storage and other costs", hint: "Any additional known expense." }
@@ -88,6 +88,8 @@ export default function CalculatorPage() {
   const [destinationPort, setDestinationPort] = useState("Poti");
   const [shippingMethod, setShippingMethod] = useState("Ocean freight");
   const [quantity, setQuantity] = useState(1);
+  const [dutyRate, setDutyRate] = useState<number | null>(null);
+  const [vatRate, setVatRate] = useState<number | null>(null);
   const [costs, setCosts] = useState<CostValues>(emptyCosts);
   const [estimateName, setEstimateName] = useState("");
   const [savedEstimates, setSavedEstimates] = useState<SavedEstimate[]>([]);
@@ -118,7 +120,7 @@ export default function CalculatorPage() {
       setSaveMessage("Enter a name for this estimate first.");
       return;
     }
-    const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, destination, destinationPort, shippingMethod, quantity, costs: { ...costs } };
+    const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
     persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
     setEstimateName("");
     setSaveMessage("Estimate saved in this browser.");
@@ -139,6 +141,8 @@ export default function CalculatorPage() {
     setShippingMethod(saved.shippingMethod);
     setQuantity(saved.quantity);
     setCosts(saved.costs);
+    setDutyRate(saved.dutyRate ?? null);
+    setVatRate(saved.vatRate ?? null);
     setSaveMessage(`Loaded “${saved.name}”.`);
   }
 
@@ -150,13 +154,26 @@ export default function CalculatorPage() {
     const enteredCosts = costFields.filter(({ key }) => costs[key] !== null);
     const knownSubtotal = enteredCosts.reduce((sum, { key }) => sum + (costs[key] ?? 0), 0);
     const unknownCosts = costFields.filter(({ key }) => costs[key] === null);
+    const customsValueKeys: CostKey[] = ["purchase", "supplier", "inland", "freight", "insurance"];
+    const customsValue = customsValueKeys.reduce((sum, key) => sum + (costs[key] ?? 0), 0);
+    const missingCustomsValue = customsValueKeys.filter((key) => costs[key] === null).length;
+    const importDuty = dutyRate === null ? null : customsValue * dutyRate / 100;
+    const importVat = dutyRate === null || vatRate === null
+      ? null
+      : (customsValue + (importDuty ?? 0) + (costs.customs ?? 0)) * vatRate / 100;
+    const estimatedTotal = knownSubtotal + (importDuty ?? 0) + (importVat ?? 0);
     return {
       knownSubtotal,
       unknownCosts,
       enteredCount: enteredCosts.length,
-      perItem: quantity > 0 ? knownSubtotal / quantity : knownSubtotal
+      customsValue,
+      missingCustomsValue,
+      importDuty,
+      importVat,
+      estimatedTotal,
+      perItem: quantity > 0 ? estimatedTotal / quantity : estimatedTotal
     };
-  }, [costs, quantity]);
+  }, [costs, quantity, dutyRate, vatRate]);
 
   function updateCost(key: CostKey, value: number | null) {
     setCosts((current) => ({ ...current, [key]: value }));
@@ -171,6 +188,8 @@ export default function CalculatorPage() {
     setShippingMethod("Ocean freight");
     setQuantity(1);
     setCosts(emptyCosts);
+    setDutyRate(null);
+    setVatRate(null);
   }
 
   function changeCurrency(nextCurrency: Currency) {
@@ -244,6 +263,15 @@ export default function CalculatorPage() {
               </div>
               <NumberField id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value ?? 1)))} hint="Used to calculate the average cost per item." />
             </div>
+            <h2 style={{ marginTop: 34 }}>Verified tax rates</h2>
+            <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the customs-value costs entered above, so missing purchase, freight or insurance amounts can make the result too low.</p>
+            <div className="form-grid">
+              <NumberField id="duty-rate" label="Import duty rate (%)" value={dutyRate} onChange={(value) => setDutyRate(value === null ? null : Math.min(100, value))} hint="Use the rate for the exact HS / tariff code and origin rules." />
+              <NumberField id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} onChange={(value) => setVatRate(value === null ? null : Math.min(100, value))} hint="Enter 0 only if the applicable import is confirmed to be exempt or zero-rated." />
+            </div>
+            <div className="notice">
+              <strong>Check the official tariff before entering rates.</strong> {destination.trim().toLowerCase() === "georgia" ? <a href="https://www.rs.ge/CommodityCodes-en" target="_blank" rel="noreferrer">Georgia Revenue Service HS Codes and tax rates ↗</a> : <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>}. Trade agreements, product classification, exemptions and special taxes can change the applicable rate.
+            </div>
             <h2 style={{ marginTop: 34 }}>Known costs</h2>
             <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
             <div className="form-grid">
@@ -284,9 +312,9 @@ export default function CalculatorPage() {
           </section>
 
           <aside className="panel result-panel" aria-live="polite">
-            <span className="result-label">Known-cost subtotal</span>
-            <div className="result-total">{money(result.knownSubtotal, currency)}</div>
-            <p>This is the sum of the amounts entered, not a guaranteed final landed cost.</p>
+            <span className="result-label">{dutyRate !== null && vatRate !== null ? "Estimated total using entered rates" : "Known-cost subtotal"}</span>
+            <div className="result-total">{money(result.estimatedTotal, currency)}</div>
+            <p>{dutyRate !== null && vatRate !== null ? "Includes estimated duty and VAT/GST using the rates you entered. Confirm the tax base and any country-specific rules before relying on it." : "Enter verified duty and VAT/GST rates below to add a preliminary tax estimate. Until then, this is only the sum of entered costs."}</p>
             <div className="result-lines">
               {costFields.map(({ key, label }) => (
                 <div className="result-line" key={key}>
@@ -294,6 +322,9 @@ export default function CalculatorPage() {
                   <strong>{costs[key] === null ? "Not entered" : money(costs[key] ?? 0, currency)}</strong>
                 </div>
               ))}
+              <div className="result-line"><span>Customs-value costs entered</span><strong>{money(result.customsValue, currency)}</strong></div>
+              <div className="result-line"><span>Import duty {dutyRate === null ? "(rate missing)" : `(${dutyRate}%)`}</span><strong>{result.importDuty === null ? "Enter verified rate" : money(result.importDuty, currency)}</strong></div>
+              <div className="result-line"><span>Import VAT / GST {vatRate === null ? "(rate missing)" : `(${vatRate}%)`}</span><strong>{result.importVat === null ? "Enter both duty and VAT/GST rates" : money(result.importVat, currency)}</strong></div>
               <div className="result-line result-line-total">
                 <span>Average per item</span>
                 <strong>{money(result.perItem, currency)}</strong>
@@ -303,10 +334,10 @@ export default function CalculatorPage() {
               <strong>{result.unknownCosts.length} of {costFields.length} cost categories still unknown.</strong>
               {result.unknownCosts.length > 0
                 ? ` Add or verify: ${result.unknownCosts.map(({ label }) => label.toLowerCase()).join(", ")}.`
-                : " All listed categories have an entered amount. Verify applicable taxes and fees with official sources before relying on the total."}
+                : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
             </div>
             <p style={{ marginTop: 18, fontSize: ".78rem" }}>
-              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. No live freight rates, currency conversion, or automatic customs assessment is connected.
+              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. No live freight rates, currency conversion or automatic tariff lookup is connected. This calculator applies the rates you enter and does not replace the destination country’s official customs calculation.
             </p>
           </aside>
         </div>
