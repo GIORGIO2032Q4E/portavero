@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
+import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = 480;
@@ -88,29 +89,29 @@ export default function VehicleImportPage() {
   const validVehicleType = !classicCar || vehicleAge > 30;
 
   const result = useMemo(() => {
-    const age = Math.max(0, vehicleAge);
-    const previousRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
-    let rate = preAprilRegime
-      ? previousRates[Math.min(age, previousRates.length - 1)]
-      : age <= 6 ? 1.5 : 4.5;
-    if (classicCar && age > 30) rate = 1;
-    if (!isElectric && !classicCar) {
-      if (steering === "right") rate *= 3;
-      else if (hybrid && age <= 6) rate *= 0.4;
-    }
-    const excise = eligibleYear && validEngine && validVehicleType
-      ? isElectric
-        ? steering === "right" ? (preAprilRegime ? rate * 2000 : 3000) : 0
-        : classicCar && age > 30 ? engineCc : engineCc * rate
-      : 0;
-    const importDuty = eligibleYear && validEngine && validVehicleType && !isElectric
-      ? engineCc * 0.05 * (1 + age * 0.05)
-      : 0;
+    const taxes = calculateVehicleTaxes({
+      manufactureYear: year,
+      declarationYear,
+      engineCc,
+      steering,
+      hybrid,
+      classicCar,
+      isElectric,
+      preAprilRegime
+    });
     const enteredCosts = [purchase, auction, inland, shipping, insurance, port, delivery];
     const knownCosts = enteredCosts.reduce<number>((sum, value) => sum + (value ?? 0), 0);
     const unknownCosts = enteredCosts.filter((value) => value === null).length;
-    return { excise, importDuty, knownCosts, unknownCosts, officialFees: standardStateFees, total: excise + importDuty + standardStateFees + knownCosts, rate };
-  }, [vehicleAge, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, eligibleYear, validEngine, validVehicleType, purchase, auction, inland, shipping, insurance, port, delivery]);
+    return {
+      excise: taxes.excise,
+      importDuty: taxes.importDuty,
+      knownCosts,
+      unknownCosts,
+      officialFees: standardStateFees,
+      total: taxes.excise + taxes.importDuty + standardStateFees + knownCosts,
+      rate: taxes.rate
+    };
+  }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
 
   return (
     <>
