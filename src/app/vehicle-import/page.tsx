@@ -139,7 +139,7 @@ export default function VehicleImportPage() {
 
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
-            <div className="result-total">{money(result.excise)}</div>
+            <div className="result-total">{eligibleYear && validEngine ? money(result.excise) : "Check details"}</div>
             <p>{eligibleYear && validEngine ? `${year} model year · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³` : "Enter valid vehicle details."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rate</span><strong>{money(result.rate)} / cm³</strong></div>
