@@ -1450,3 +1450,9 @@ p,
   .account-estimate { align-items: flex-start; }
   .account-estimate .button { flex-shrink: 0; }
 }
+
+.account-estimate-actions { display: flex; gap: 8px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .account-estimate-actions { width: 100%; }
+  .account-estimate-actions .button { flex: 1; }
+}
