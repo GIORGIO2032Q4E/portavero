@@ -1,53 +1,53 @@
 # Portavero
 
-Portavero is a small personal web project about planning import costs, with an initial focus on bringing goods and cars into Georgia.
+Portavero is a personal project for planning the costs of importing goods and vehicles into Georgia.
 
-The idea is simple: enter the costs you already know, see their total, and keep track of the costs you still need to confirm.
+The calculators organize amounts you enter yourself. They do not provide carrier quotes or replace an official customs assessment.
 
-## What it can do
+## Current features
 
-- Add up costs entered in the general import calculator and calculate an average per item.
-- Save up to 10 named estimates in the current browser and load them later on that device.
-- Sign up, sign in, reset a password and save estimates to a Supabase-backed account after configuration.
-- Print an estimate or use the browser print dialog to save it as a PDF.
-- Compare up to three shipping quotes entered by the user, grouped by currency. These are not live provider prices.
-- Show which cost fields are still blank.
-- Give a preliminary excise estimate for some passenger vehicles imported into Georgia.
-- Show a checklist of questions to ask a shipping provider.
+- Add known import costs and calculate a subtotal.
+- Save estimates in the current browser and print them or save them as a PDF.
+- Create an account and save estimates to Supabase when the project is configured.
+- Compare up to three shipping quotes entered by you, grouped by currency.
+- Review a checklist of questions to ask a shipping provider.
+- Browse a curated list of common vehicle models and engine variants.
+- Get a preliminary estimate for selected passenger-vehicle taxes.
 
-## What it cannot do yet
+## Current limits
 
-- Fetch live shipping prices or quotes from carriers automatically.
-- Convert currencies using live exchange rates. The manual quote comparison does not convert currencies.
-- Book shipments or track cargo.
-- Calculate every customs duty, tax, or service fee.
-- Use account features until a Supabase project is configured and the SQL schema has been applied.
-- Replace the official Revenue Service calculator.
+- Shipping quotes, exchange rates and cargo tracking are not fetched automatically.
+- The vehicle list is not a complete database and does not identify a vehicle by VIN.
+- Tax estimates do not cover every vehicle classification, fee or transitional rule.
+- Blank costs are excluded from the displayed subtotal.
+- The figures are for planning. Confirm quotes and tax treatment with providers and the Georgian Revenue Service before making a purchase or shipping a vehicle.
 
-The numbers are for planning only. Check important costs with the carrier, customs professional, or official source before relying on them. The vehicle estimate has limits, including fully electric vehicles and possible transitional rules. Check the [official Revenue Service calculator](https://www.rs.ge/CarClearance-en) for the specific vehicle.
+Use the [official Revenue Service vehicle calculator](https://www.rs.ge/CarClearance-en) to check a specific vehicle.
 
-## Account setup
+## Run locally
 
-1. Create a project in [Supabase](https://supabase.com/dashboard).
-2. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the Supabase project settings.
-3. Run `supabase/schema.sql` in the Supabase SQL Editor to create the saved-estimates table and user-specific Row Level Security policies.
-4. In Supabase Authentication URL settings, set the site URL and add the local, preview and production URLs to the allowed redirect URLs.
-5. Add the same public environment variables to the Vercel project, redeploy, and test sign-up, email confirmation, sign-in and password reset.
-
-Only the public anon/publishable key belongs in browser environment variables. Never expose the service-role key. Account features are not active until these setup steps are complete.
-
-## Run it locally
-
-You need Node.js and npm installed.
+Requirements: Node.js 22 and npm.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
-## Useful commands
+## Environment variables
+
+Copy `.env.example` to `.env.local`.
+
+- `NEXT_PUBLIC_SITE_URL`: base URL used for metadata and sitemap links.
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase publishable key. The older `NEXT_PUBLIC_SUPABASE_ANON_KEY` name is also supported.
+
+Apply `supabase/schema.sql` in the Supabase SQL Editor to create the saved-estimates table and its Row Level Security policies. Add the environment variables to Vercel and redeploy after changing them. Configure Supabase Authentication's site URL and allowed redirect URLs for local development and the deployed site.
+
+Only the publishable/anon key belongs in browser-accessible environment variables. Never put a Supabase secret or service-role key in `NEXT_PUBLIC_*` variables or commit it to the repository.
+
+## Checks
 
 ```bash
 npm run lint
@@ -55,15 +55,14 @@ npm run typecheck
 npm run build
 ```
 
-## Technologies
+## Stack
 
 - Next.js
 - React
 - TypeScript
 - CSS
-
-This is an early version of the project. I plan to improve it as I test the tools and verify the information.
+- Supabase Authentication and database
 
 ## Deployment
 
-The project can be deployed on a Next.js hosting service such as Vercel. Do not add passwords, API keys, or other private credentials to the repository.
+The production site is hosted on Vercel. Keep credentials out of source control and verify sign-up, sign-in, password recovery and saved-estimate access after changing the Supabase configuration.
