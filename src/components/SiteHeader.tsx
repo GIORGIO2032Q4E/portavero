@@ -8,7 +8,8 @@ const navigation = [
   { href: "/calculator", label: "Import calculator" },
   { href: "/vehicle-import", label: "Vehicle import" },
   { href: "/shipping", label: "Shipping" },
-  { href: "/how-it-works", label: "How it works" }
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/account", label: "Account" }
 ];
 
 export default function SiteHeader() {
