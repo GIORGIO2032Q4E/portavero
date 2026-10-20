@@ -1025,3 +1025,53 @@ h2, h3 { font-weight: 650; }
 @media (prefers-reduced-motion: reduce) {
   .button, .simple-tool-row > a { transition: none !important; }
 }
+
+
+/* Keep the print / PDF version focused on the estimate itself. */
+@media print {
+  .print-hide,
+  .site-header,
+  .site-footer,
+  nav,
+  .hero-actions,
+  button {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 11pt;
+  }
+
+  .container {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .panel,
+  .result-panel,
+  .page-hero,
+  .section,
+  .section-tint {
+    box-shadow: none !important;
+    border: 0 !important;
+    background: #fff !important;
+    break-inside: avoid;
+  }
+
+  input,
+  select {
+    border: 0 !important;
+    padding-left: 0 !important;
+    color: #111 !important;
+    background: transparent !important;
+  }
+
+  a {
+    color: #111 !important;
+    text-decoration: none !important;
+  }
+}
