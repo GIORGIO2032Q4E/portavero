@@ -270,7 +270,18 @@ export default function CalculatorPage() {
               <NumberField id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} onChange={(value) => setVatRate(value === null ? null : Math.min(100, value))} hint="Enter 0 only if the applicable import is confirmed to be exempt or zero-rated." />
             </div>
             <div className="notice">
-              <strong>Check the official tariff before entering rates.</strong> {destination.trim().toLowerCase() === "georgia" ? <a href="https://www.rs.ge/CommodityCodes-en" target="_blank" rel="noreferrer">Georgia Revenue Service HS Codes and tax rates ↗</a> : <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>}. Trade agreements, product classification, exemptions and special taxes can change the applicable rate.
+              <strong>Check the official tariff before entering rates.</strong>{" "}
+              {destination.trim().toLowerCase() === "georgia" ? (
+                <a href="https://www.rs.ge/CommodityCodes-en" target="_blank" rel="noreferrer">Georgia Revenue Service tariff and commodity codes ↗</a>
+              ) : /^(eu|european union|germany|france|italy|spain|netherlands|poland|ireland|belgium|austria|portugal|greece|finland|sweden|denmark|czechia|czech republic|romania|bulgaria|croatia|slovakia|slovenia|hungary|lithuania|latvia|estonia|luxembourg|cyprus|malta)$/i.test(destination.trim()) ? (
+                <a href="https://taxation-customs.ec.europa.eu/online-services/online-services-and-databases-customs/eu-customs-tariff-taric_en" target="_blank" rel="noreferrer">European Commission TARIC tariff database ↗</a>
+              ) : /^(uk|united kingdom|great britain|england|scotland|wales|northern ireland)$/i.test(destination.trim()) ? (
+                <a href="https://www.gov.uk/trade-tariff" target="_blank" rel="noreferrer">UK Trade Tariff: commodity codes and duty ↗</a>
+              ) : /^(us|usa|united states|united states of america)$/i.test(destination.trim()) ? (
+                <a href="https://hts.usitc.gov/" target="_blank" rel="noreferrer">United States Harmonized Tariff Schedule ↗</a>
+              ) : (
+                <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff.aspx" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>
+              )}. Enter only rates confirmed for the destination, HS code, country of origin and import date. This tool does not fetch tariff rates automatically. EU TARIC does not include national VAT rates, and special taxes or exemptions may require separate checks.
             </div>
             <h2 style={{ marginTop: 34 }}>Known costs</h2>
             <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
