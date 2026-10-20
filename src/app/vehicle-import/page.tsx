@@ -109,7 +109,7 @@ export default function VehicleImportPage() {
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
           <h1>Estimate the cost of importing a car.</h1>
-          <p>Enter your car details and known costs to get a preliminary excise estimate for Georgia. Check the result with the official Revenue Service calculator.</p>
+          <p>Enter your car details and known costs to estimate excise and import duty for Georgia. Check the result with the official Revenue Service calculator.</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/how-it-works" className="button button-dark">How estimates work</Link>
@@ -122,7 +122,7 @@ export default function VehicleImportPage() {
           <section className="panel vehicle-panel">
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
             <p className="panel-intro">This estimate uses a limited set of rules for passenger vehicles classified under HS 8703. Check the official calculator if you are unsure about your vehicle.</p>
-            <div className="notice"><strong>Electric vehicles:</strong> This estimator does not calculate the special excise rule for fully electric vehicles. Use the official Revenue Service calculator for electric vehicles and any vehicle with uncertain classification or transitional status.</div>
+            <div className="notice"><strong>Important:</strong> This is an estimate for passenger vehicles under HS 8703. Electric-vehicle rules and the classic-car rate are included, but special classification and transitional cases still need official verification.</div>
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="source-country">Country of purchase</label>
