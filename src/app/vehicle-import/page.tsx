@@ -57,6 +57,7 @@ function CostField({
 
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
+  const [declarationYear, setDeclarationYear] = useState(new Date().getFullYear());
   const [makeName, setMakeName] = useState("");
   const [modelName, setModelName] = useState("");
   const [engineId, setEngineId] = useState("");
@@ -79,8 +80,8 @@ export default function VehicleImportPage() {
   const isElectric = selectedEngine?.fuel === "Electric";
 
   const currentYear = new Date().getFullYear();
-  const vehicleAge = currentYear - year;
-  const eligibleYear = vehicleAge >= 0 && year <= currentYear;
+  const vehicleAge = declarationYear - year;
+  const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
   const validEngine = isElectric || (Number.isFinite(engineCc) && engineCc > 0);
 
   const result = useMemo(() => {
@@ -164,10 +165,19 @@ export default function VehicleImportPage() {
               <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
                 <select id="manufacture-year" value={year} onChange={(event) => setYear(Number(event.target.value))}>
-                  {Array.from({ length: currentYear - 1960 + 1 }, (_, index) => currentYear - index).map((value) => (
+                  {Array.from({ length: currentYear - 1960 + 1 }, (_, index) => currentYear - index).map((value) => currentYear - value).map((value) => (
                     <option key={value} value={value}>{value}</option>
                   ))}
                 </select>
+              </div>
+              <div className="field">
+                <label htmlFor="declaration-year">Expected customs declaration year</label>
+                <select id="declaration-year" value={declarationYear} onChange={(event) => setDeclarationYear(Number(event.target.value))}>
+                  {Array.from({ length: 6 }, (_, index) => currentYear + index).map((value) => (
+                    <option key={value} value={value}>{value}</option>
+                  ))}
+                </select>
+                <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
               <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
               <div className="field">
@@ -200,7 +210,7 @@ export default function VehicleImportPage() {
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
             <div className="result-total">{eligibleYear && validEngine ? money(result.excise) : "Check details"}</div>
-            <p>{eligibleYear && validEngine ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
+            <p>{eligibleYear && validEngine ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rule</span><strong>{isElectric ? (steering === "right" ? "GEL 3,000 fixed" : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
