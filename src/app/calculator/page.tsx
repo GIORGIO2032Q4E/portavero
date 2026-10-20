@@ -347,9 +347,9 @@ export default function CalculatorPage() {
           </section>
 
           <aside className="panel result-panel" aria-live="polite">
-            <span className="result-label">{dutyRate !== null && vatRate !== null ? "Estimated total using entered rates" : "Known-cost subtotal"}</span>
+            <span className="result-label">{dutyRate !== null && vatRate !== null ? "Estimated total using entered rates" : dutyRate !== null ? "Subtotal including entered duty estimate" : "Known-cost subtotal"}</span>
             <div className="result-total">{money(result.estimatedTotal, currency)}</div>
-            <p>{dutyRate !== null && vatRate !== null ? "Includes estimated duty and VAT/GST using the rates you entered. Confirm the tax base and any country-specific rules before relying on it." : "Enter verified duty and VAT/GST rates below to add a preliminary tax estimate. Until then, this is only the sum of entered costs."}</p>
+            <p>{dutyRate !== null && vatRate !== null ? "Includes estimated duty and VAT/GST using the rates you entered. Confirm the tax base and any country-specific rules before relying on it." : dutyRate !== null ? "Includes the duty estimate from your entered rate, but excludes VAT/GST until both rates are available. Confirm the tax base and country-specific rules." : vatRate !== null ? "VAT/GST cannot be estimated yet because the duty rate needed for its tax base is missing. The displayed amount is only your entered costs." : "Enter verified duty and VAT/GST rates below to add a preliminary tax estimate. Until then, this is only the sum of entered costs."}</p>
             <div className="result-lines">
               {costFields.map(({ key, label }) => (
                 <div className="result-line" key={key}>
