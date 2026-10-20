@@ -67,6 +67,7 @@ export default function VehicleImportPage() {
   const [steering, setSteering] = useState("left");
   const [hybrid, setHybrid] = useState(false);
   const [classicCar, setClassicCar] = useState(false);
+  const [preAprilRegime, setPreAprilRegime] = useState(false);
   const [purchase, setPurchase] = useState<number | null>(null);
   const [auction, setAuction] = useState<number | null>(null);
   const [inland, setInland] = useState<number | null>(null);
@@ -88,13 +89,19 @@ export default function VehicleImportPage() {
 
   const result = useMemo(() => {
     const age = Math.max(0, vehicleAge);
-    let rate = classicCar && age > 30 ? 1 : age <= 6 ? 1.5 : 4.5;
+    const previousRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
+    let rate = preAprilRegime
+      ? previousRates[Math.min(age, previousRates.length - 1)]
+      : age <= 6 ? 1.5 : 4.5;
+    if (classicCar && age > 30) rate = 1;
     if (!isElectric && !classicCar) {
       if (steering === "right") rate *= 3;
       else if (hybrid && age <= 6) rate *= 0.4;
     }
     const excise = eligibleYear && validEngine && validVehicleType
-      ? isElectric ? (steering === "right" ? 3000 : 0) : engineCc * rate
+      ? isElectric
+        ? steering === "right" ? (preAprilRegime ? rate * 2000 : 3000) : 0
+        : classicCar && age > 30 ? engineCc : engineCc * rate
       : 0;
     const importDuty = eligibleYear && validEngine && validVehicleType && !isElectric
       ? engineCc * 0.05 * (1 + age * 0.05)
@@ -103,7 +110,7 @@ export default function VehicleImportPage() {
     const knownCosts = enteredCosts.reduce<number>((sum, value) => sum + (value ?? 0), 0);
     const unknownCosts = enteredCosts.filter((value) => value === null).length;
     return { excise, importDuty, knownCosts, unknownCosts, officialFees: standardStateFees, total: excise + importDuty + standardStateFees + knownCosts, rate };
-  }, [vehicleAge, steering, hybrid, classicCar, isElectric, engineCc, eligibleYear, validEngine, validVehicleType, purchase, auction, inland, shipping, insurance, port, delivery]);
+  }, [vehicleAge, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, eligibleYear, validEngine, validVehicleType, purchase, auction, inland, shipping, insurance, port, delivery]);
 
   return (
     <>
@@ -184,6 +191,14 @@ export default function VehicleImportPage() {
               </div>
               <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
               <div className="field">
+                <label htmlFor="pre-april-regime">Tax regime for this import</label>
+                <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
+                  <option value="current">Current rules (from 2 April 2026)</option>
+                  <option value="previous">Previous rules (eligible transitional cases only)</option>
+                </select>
+                <small>Choose the previous regime only if your documents meet the Revenue Service transition conditions.</small>
+              </div>
+              <div className="field">
                 <label htmlFor="steering">Steering configuration</label>
                 <select id="steering" value={steering} onChange={(event) => setSteering(event.target.value)}>
                   <option value="left">Left-hand drive</option>
@@ -204,9 +219,10 @@ export default function VehicleImportPage() {
                 <small>The 60% reduction applies only to left-hand-drive hybrids aged 0–6 years. Select classic only if the vehicle qualifies for the legal classic-car rate.</small>
               </div>
             </div>
+            {preAprilRegime && <div className="notice" role="status"><strong>Transitional-rate warning:</strong> selecting the previous rules does not establish eligibility. The Revenue Service requires qualifying registration, transport, or shipping documents and applies different deadlines to different transport methods. Confirm eligibility before relying on this result.</div>}
             {(!eligibleYear || !validEngine || !validVehicleType || isElectric) && <div className="notice" role="status">{isElectric ? "Electric-vehicle excise and import-duty rules are included for passenger cars. Verify classification and special cases with the official calculator." : !validVehicleType ? "The classic-car rate is available only when the vehicle is more than 30 years old and qualifies under the legal classification." : "Check the manufacture year and engine capacity before using this estimate."}</div>}
             <div className="notice">
-              <strong>Rule used:</strong> {isElectric ? (steering === "right" ? "GEL 3,000 fixed excise for right-hand-drive/converted EVs" : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label} · purchase/shipping country: ${sourceCountry}.` : "Choose a vehicle variant if available, or enter the engine capacity manually."} The catalogue lists common variants only, not every year/market configuration. Transitional cases and vehicle classification need official verification.
+              <strong>Rule used:</strong> {preAprilRegime ? "Previous age-based excise table (transitional cases only)" : "Current rates from 2 April 2026"}. {isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rule: age-based rate × 2,000 for right-hand-drive/converted EVs" : "GEL 3,000 fixed excise for right-hand-drive/converted EVs") : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label} · purchase/shipping country: ${sourceCountry}.` : "Choose a vehicle variant if available, or enter the engine capacity manually."} The catalogue lists common variants only, not every year/market configuration. Transitional cases and vehicle classification need official verification.
             </div>
           </section>
 
@@ -253,8 +269,8 @@ export default function VehicleImportPage() {
       <section className="section">
         <div className="container content-narrow prose">
           <h2>Important rules and verification</h2>
-          <p>The Georgian Tax Code sets excise at GEL 1.50 per cm³ for passenger vehicles aged 0–6 years and GEL 4.50 per cm³ for older vehicles. Right-hand-drive or converted vehicles use three times the ordinary rate. Left-hand-drive hybrids aged 0–6 years receive a 60% reduction. The Code also provides a GEL 1.00 per cm³ rate for vehicles legally classified as classic cars, and sets excise at GEL 0 for left-hand-drive electric vehicles and GEL 3,000 for right-hand-drive or converted electric vehicles. Vehicle age is based on the year the customs declaration is registered, not the exact month or day. The catalogue is a practical starting list, not an official complete database.</p>
-          <p>The planner estimates import duty using Article 197(6): GEL 0.05 per cm³, plus 5% of that base duty amount for each year of vehicle operation. The law exempts electric vehicles from import duty. The result also adds GEL 480 for the standard listed fees shown by the Revenue Service: GEL 150 clearance, GEL 50 declaration, GEL 30 expert inspection, GEL 50 internal transit number, GEL 100 registration certificate, GEL 80 registration plate and GEL 20 vehicle inspection. Optional broker fees, storage, special classifications and transitional treatment based on earlier registration or transport documents still require checking.</p>
+          <p>For imports taxed under the rules effective from 2 April 2026, Georgia sets excise at GEL 1.50 per cm³ for passenger vehicles aged 0–6 years and GEL 4.50 per cm³ for older vehicles. Right-hand-drive or converted vehicles use three times the ordinary rate; left-hand-drive hybrids aged 0–6 years receive a 60% reduction. Right-hand-drive or converted electric cars have a GEL 3,000 excise rate, while left-hand-drive electric cars have GEL 0 excise. The law contains transitional provisions for qualifying vehicles based on registration and transport documents. Right-hand-drive or converted vehicles use three times the ordinary rate. Left-hand-drive hybrids aged 0–6 years receive a 60% reduction. The Code also provides a GEL 1.00 per cm³ rate for vehicles legally classified as classic cars, and sets excise at GEL 0 for left-hand-drive electric vehicles and GEL 3,000 for right-hand-drive or converted electric vehicles. Vehicle age is based on the year the customs declaration is registered, not the exact month or day. The catalogue is a practical starting list, not an official complete database.</p>
+          <p>The planner estimates import duty using Article 197(6): GEL 0.05 per cm³, plus 5% of that base duty amount for each year of vehicle operation. The law exempts electric vehicles from import duty. Previous excise rates are available only as a manual transitional option and must be supported by the documents required by the Revenue Service. The result also adds GEL 480 for the standard listed fees shown by the Revenue Service: GEL 150 clearance, GEL 50 declaration, GEL 30 expert inspection, GEL 50 internal transit number, GEL 100 registration certificate, GEL 80 registration plate and GEL 20 vehicle inspection. Optional broker fees, storage, special classifications and transitional treatment based on earlier registration or transport documents still require checking.</p>
           <p><strong>Before bidding or shipping, verify the exact vehicle in the official <a href={revenueServiceUrl} target="_blank" rel="noreferrer">Revenue Service Auto/Moto Levy Calculator</a>.</strong> If the vehicle&apos;s classification or transitional status is unclear, contact the Revenue Service.</p>
           <p>Sources: <a href="https://new.matsne.gov.ge/en/document/view/1043717" target="_blank" rel="noreferrer">Tax Code of Georgia, Articles 188, 197 and 199</a> and the <a href="https://voice.rs.ge/Default.aspx?id=3874" target="_blank" rel="noreferrer">Revenue Service notice on the April 2, 2026 change</a>. This estimate is informational, not a binding customs assessment. Verify the final amount with the official <a href={revenueServiceUrl} target="_blank" rel="noreferrer">Revenue Service calculator</a>.</p>
         </div>
