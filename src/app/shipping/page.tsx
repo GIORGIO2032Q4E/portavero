@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shipping cost planning",
+  description: "Review the charges, route details, and transit assumptions to confirm with a freight provider before booking."
+};
+
 import Link from "next/link";
 
 export default function ShippingPage() {
