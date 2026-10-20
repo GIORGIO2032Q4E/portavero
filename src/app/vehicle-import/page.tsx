@@ -132,14 +132,14 @@ export default function VehicleImportPage() {
               </div>
               <div className="field">
                 <label htmlFor="make">Make</label>
-                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); }}>
+                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setHybrid(false); setClassicCar(false); }}>
                   <option value="">Choose a make</option>
                   {vehicleCatalog.map((make) => <option key={make.name} value={make.name}>{make.name}</option>)}
                 </select>
               </div>
               <div className="field">
                 <label htmlFor="model">Model</label>
-                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); }}>
+                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setHybrid(false); setClassicCar(false); }}>
                   <option value="">Choose a model</option>
                   {selectedMake?.models.map((model) => <option key={model.name} value={model.name}>{model.name}</option>)}
                 </select>
