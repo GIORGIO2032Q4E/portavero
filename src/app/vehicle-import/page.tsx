@@ -34,7 +34,10 @@ function CostField({
         min="0"
         step="0.01"
         value={value}
-        onChange={(event) => onChange(Math.max(0, Number(event.target.value) || 0))}
+        onChange={(event) => {
+          const parsed = Number(event.target.value);
+          onChange(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
+        }}
       />
       {hint && <small>{hint}</small>}
     </div>
