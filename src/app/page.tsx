@@ -4,123 +4,96 @@ const tools = [
   {
     number: "01",
     title: "Import cost calculator",
-    description: "Bring the purchase price, freight, insurance, customs and local charges into one working budget.",
+    description: "Add the costs you already know and see a subtotal, plus the amounts you still need to check.",
     href: "/calculator",
     link: "Open calculator"
   },
   {
     number: "02",
-    title: "Vehicle import planner",
-    description: "Build a Georgia-bound vehicle budget and check the preliminary excise estimate against official guidance.",
+    title: "Vehicle import estimate",
+    description: "Enter basic vehicle details to get a preliminary excise estimate for Georgia.",
     href: "/vehicle-import",
-    link: "Plan a vehicle import"
+    link: "Estimate vehicle costs"
   },
   {
     number: "03",
     title: "Shipping checklist",
-    description: "Know which charges to ask a carrier about before comparing quotes or committing to a shipment.",
+    description: "A short list of questions to ask before accepting a shipping quote.",
     href: "/shipping",
-    link: "Review shipping costs"
+    link: "View checklist"
   }
 ];
 
 export default function HomePage() {
   return (
     <>
-      <section className="editorial-hero">
-        <div className="container">
-          <div className="hero-kicker">
-            <span>PORTAVERO / IMPORT PLANNING</span>
-            <span>BUILT FOR CLEARER DECISIONS</span>
-          </div>
-          <div className="editorial-hero-grid">
-            <div className="editorial-copy">
-              <p className="editorial-label">Cross-border costs, made visible</p>
-              <h1>Know what the import <em>actually costs.</em></h1>
-              <p className="editorial-lede">A practical workspace for the costs between buying abroad and receiving goods in Georgia. Start with verified numbers. Keep the unknowns in view.</p>
-              <div className="hero-actions">
-                <Link href="/calculator" className="button button-dark">Build an estimate <span aria-hidden="true">↗</span></Link>
-                <Link href="/vehicle-import" className="button button-outline">Importing a vehicle?</Link>
-              </div>
-              <p className="editorial-footnote"><span aria-hidden="true">01</span> No invented freight quotes. No missing costs quietly set to zero.</p>
+      <section className="simple-hero">
+        <div className="container simple-hero-grid">
+          <div className="simple-hero-copy">
+            <p className="simple-status">An independent project · Early version</p>
+            <h1>Planning an import to Georgia?</h1>
+            <p className="simple-lede">Portavero helps you put the costs in one place. Enter the prices you know, keep unknown fees blank, and get a clearer starting budget.</p>
+            <div className="hero-actions">
+              <Link href="/calculator" className="button button-dark">Try the cost calculator</Link>
+              <Link href="/vehicle-import" className="simple-text-link">Importing a car? <span aria-hidden="true">→</span></Link>
             </div>
-
-            <aside className="ledger-card" aria-label="Example of an import cost worksheet">
-              <div className="ledger-topline">
-                <span>WORKSHEET / 001</span>
-                <span>ILLUSTRATIVE ONLY</span>
-              </div>
-              <div className="ledger-heading">
-                <div>
-                  <p className="ledger-overline">LANDED COST, STEP BY STEP</p>
-                  <h2>Your numbers.<br />One clear picture.</h2>
-                </div>
-                <span className="ledger-stamp">PV<br />01</span>
-              </div>
-              <div className="ledger-route">
-                <div className="ledger-route-point"><span className="route-node" /><span>Origin</span><strong>United States / Japan</strong></div>
-                <span className="ledger-route-line" aria-hidden="true" />
-                <div className="ledger-route-point"><span className="route-node route-node-end" /><span>Destination</span><strong>Georgia</strong></div>
-              </div>
-              <div className="ledger-table">
-                <div className="ledger-row"><span>Purchase price</span><span>Enter amount</span></div>
-                <div className="ledger-row"><span>International freight</span><span>Quote required</span></div>
-                <div className="ledger-row"><span>Customs and clearance</span><span>Verify first</span></div>
-              </div>
-              <div className="ledger-bottom">
-                <span>KNOWN COSTS ONLY</span>
-                <span className="ledger-bottom-mark">UNKNOWN ≠ FREE</span>
-              </div>
-            </aside>
+            <p className="simple-note">No live shipping quotes or automatic customs calculations yet.</p>
           </div>
+          <aside className="simple-example">
+            <div className="simple-example-heading">
+              <span>EXAMPLE COST LIST</span>
+              <span>USD</span>
+            </div>
+            <div className="simple-example-row"><span>Purchase price</span><strong>Enter amount</strong></div>
+            <div className="simple-example-row"><span>Shipping</span><strong>Needs a quote</strong></div>
+            <div className="simple-example-row"><span>Insurance</span><strong>Not entered</strong></div>
+            <div className="simple-example-row"><span>Customs and fees</span><strong>Check first</strong></div>
+            <p className="simple-example-foot">The example is for layout only. No prices are estimated here.</p>
+          </aside>
         </div>
       </section>
 
-      <section className="tool-index-section">
+      <section className="simple-tools-section">
         <div className="container">
-          <div className="tool-index-heading">
-            <div>
-              <p className="editorial-label">THE WORKSPACE</p>
-              <h2>Tools for the decisions<br />that come before delivery.</h2>
-            </div>
-            <p>Import costs are spread across sellers, carriers, ports and customs. Keep each part visible before you commit.</p>
+          <div className="simple-section-heading">
+            <p className="editorial-label">TOOLS</p>
+            <h2>Start with the part you need.</h2>
+            <p>These are small planning tools, not a freight booking service.</p>
           </div>
-          <div className="tool-index">
+          <div className="simple-tool-list">
             {tools.map((tool) => (
-              <article className="tool-index-row" key={tool.number}>
-                <span className="tool-index-number">{tool.number}</span>
-                <div className="tool-index-copy">
+              <article className="simple-tool-row" key={tool.number}>
+                <span className="simple-tool-number">{tool.number}</span>
+                <div>
                   <h3>{tool.title}</h3>
                   <p>{tool.description}</p>
                 </div>
-                <Link className="tool-index-link" href={tool.href}>{tool.link}<span aria-hidden="true">↗</span></Link>
+                <Link href={tool.href}>{tool.link} <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="process-section">
-        <div className="container process-layout">
-          <div className="process-intro">
-            <p className="editorial-label">A BETTER STARTING POINT</p>
-            <h2>Separate what you know from what you still need to confirm.</h2>
+      <section className="simple-how-section">
+        <div className="container simple-how-grid">
+          <div>
+            <p className="editorial-label">HOW TO USE IT</p>
+            <h2>Three simple steps.</h2>
           </div>
-          <ol className="process-list">
-            <li><span>01</span><div><h3>Enter confirmed costs</h3><p>Use the amounts from your seller, carrier or service provider.</p></div></li>
-            <li><span>02</span><div><h3>Flag the gaps</h3><p>Leave unknown charges blank until you have a credible figure.</p></div></li>
-            <li><span>03</span><div><h3>Verify before paying</h3><p>Check customs rules and final fees with the official source or provider.</p></div></li>
+          <ol>
+            <li><strong>Enter confirmed amounts.</strong><span>Use prices from your seller or shipping company.</span></li>
+            <li><strong>Leave unknown costs blank.</strong><span>That way, a missing amount is not treated as free.</span></li>
+            <li><strong>Check the final numbers.</strong><span>Confirm tax rules and extra fees with official sources or your provider.</span></li>
           </ol>
         </div>
       </section>
 
-      <section className="home-cta-section">
-        <div className="container home-cta">
-          <div>
-            <p className="editorial-label">START WITH WHAT YOU HAVE</p>
-            <h2>Make the first estimate.<br />Improve it as facts arrive.</h2>
-          </div>
-          <Link href="/calculator" className="button button-light">Open the import calculator <span aria-hidden="true">↗</span></Link>
+      <section className="simple-bottom-cta">
+        <div className="container">
+          <h2>Start with the numbers you have.</h2>
+          <p>You can update the estimate when you get more accurate quotes.</p>
+          <Link href="/calculator" className="button button-dark">Open calculator</Link>
         </div>
       </section>
     </>
