@@ -42,7 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <div className="footer-brand">
               <Link href="/" className="brand">
                 <span className="brand-mark" aria-hidden="true">P</span>
-                <span>porta<span className="brand-light">vero</span></span>
+                <span>Portavero</span>
               </Link>
               <p>A small tool for planning import costs.</p>
             </div>
@@ -51,6 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/how-it-works">How it works</Link>
               <Link href="/privacy-policy">Privacy</Link>
               <Link href="/terms">Terms</Link>
+              <Link href="/account">Account</Link>
             </div>
           </div>
           <div className="footer-bottom">
