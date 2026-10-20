@@ -52,7 +52,7 @@ export default function HomePage() {
               </div>
               <div className="ledger-heading">
                 <div>
-                  <p className="ledger-overline">LANDed COST, STEP BY STEP</p>
+                  <p className="ledger-overline">LANDED COST, STEP BY STEP</p>
                   <h2>Your numbers.<br />One clear picture.</h2>
                 </div>
                 <span className="ledger-stamp">PV<br />01</span>
