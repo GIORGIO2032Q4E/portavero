@@ -154,10 +154,10 @@ export default function AccountPage() {
           {!configured ? (
             <section className="panel account-panel">
               <h2>One setup step first</h2>
-              <p>Account security is handled by Supabase. The code is ready to connect, but the live account service needs a Supabase project URL and public anon key.</p>
+              <p>Supabase handles account sign-in. To enable this feature, configure the project URL and publishable key.</p>
               <ol>
                 <li>Create a project at <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Supabase</a>.</li>
-                <li>Copy the project URL and anon/public key into your local environment and Vercel environment variables.</li>
+                <li>Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to your local environment and Vercel project.</li>
                 <li>Run the SQL in <code>supabase/schema.sql</code> in the Supabase SQL Editor.</li>
                 <li>In Supabase Authentication settings, set the site URL and allow your Portavero preview/production URLs.</li>
               </ol>
