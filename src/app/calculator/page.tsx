@@ -2,98 +2,231 @@
 
 import { useMemo, useState } from "react";
 
-const money = (value: number, currency: string) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: currency === "JPY" ? 0 : 2 }).format(value);
+type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
+type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
 
-function NumberField({ id, label, value, onChange, hint, min = 0, step = "0.01" }: {
-  id: string; label: string; value: number; onChange: (value: number) => void; hint?: string; min?: number; step?: string;
+type CostValues = Record<CostKey, number | null>;
+
+const costFields: { key: CostKey; label: string; hint: string }[] = [
+  { key: "purchase", label: "Purchase price", hint: "Price paid to the seller." },
+  { key: "supplier", label: "Supplier or auction fees", hint: "Enter the fee shown by the seller or auction." },
+  { key: "inland", label: "Origin inland transport", hint: "Transport to the export port or warehouse." },
+  { key: "freight", label: "International freight", hint: "Use a carrier quote where possible." },
+  { key: "insurance", label: "Cargo insurance", hint: "Leave blank until confirmed if you do not know it." },
+  { key: "customs", label: "Customs duties and taxes", hint: "Enter a verified estimate from an official source or professional." },
+  { key: "port", label: "Port and clearance charges", hint: "Destination handling, broker and documentation fees." },
+  { key: "delivery", label: "Final delivery", hint: "Transport from the port to the final destination." },
+  { key: "other", label: "Storage and other costs", hint: "Any additional known expense." }
+];
+
+const emptyCosts: CostValues = {
+  purchase: null,
+  supplier: null,
+  inland: null,
+  freight: null,
+  insurance: null,
+  customs: null,
+  port: null,
+  delivery: null,
+  other: null
+};
+
+function money(value: number, currency: Currency) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: currency === "JPY" ? 0 : 2
+  }).format(value);
+}
+
+function NumberField({
+  id,
+  label,
+  value,
+  onChange,
+  hint
+}: {
+  id: string;
+  label: string;
+  value: number | null;
+  onChange: (value: number | null) => void;
+  hint?: string;
 }) {
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      <input id={id} type="number" min={min} step={step} value={value} onChange={(event) => {
-          const parsed = Number(event.target.value);
-          onChange(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
-        }} />
+      <input
+        id={id}
+        type="number"
+        min="0"
+        step="0.01"
+        inputMode="decimal"
+        value={value ?? ""}
+        onChange={(event) => {
+          const raw = event.target.value;
+          if (raw === "") {
+            onChange(null);
+            return;
+          }
+          const parsed = Number(raw);
+          onChange(Number.isFinite(parsed) && parsed >= 0 ? parsed : null);
+        }}
+      />
       {hint && <small>{hint}</small>}
     </div>
   );
 }
 
 export default function CalculatorPage() {
-  const [currency, setCurrency] = useState("USD");
-  const [goods, setGoods] = useState(0);
-  const [shipping, setShipping] = useState(0);
-  const [insurance, setInsurance] = useState(0);
-  const [customs, setCustoms] = useState(0);
-  const [handling, setHandling] = useState(0);
-  const [other, setOther] = useState(0);
+  const [currency, setCurrency] = useState<Currency>("USD");
+  const [category, setCategory] = useState("Vehicle");
+  const [origin, setOrigin] = useState("United States");
+  const [destination, setDestination] = useState("Georgia");
+  const [destinationPort, setDestinationPort] = useState("Poti");
+  const [shippingMethod, setShippingMethod] = useState("Ocean freight");
   const [quantity, setQuantity] = useState(1);
-
-  const changeCurrency = (nextCurrency: string) => {
-    if (nextCurrency === currency) return;
-    setCurrency(nextCurrency);
-    setGoods(0);
-    setShipping(0);
-    setInsurance(0);
-    setCustoms(0);
-    setHandling(0);
-    setOther(0);
-  };
+  const [costs, setCosts] = useState<CostValues>(emptyCosts);
 
   const result = useMemo(() => {
-    const subtotal = goods + shipping + insurance + customs + handling + other;
-    return { subtotal, perItem: quantity > 0 ? subtotal / quantity : subtotal };
-  }, [goods, shipping, insurance, customs, handling, other, quantity]);
+    const enteredCosts = costFields.filter(({ key }) => costs[key] !== null);
+    const knownSubtotal = enteredCosts.reduce((sum, { key }) => sum + (costs[key] ?? 0), 0);
+    const unknownCosts = costFields.filter(({ key }) => costs[key] === null);
+    return {
+      knownSubtotal,
+      unknownCosts,
+      enteredCount: enteredCosts.length,
+      perItem: quantity > 0 ? knownSubtotal / quantity : knownSubtotal
+    };
+  }, [costs, quantity]);
+
+  function updateCost(key: CostKey, value: number | null) {
+    setCosts((current) => ({ ...current, [key]: value }));
+  }
+
+  function resetCalculator() {
+    setCurrency("USD");
+    setCategory("Vehicle");
+    setOrigin("United States");
+    setDestination("Georgia");
+    setDestinationPort("Poti");
+    setShippingMethod("Ocean freight");
+    setQuantity(1);
+    setCosts(emptyCosts);
+  }
+
+  function changeCurrency(nextCurrency: Currency) {
+    if (nextCurrency === currency) return;
+    setCurrency(nextCurrency);
+    setCosts(emptyCosts);
+  }
 
   return (
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">Import planning tool</span>
-          <h1>See the cost beyond the price tag.</h1>
-          <p>Enter the costs you know to estimate your total import spend. Every amount is editable, and no customs rate or shipping quote is assumed to be live.</p>
+          <span className="eyebrow">Import cost calculator</span>
+          <h1>Build an import budget from real numbers.</h1>
+          <p>Add the charges you know, leave unknown costs blank, and see a transparent subtotal. Portavero does not invent freight quotes or silently count missing charges as free.</p>
         </div>
       </section>
       <section className="section">
         <div className="container tool-layout">
           <section className="panel">
-            <h2>Your shipment</h2>
-            <p className="panel-intro">Use one currency for every field. Convert amounts yourself before entering them if needed.</p>
+            <h2>Shipment details</h2>
+            <p className="panel-intro">For a meaningful estimate, use the same currency for every amount. This tool does not convert currencies or fetch live rates.</p>
             <div className="form-grid">
               <div className="field">
-                <label htmlFor="currency">Currency</label>
-                <select id="currency" value={currency} onChange={(event) => changeCurrency(event.target.value)}>
+                <label htmlFor="category">What are you importing?</label>
+                <select id="category" value={category} onChange={(event) => setCategory(event.target.value)}>
+                  <option>Vehicle</option>
+                  <option>Motorcycle</option>
+                  <option>Electronics</option>
+                  <option>Machinery</option>
+                  <option>General cargo</option>
+                  <option>Other goods</option>
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="currency">Calculation currency</label>
+                <select id="currency" value={currency} onChange={(event) => changeCurrency(event.target.value as Currency)}>
                   <option value="USD">USD · US dollar</option>
                   <option value="EUR">EUR · Euro</option>
                   <option value="GBP">GBP · British pound</option>
                   <option value="GEL">GEL · Georgian lari</option>
                   <option value="JPY">JPY · Japanese yen</option>
                 </select>
-                <small>Changing currency clears the amounts to prevent accidental relabeling. Enter all costs in the selected currency.</small>
+                <small>Changing currency clears amounts so they are not accidentally relabelled.</small>
               </div>
-              <NumberField id="goods" label="Goods / purchase value" value={goods} onChange={setGoods} hint="Total amount paid to the seller." />
-              <NumberField id="shipping" label="Shipping / freight" value={shipping} onChange={setShipping} hint="Use a carrier quote where possible." />
-              <NumberField id="insurance" label="Insurance" value={insurance} onChange={setInsurance} />
-              <NumberField id="customs" label="Customs and taxes" value={customs} onChange={setCustoms} hint="Enter a verified figure, or leave at zero until known." />
-              <NumberField id="handling" label="Handling / port charges" value={handling} onChange={setHandling} hint="Enter a provider quote when available." />
-              <NumberField id="other" label="Other costs" value={other} onChange={setOther} hint="Broker, inland delivery, storage or other fees." />
-              <NumberField id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value)))} min={1} step="1" hint="Used to estimate average cost per item." />
+              <div className="field">
+                <label htmlFor="origin">Origin country or location</label>
+                <input id="origin" value={origin} onChange={(event) => setOrigin(event.target.value)} maxLength={100} />
+              </div>
+              <div className="field">
+                <label htmlFor="destination">Destination country</label>
+                <input id="destination" value={destination} onChange={(event) => setDestination(event.target.value)} maxLength={100} />
+              </div>
+              <div className="field">
+                <label htmlFor="port">Destination port or terminal</label>
+                <select id="port" value={destinationPort} onChange={(event) => setDestinationPort(event.target.value)}>
+                  <option value="Poti">Poti, Georgia</option>
+                  <option value="Batumi">Batumi, Georgia</option>
+                  <option value="Other">Other / not selected</option>
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="shipping-method">Shipping method</label>
+                <select id="shipping-method" value={shippingMethod} onChange={(event) => setShippingMethod(event.target.value)}>
+                  <option>Ocean freight</option>
+                  <option>Air freight</option>
+                  <option>Road transport</option>
+                  <option>Rail freight</option>
+                  <option>Not decided</option>
+                </select>
+              </div>
+              <NumberField id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value ?? 1)))} hint="Used to calculate the average cost per item." />
             </div>
+            <h2 style={{ marginTop: 34 }}>Known costs</h2>
+            <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
+            <div className="form-grid">
+              {costFields.map((field) => (
+                <NumberField
+                  key={field.key}
+                  id={field.key}
+                  label={field.label}
+                  value={costs[field.key]}
+                  onChange={(value) => updateCost(field.key, value)}
+                  hint={field.hint}
+                />
+              ))}
+            </div>
+            <button type="button" className="button button-outline" onClick={resetCalculator} style={{ marginTop: 24 }}>Reset calculator</button>
           </section>
+
           <aside className="panel result-panel" aria-live="polite">
-            <span className="result-label">Estimated total</span>
-            <div className="result-total">{money(result.subtotal, currency)}</div>
-            <p>Based only on the amounts entered above.</p>
+            <span className="result-label">Known-cost subtotal</span>
+            <div className="result-total">{money(result.knownSubtotal, currency)}</div>
+            <p>This is the sum of the amounts entered, not a guaranteed final landed cost.</p>
             <div className="result-lines">
-              <div className="result-line"><span>Goods</span><strong>{money(goods, currency)}</strong></div>
-              <div className="result-line"><span>Shipping</span><strong>{money(shipping, currency)}</strong></div>
-              <div className="result-line"><span>Insurance</span><strong>{money(insurance, currency)}</strong></div>
-              <div className="result-line"><span>Customs and taxes</span><strong>{money(customs, currency)}</strong></div>
-              <div className="result-line"><span>Handling and other</span><strong>{money(handling + other, currency)}</strong></div>
-              <div className="result-line"><span>Average per item</span><strong>{money(result.perItem, currency)}</strong></div>
+              {costFields.map(({ key, label }) => (
+                <div className="result-line" key={key}>
+                  <span>{label}</span>
+                  <strong>{costs[key] === null ? "Not entered" : money(costs[key] ?? 0, currency)}</strong>
+                </div>
+              ))}
+              <div className="result-line result-line-total">
+                <span>Average per item</span>
+                <strong>{money(result.perItem, currency)}</strong>
+              </div>
             </div>
-            <div className="disclaimer">Planning estimate only. A zero in any field means no amount has been included, not that the charge is legally waived or free.</div>
+            <div className="disclaimer">
+              <strong>{result.unknownCosts.length} of {costFields.length} cost categories still unknown.</strong>
+              {result.unknownCosts.length > 0
+                ? ` Add or verify: ${result.unknownCosts.map(({ label }) => label.toLowerCase()).join(", ")}.`
+                : " All listed categories have an entered amount. Verify applicable taxes and fees with official sources before relying on the total."}
+            </div>
+            <p style={{ marginTop: 18, fontSize: ".78rem" }}>
+              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. No live freight rates, currency conversion, or automatic customs assessment is connected.
+            </p>
           </aside>
         </div>
       </section>
