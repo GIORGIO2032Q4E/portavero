@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { saveCloudEstimate } from "@/lib/auth";
 
@@ -263,7 +264,7 @@ export default function CalculatorPage() {
             </div>
             <section className="saved-estimates print-hide" style={{ marginTop: 30, borderTop: "1px solid var(--border, #ddd)", paddingTop: 22 }}>
               <h2>Save this estimate</h2>
-              <p className="panel-intro">Saved estimates stay in this browser on this device. They are not uploaded to an account or synced across devices.</p>
+              <p className="panel-intro">Saved estimates stay in this browser on this device when you are signed out. <Link href="/account" className="text-link">Sign in or create an account</Link> to sync new estimates across devices.</p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <input aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} style={{ flex: "1 1 220px" }} />
                 <button type="button" className="button button-dark" onClick={saveEstimate}>Save estimate</button>
