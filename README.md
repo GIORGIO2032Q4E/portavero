@@ -6,16 +6,18 @@ The idea is simple: enter the costs you already know, see their total, and keep 
 
 ## What it can do
 
-- Add up costs entered in the general import calculator.
+- Add up costs entered in the general import calculator and calculate an average per item.
+- Save up to 10 named estimates in the current browser and load them later on that device.
+- Print an estimate or use the browser print dialog to save it as a PDF.
+- Compare up to three shipping quotes entered by the user, grouped by currency. These are not live provider prices.
 - Show which cost fields are still blank.
-- Calculate an average cost per item.
 - Give a preliminary excise estimate for some passenger vehicles imported into Georgia.
 - Show a checklist of questions to ask a shipping provider.
 
 ## What it cannot do yet
 
-- Find live shipping prices or compare real carrier quotes.
-- Convert currencies using live exchange rates.
+- Fetch live shipping prices or quotes from carriers automatically.
+- Convert currencies using live exchange rates. The manual quote comparison does not convert currencies.
 - Book shipments or track cargo.
 - Calculate every customs duty, tax, or service fee.
 - Replace the official Revenue Service calculator.
