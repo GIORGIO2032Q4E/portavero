@@ -1075,3 +1075,256 @@ h2, h3 { font-weight: 650; }
     text-decoration: none !important;
   }
 }
+
+
+/* Final readability pass: calm colors, clear form fields, and restrained polish. */
+:root {
+  --paper: #f5f6f1;
+  --surface: #ffffff;
+  --ink: #172b24;
+  --muted: #526159;
+  --line: #d7e0d8;
+  --green: #d9eda0;
+  --green-deep: #24523c;
+  --green-soft: #eef5e4;
+  --orange: #b95f35;
+  --dark: #17382b;
+  --radius: 12px;
+  --shadow: 0 12px 32px rgba(23, 56, 43, .07);
+}
+
+body {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+p,
+.field small {
+  color: var(--muted);
+}
+
+.main-nav .nav-link,
+.main-nav a,
+.footer-links a {
+  color: #43544a;
+}
+
+.page-hero {
+  background: linear-gradient(180deg, #fbfcf8 0%, var(--paper) 100%);
+}
+
+.page-hero .eyebrow,
+.eyebrow {
+  color: #24523c;
+}
+
+.panel,
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(23, 56, 43, .035);
+}
+
+.tool-layout > .panel:first-child {
+  padding: clamp(20px, 3vw, 32px);
+}
+
+.panel h2 {
+  color: #1a3328;
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  letter-spacing: -.03em;
+}
+
+.panel-intro {
+  color: #526159;
+  line-height: 1.65;
+}
+
+.field label {
+  color: #293c31;
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.saved-estimates > div > input,
+.saved-estimates input {
+  min-height: 48px;
+  color: #172b24;
+  background: #fff;
+  border: 1px solid #b9c9bd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: inset 0 1px 2px rgba(23, 56, 43, .025);
+}
+
+.field input::placeholder,
+.saved-estimates input::placeholder {
+  color: #68766d;
+  opacity: 1;
+}
+
+.field input:hover,
+.field select:hover,
+.saved-estimates input:hover {
+  border-color: #789783;
+}
+
+.field input:focus,
+.field select:focus,
+.saved-estimates input:focus {
+  border-color: #397552;
+  outline: 3px solid rgba(57, 117, 82, .18);
+  outline-offset: 1px;
+}
+
+.field select option {
+  color: #172b24;
+  background: #fff;
+}
+
+.button {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.button-dark {
+  color: #fff;
+  background: #24523c;
+}
+
+.button-dark:hover {
+  color: #fff;
+  background: #183e2c;
+}
+
+.button-outline {
+  color: #234331;
+  border-color: #a9bcae;
+  background: #fff;
+}
+
+.button-outline:hover {
+  color: #183e2c;
+  border-color: #789783;
+  background: #f0f5ed;
+}
+
+.result-panel {
+  color: #fff;
+  background: #17382b;
+  border: 1px solid #244d3a;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(23, 56, 43, .12);
+}
+
+.result-panel .result-label {
+  color: #d9eda0;
+}
+
+.result-panel .result-total {
+  color: #fff;
+}
+
+.result-panel p,
+.result-panel .result-currency {
+  color: #e0e9e2;
+}
+
+.result-panel .result-lines {
+  border-top-color: rgba(255, 255, 255, .22);
+}
+
+.result-panel .result-line {
+  border-bottom-color: rgba(255, 255, 255, .16);
+}
+
+.result-panel .result-line span {
+  color: #e0e9e2;
+}
+
+.result-panel .result-line strong {
+  color: #fff;
+}
+
+.result-panel .result-line-total {
+  border-top-color: rgba(217, 237, 160, .55);
+}
+
+.result-panel .result-line-total span,
+.result-panel .result-line-total strong {
+  color: #e2f4b4;
+}
+
+.result-panel .disclaimer {
+  color: #f0f5ed;
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 8px;
+}
+
+.saved-estimates {
+  border-top-color: #d7e0d8 !important;
+}
+
+.saved-estimates .result-line {
+  padding: 14px 0;
+  border-bottom: 1px solid #e1e7e1;
+}
+
+.saved-estimates .result-line > span:first-child {
+  color: #293c31;
+}
+
+.saved-estimates .result-line small {
+  color: #526159;
+}
+
+.quote-entry {
+  background: #fbfcf8;
+  border-color: #d7e0d8 !important;
+  border-radius: 10px !important;
+}
+
+#quote-comparison .result-lines .result-line {
+  color: #172b24;
+  border-bottom-color: #d7e0d8;
+}
+
+#quote-comparison .result-lines .result-line span,
+#quote-comparison .result-lines .result-line strong {
+  color: #293c31;
+}
+
+#quote-comparison .disclaimer {
+  color: #34483b;
+  background: #eef5e4;
+  border: 1px solid #d8e5c8;
+}
+
+@media (max-width: 600px) {
+  .tool-layout > .panel:first-child {
+    padding: 19px;
+  }
+
+  .result-panel {
+    padding: 22px;
+  }
+
+  .saved-estimates .result-line {
+    align-items: flex-start;
+  }
+
+  .saved-estimates .result-line > span:last-child {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .saved-estimates .result-line button {
+    flex: 1;
+  }
+}
