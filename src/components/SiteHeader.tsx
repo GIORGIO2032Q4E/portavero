@@ -7,8 +7,10 @@ import { useState } from "react";
 const navigation = [
   { href: "/calculator", label: "Import calculator" },
   { href: "/vehicle-import", label: "Vehicle import" },
+  { href: "/vehicles", label: "Vehicle catalogue" },
   { href: "/shipping", label: "Shipping" },
-  { href: "/how-it-works", label: "How it works" }
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/account", label: "Account" }
 ];
 
 export default function SiteHeader() {
@@ -20,11 +22,11 @@ export default function SiteHeader() {
   }
 
   return (
-    <header className="site-header">
+    <header className="site-header" onKeyDown={(event) => { if (event.key === "Escape") closeMenu(); }}>
       <div className="header-inner">
         <Link href="/" className="brand" aria-label="Portavero home" onClick={closeMenu}>
           <span className="brand-mark" aria-hidden="true">P</span>
-          <span>porta<span className="brand-light">vero</span></span>
+          <span>Portavero</span>
         </Link>
 
         <button
@@ -35,7 +37,7 @@ export default function SiteHeader() {
           aria-controls="primary-navigation"
           onClick={() => setMenuOpen((open) => !open)}
         >
-          <span aria-hidden="true">{menuOpen ? "×" : "☰"}</span>
+          <span className={`menu-glyph${menuOpen ? " is-open" : ""}`} aria-hidden="true"><span /><span /></span>
         </button>
 
         <nav

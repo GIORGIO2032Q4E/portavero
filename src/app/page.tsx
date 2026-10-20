@@ -4,103 +4,103 @@ const tools = [
   {
     number: "01",
     title: "Import cost calculator",
-    description: "Bring product price, shipping, insurance and extra charges into one clear estimate.",
+    description: "Add the costs you already know and see a subtotal, plus the amounts you still need to check.",
     href: "/calculator",
-    link: "Calculate your landed cost"
+    link: "Open calculator"
   },
   {
     number: "02",
-    title: "Vehicle import planning",
-    description: "Organize a vehicle's purchase price, transport, port costs and other known expenses.",
+    title: "Vehicle import estimate",
+    description: "Enter basic vehicle details to get a preliminary excise estimate for Georgia.",
     href: "/vehicle-import",
-    link: "Plan a vehicle import"
+    link: "Estimate vehicle costs"
   },
   {
     number: "03",
-    title: "Shipping quote checklist",
-    description: "Review the charges a freight quote should cover and identify details to confirm before booking.",
+    title: "Vehicle catalogue",
+    description: "Browse supported makes, models and common engine variants before estimating import costs.",
+    href: "/vehicles",
+    link: "Browse vehicles"
+  },
+  {
+    number: "04",
+    title: "Shipping checklist",
+    description: "A short list of questions to ask before accepting a shipping quote.",
     href: "/shipping",
-    link: "Explore shipping costs"
+    link: "View checklist"
   }
 ];
 
 export default function HomePage() {
   return (
     <>
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <span className="eyebrow">A clearer way to import</span>
-            <h1>Know the full cost <em>before you import.</em></h1>
-            <p>Plan your next cross-border shipment with the costs in one place, the assumptions in plain sight, and fewer expensive surprises.</p>
+      <section className="simple-hero">
+        <div className="container simple-hero-grid">
+          <div className="simple-hero-copy">
+            <p className="simple-status">An independent project · Early version</p>
+            <h1>Planning an import to Georgia?</h1>
+            <p className="simple-lede">Portavero helps you put the costs in one place. Enter the prices you know, keep unknown fees blank, and get a clearer starting budget.</p>
             <div className="hero-actions">
-              <Link href="/calculator" className="button button-dark">Calculate import cost <span aria-hidden="true">↗</span></Link>
-              <Link href="/vehicle-import" className="button button-outline">Explore vehicle import</Link>
+              <Link href="/calculator" className="button button-dark">Try the cost calculator</Link>
+              <Link href="/vehicle-import" className="simple-text-link">Importing a car? <span aria-hidden="true">→</span></Link>
             </div>
-            <div className="trust-note"><span className="trust-dot" /> Estimates you can inspect. No made-up live rates.</div>
+            <p className="simple-note">No live shipping quotes or automatic customs calculations yet.</p>
           </div>
-          <div className="hero-art" aria-label="Illustration of an import route and cost summary">
-            <div className="float-note note-top">One clear estimate<span>Costs in one place</span></div>
-            <div className="route-card">
-              <div className="route-card-top">
-                <div><div className="route-label">Import overview</div><div className="route-title">From purchase to arrival</div></div>
-                <span className="status-label">Planning mode</span>
-              </div>
-              <div className="route-map">
-                <div className="route-path" /><span className="map-point" /><span className="map-point end" />
-                <div className="map-caption"><span>Origin</span><span>Destination</span></div>
-              </div>
-              <div className="route-stats">
-                <div className="route-stat"><span>Costs included</span><strong>Line by line</strong></div>
-                <div className="route-stat"><span>Data source</span><strong>Your inputs</strong></div>
-              </div>
+          <aside className="simple-example">
+            <div className="simple-example-heading">
+              <span>EXAMPLE COST LIST</span>
+              <span>USD</span>
             </div>
-            <div className="float-note note-bottom">See what is known<span>And what still needs a quote</span></div>
-          </div>
+            <div className="simple-example-row"><span>Purchase price</span><strong>Enter amount</strong></div>
+            <div className="simple-example-row"><span>Shipping</span><strong>Needs a quote</strong></div>
+            <div className="simple-example-row"><span>Insurance</span><strong>Not entered</strong></div>
+            <div className="simple-example-row"><span>Customs and fees</span><strong>Check first</strong></div>
+            <p className="simple-example-foot">The example is for layout only. No prices are estimated here.</p>
+          </aside>
         </div>
       </section>
 
-      <section className="section section-tint">
+      <section className="simple-tools-section">
         <div className="container">
-          <div className="section-heading">
-            <span className="eyebrow">Your import toolkit</span>
-            <h2>Less guesswork. More visibility.</h2>
-            <p>Import costs can hide in the gaps between suppliers, shipping companies and customs. Portavero gives those moving parts a place to meet.</p>
+          <div className="simple-section-heading">
+            <p className="editorial-label">TOOLS</p>
+            <h2>Start with the part you need.</h2>
+            <p>These are small planning tools, not a freight booking service.</p>
           </div>
-          <div className="card-grid">
+          <div className="simple-tool-list">
             {tools.map((tool) => (
-              <article className="feature-card" key={tool.number}>
-                <span className="feature-icon">{tool.number}</span>
-                <h3>{tool.title}</h3>
-                <p>{tool.description}</p>
-                <Link className="text-link" href={tool.href}>{tool.link} <span aria-hidden="true">↗</span></Link>
+              <article className="simple-tool-row" key={tool.number}>
+                <span className="simple-tool-number">{tool.number}</span>
+                <div>
+                  <h3>{tool.title}</h3>
+                  <p>{tool.description}</p>
+                </div>
+                <Link href={tool.href}>{tool.link} <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <div className="section-heading">
-            <span className="eyebrow">The process</span>
-            <h2>Three steps. A much clearer picture.</h2>
-            <p>Start with what you know. Add real quotes as you get them. Keep unknown costs visible instead of quietly pretending they are zero.</p>
+      <section className="simple-how-section">
+        <div className="container simple-how-grid">
+          <div>
+            <p className="editorial-label">HOW TO USE IT</p>
+            <h2>Three simple steps.</h2>
           </div>
-          <div className="steps-grid">
-            <article className="step"><span className="step-number">STEP 01</span><h3>Enter the basics</h3><p>Add your item value, currency, shipping and any known fees.</p></article>
-            <article className="step"><span className="step-number">STEP 02</span><h3>Review the breakdown</h3><p>See the estimated total and exactly which inputs shape it.</p></article>
-            <article className="step"><span className="step-number">STEP 03</span><h3>Verify before you commit</h3><p>Confirm carrier quotes, customs treatment and local charges with their official sources.</p></article>
-          </div>
+          <ol>
+            <li><strong>Enter confirmed amounts.</strong><span>Use prices from your seller or shipping company.</span></li>
+            <li><strong>Leave unknown costs blank.</strong><span>That way, a missing amount is not treated as free.</span></li>
+            <li><strong>Check the final numbers.</strong><span>Confirm tax rules and extra fees with official sources or your provider.</span></li>
+          </ol>
         </div>
       </section>
 
-      <section className="section section-dark">
+      <section className="simple-bottom-cta">
         <div className="container">
-          <div className="callout">
-            <div><h2>Start with the numbers you have.</h2><p>Build a first estimate in a few minutes, then improve it as better information arrives.</p></div>
-            <Link href="/calculator" className="button button-dark">Open the calculator <span aria-hidden="true">↗</span></Link>
-          </div>
+          <h2>Start with the numbers you have.</h2>
+          <p>You can update the estimate when you get more accurate quotes.</p>
+          <Link href="/calculator" className="button button-dark">Open calculator</Link>
         </div>
       </section>
     </>

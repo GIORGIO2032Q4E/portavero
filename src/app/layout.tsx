@@ -8,17 +8,17 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `h
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Portavero | Know the full cost before you import",
+    default: "Portavero | Import cost planner",
     template: "%s | Portavero"
   },
   description:
-    "Plan cross-border imports with a clearer view of product, shipping, insurance and other costs. Start with a transparent import estimate for Georgia.",
+    "A simple tool for organizing import costs, with a focus on goods and vehicles brought into Georgia.",
   applicationName: "Portavero",
   icons: { icon: "/favicon.svg" },
   keywords: ["import cost calculator", "shipping estimator", "Georgia imports", "vehicle import"],
   openGraph: {
     title: "Portavero | Know the full cost before you import",
-    description: "A clearer starting point for cross-border import planning.",
+    description: "A simple starting point for planning import costs.",
     type: "website",
     siteName: "Portavero"
   },
@@ -42,19 +42,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <div className="footer-brand">
               <Link href="/" className="brand">
                 <span className="brand-mark" aria-hidden="true">P</span>
-                <span>porta<span className="brand-light">vero</span></span>
+                <span>Portavero</span>
               </Link>
-              <p>Know the full cost before you import.</p>
+              <p>A small tool for planning import costs.</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>
               <Link href="/how-it-works">How it works</Link>
+          <Link href="/vehicles">Vehicle catalogue</Link>
               <Link href="/privacy-policy">Privacy</Link>
               <Link href="/terms">Terms</Link>
+              <Link href="/account">Account</Link>
             </div>
           </div>
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} Portavero. Built for clearer decisions.</span>
+            <span>© {new Date().getFullYear()} Portavero. Independent project.</span>
             <span>Estimates are planning tools, not customs declarations or binding quotes.</span>
           </div>
         </footer>

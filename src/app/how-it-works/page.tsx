@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "How import estimates work",
+  description: "See how Portavero combines user-entered costs, calculated totals, and clearly identified unknowns."
+};
+
 import Link from "next/link";
 
 export default function HowItWorksPage() {
@@ -6,8 +13,8 @@ export default function HowItWorksPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">How Portavero works</span>
-          <h1>A useful estimate starts with honest inputs.</h1>
-          <p>Portavero adds the cost components you enter and shows the result. It does not quietly fill missing information with a made-up quote or claim that an unverified tax amount is official.</p>
+          <h1>How the estimate works.</h1>
+          <p>The calculator adds the amounts you enter. It does not include unknown costs or fetch shipping prices and official tax amounts automatically.</p>
         </div>
       </section>
       <section className="section">
