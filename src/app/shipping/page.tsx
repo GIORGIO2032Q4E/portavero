@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 };
 
 import Link from "next/link";
+import QuoteComparison from "./quote-comparison";
 
 export default function ShippingPage() {
   return (
@@ -43,6 +44,7 @@ export default function ShippingPage() {
           </div>
         </div>
       </section>
+      <QuoteComparison />
     </>
   );
 }
