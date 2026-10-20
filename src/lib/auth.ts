@@ -116,13 +116,45 @@ export async function signOut() {
   const session = await getSession();
   if (session) {
     try {
-      await authRequest("logout", undefined, session.access_token);
+      await authRequest("logout", {}, session.access_token);
     } finally {
       storeSession(null);
     }
   } else {
     storeSession(null);
   }
+}
+
+export async function updatePassword(password: string, accessToken: string) {
+  const { url, key } = config();
+  const response = await fetch(url + "/auth/v1/user", {
+    method: "PUT",
+    headers: { apikey: key, Authorization: "Bearer " + accessToken, "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({})) as Record<string, unknown>;
+    throw new Error(typeof result.message === "string" ? result.message : "Could not update password.");
+  }
+}
+
+export async function setRecoverySessionFromUrlHash() {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  if (params.get("type") !== "recovery") return null;
+  const result: Record<string, unknown> = {
+    access_token: params.get("access_token"),
+    refresh_token: params.get("refresh_token"),
+    token_type: params.get("token_type") ?? "bearer",
+    expires_in: Number(params.get("expires_in") ?? 3600),
+    user: { id: params.get("user_id") ?? "recovery" }
+  };
+  const session = normaliseSession(result);
+  if (!session) return null;
+  storeSession(session);
+  window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  return session;
 }
 
 export async function sendPasswordReset(email: string) {
