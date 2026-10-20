@@ -32,7 +32,7 @@ test("current rate is GEL 4.50/cm³ at age 7 and above", () => {
 test("left-hand-drive hybrid age 0 through 6 gets a 60% excise reduction", () => {
   const result = calculate({ hybrid: true });
   assert.ok(Math.abs(result.rate - 0.6) < 1e-9);
-  assert.equal(result.excise, 1200);
+  assert.ok(Math.abs(result.excise - 1200) < 1e-9);
 });
 
 test("right-hand-drive non-electric car uses triple excise", () => {
