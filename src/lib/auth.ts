@@ -22,7 +22,7 @@ export type CloudEstimate = {
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export function isAuthConfigured() {
   return Boolean(supabaseUrl && supabaseKey);
@@ -30,7 +30,7 @@ export function isAuthConfigured() {
 
 function config() {
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Accounts are not configured yet. Add the Supabase URL and anon key to the deployment environment.");
+    throw new Error("Accounts are not configured yet. Add the Supabase URL and publishable (or legacy anon) key to the deployment environment.");
   }
   return { url: supabaseUrl, key: supabaseKey };
 }
