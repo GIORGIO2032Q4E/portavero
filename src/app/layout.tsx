@@ -8,17 +8,17 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `h
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Portavero | Know the full cost before you import",
+    default: "Portavero | Import cost planner",
     template: "%s | Portavero"
   },
   description:
-    "Plan cross-border imports with a clearer view of product, shipping, insurance and other costs. Start with a transparent import estimate for Georgia.",
+    "A simple tool for organizing import costs, with a focus on goods and vehicles brought into Georgia.",
   applicationName: "Portavero",
   icons: { icon: "/favicon.svg" },
   keywords: ["import cost calculator", "shipping estimator", "Georgia imports", "vehicle import"],
   openGraph: {
     title: "Portavero | Know the full cost before you import",
-    description: "A clearer starting point for cross-border import planning.",
+    description: "A simple starting point for planning import costs.",
     type: "website",
     siteName: "Portavero"
   },
