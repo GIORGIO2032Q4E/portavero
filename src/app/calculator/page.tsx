@@ -312,7 +312,7 @@ export default function CalculatorPage() {
               </div>
               <NumberField inputMode="decimal" id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value ?? 1)))} hint="Used to calculate the average cost per item." />
             </div>
-            <h2 style={{ marginTop: 34 }}>Verified tax rates</h2>
+            <h2 className="calculator-subheading">Verified tax rates</h2>
             <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the customs-value costs entered above, so missing purchase, freight or insurance amounts can make the result too low.</p>
             <div className="form-grid">
               <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} onChange={(value) => setDutyRate(value === null ? null : Math.min(100, value))} hint="Use the rate for the exact HS / tariff code and origin rules." />
@@ -332,7 +332,7 @@ export default function CalculatorPage() {
                 <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>
               )}. Check rates for destination: {destination.trim() || "not specified"}; tariff code: {hsCode.trim() || "not entered"}; origin: {countryOfOrigin.trim() || "not specified"}; import date: {importDate || "not entered"}. This tool does not fetch tariff rates automatically. EU TARIC does not include national VAT rates, and special taxes or exemptions may require separate checks.
             </div>
-            <h2 style={{ marginTop: 34 }}>Known costs</h2>
+            <h2 className="calculator-subheading">Known costs</h2>
             <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
             <div className="form-grid">
               {costFields.map((field) => (
@@ -346,23 +346,23 @@ export default function CalculatorPage() {
                 />
               ))}
             </div>
-            <div className="calculator-actions print-hide" style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
+            <div className="calculator-actions print-hide">
               <button type="button" className="button button-outline" onClick={resetCalculator}>Reset calculator</button>
               <button type="button" className="button button-dark" onClick={() => window.print()}>Print / Save as PDF</button>
             </div>
-            <section className="saved-estimates print-hide" style={{ marginTop: 30, borderTop: "1px solid var(--border, #ddd)", paddingTop: 22 }}>
+            <section className="saved-estimates print-hide">
               <h2>Save this estimate</h2>
               <p className="panel-intro">Saved estimates stay in this browser on this device when you are signed out. <Link href="/account" className="text-link">Sign in or create an account</Link> to sync new estimates across devices.</p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <input aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} style={{ flex: "1 1 220px" }} />
+              <div className="estimate-save-controls">
+                <input className="estimate-name-input" aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} />
                 <button type="button" className="button button-dark" onClick={saveEstimate}>Save estimate</button>
               </div>
-              {saveMessage && <p role="status" style={{ marginTop: 10 }}>{saveMessage}</p>}
-              {savedEstimates.length > 0 && <div style={{ marginTop: 18 }}>
+              {saveMessage && <p className="estimate-save-message" role="status">{saveMessage}</p>}
+              {savedEstimates.length > 0 && <div className="saved-estimates-list">
                 <h3>Saved in this browser ({savedEstimates.length}/10)</h3>
-                {savedEstimates.map((saved) => <div key={saved.id} className="result-line" style={{ gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                {savedEstimates.map((saved) => <div key={saved.id} className="result-line saved-estimate-row">
                   <span><strong>{saved.name}</strong><br /><small>{new Date(saved.savedAt).toLocaleString()}</small></span>
-                  <span style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+                  <span className="saved-estimate-actions">
                     <button type="button" className="button button-outline" onClick={() => loadEstimate(saved)}>Load</button>
                     <button type="button" className="button button-outline" onClick={() => deleteEstimate(saved.id)} aria-label={`Delete ${saved.name}`}>Delete</button>
                   </span>
@@ -396,7 +396,7 @@ export default function CalculatorPage() {
                 ? ` Add or verify: ${result.unknownCosts.map(({ label }) => label.toLowerCase()).join(", ")}.`
                 : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
             </div>
-            <p style={{ marginTop: 18, fontSize: ".78rem" }}>
+            <p className="calculator-footer-note">
               Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. Goods origin: {countryOfOrigin.trim() || "not specified"} · HS code: {hsCode.trim() || "not entered"} · import date: {importDate || "not entered"}. No live freight rates, currency conversion or automatic tariff lookup is connected. This calculator applies the rates you enter and does not replace the destination country’s official customs calculation.
             </p>
           </aside>
