@@ -1,6 +1,6 @@
 const storageKey = "portavero-auth-session";
 
-export type PortaveroUser = {
+type PortaveroUser = {
   id: string;
   email?: string;
 };
@@ -53,7 +53,7 @@ function normaliseSession(value: Record<string, unknown>): PortaveroSession | nu
   };
 }
 
-export function readStoredSession(): PortaveroSession | null {
+function readStoredSession(): PortaveroSession | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(storageKey);
