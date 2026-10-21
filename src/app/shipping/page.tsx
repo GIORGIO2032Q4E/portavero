@@ -1,12 +1,11 @@
+import Link from "next/link";
 import type { Metadata } from "next";
+import QuoteComparison from "./quote-comparison";
 
 export const metadata: Metadata = {
   title: "Shipping cost planning",
   description: "Review the charges, route details, and transit assumptions to confirm with a freight provider before booking."
 };
-
-import Link from "next/link";
-import QuoteComparison from "./quote-comparison";
 
 export default function ShippingPage() {
   return (
