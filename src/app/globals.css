@@ -1565,3 +1565,154 @@ p,
     color: #222 !important;
   }
 }
+
+
+/* Print styles for the import cost calculator */
+@media print {
+  body {
+    min-width: 0 !important;
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 9.5pt !important;
+    line-height: 1.4 !important;
+  }
+
+  .site-header,
+  .site-footer,
+  .calculator-hero,
+  .print-hide {
+    display: none !important;
+  }
+
+  .calculator-page {
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .calculator-page .container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .calculator-page .tool-layout {
+    display: block !important;
+  }
+
+  .calculator-page .panel,
+  .calculator-page .result-panel {
+    position: static !important;
+    margin: 0 0 6mm !important;
+    padding: 5mm !important;
+    border: 1px solid #aaa !important;
+    border-radius: 2mm !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #111 !important;
+    overflow: visible !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .calculator-page h2,
+  .calculator-page h3,
+  .calculator-page p,
+  .calculator-page label,
+  .calculator-page small,
+  .calculator-page .result-label,
+  .calculator-page .result-total,
+  .calculator-page .result-line,
+  .calculator-page .result-line span,
+  .calculator-page .result-line strong,
+  .calculator-page .disclaimer,
+  .calculator-page .calculator-footer-note {
+    color: #111 !important;
+  }
+
+  .calculator-page .result-total {
+    font-size: 22pt !important;
+    line-height: 1.15 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .calculator-page .result-lines {
+    border-top: 1px solid #999 !important;
+  }
+
+  .calculator-page .result-line {
+    gap: 5mm !important;
+    padding: 2mm 0 !important;
+    border-bottom: .5pt solid #ddd !important;
+    font-size: 8.5pt !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .calculator-page .result-line strong {
+    text-align: right !important;
+    overflow-wrap: anywhere;
+  }
+
+  .calculator-page .disclaimer,
+  .calculator-page .notice {
+    border: 1px solid #aaa !important;
+    border-left: 2px solid #777 !important;
+    border-radius: 1mm !important;
+    background: #fff !important;
+    padding: 3mm !important;
+    font-size: 8pt !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .calculator-page .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3mm 5mm !important;
+  }
+
+  .calculator-page .field {
+    min-width: 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .calculator-page .field input,
+  .calculator-page .field select {
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 1mm 0 !important;
+    border: 0 !important;
+    border-bottom: .5pt solid #aaa !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #111 !important;
+    -webkit-text-fill-color: #111 !important;
+    font-size: 9pt !important;
+    box-shadow: none !important;
+    appearance: none;
+  }
+
+  .calculator-page a {
+    color: #111 !important;
+    text-decoration: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .calculator-page .calculator-actions .button,
+  .calculator-page .estimate-save-controls .button {
+    flex: 1 1 100%;
+  }
+
+  .calculator-page .saved-estimate-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .calculator-page .saved-estimate-actions .button {
+    flex: 1;
+    min-width: 0;
+  }
+}
