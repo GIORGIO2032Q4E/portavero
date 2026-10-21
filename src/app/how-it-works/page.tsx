@@ -1,11 +1,10 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "How import estimates work",
   description: "See how Portavero combines user-entered costs, calculated totals, and clearly identified unknowns."
 };
-
-import Link from "next/link";
 
 export default function HowItWorksPage() {
   return (
