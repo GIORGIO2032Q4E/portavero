@@ -1,5 +1,3 @@
-"use client";
-
 type NumberFieldProps = {
   id: string;
   label: string;
