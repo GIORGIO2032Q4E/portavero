@@ -100,6 +100,14 @@ export default function VehicleImportPage() {
             <strong>Portavero · Vehicle import estimate</strong>
             <span>All amounts are shown in Georgian lari (GEL).</span>
           </div>
+          <div className="print-vehicle-summary">
+            <div><span>Vehicle</span><strong>{[makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
+            <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (isElectric ? "Electric" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
+            <div><span>Purchase country</span><strong>{sourceCountry}</strong></div>
+            <div><span>Manufacture year</span><strong>{year}</strong></div>
+            <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge} year(s)</strong></div>
+            <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : "Left-hand drive"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
+          </div>
           <div className="tool-layout">
           <section className="panel vehicle-panel">
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
