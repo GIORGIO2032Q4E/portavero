@@ -1,4 +1,4 @@
-export type EngineVariant = {
+type EngineVariant = {
   id: string;
   label: string;
   cc: number;
@@ -7,8 +7,8 @@ export type EngineVariant = {
   note?: string;
 };
 
-export type VehicleModel = { name: string; engines: EngineVariant[] };
-export type VehicleMake = { name: string; models: VehicleModel[] };
+type VehicleModel = { name: string; engines: EngineVariant[] };
+type VehicleMake = { name: string; models: VehicleModel[] };
 
 // Common variants found across popular used-car import markets.
 // Engine choices vary by model year, trim and market. This is not a complete VIN-level catalogue.
