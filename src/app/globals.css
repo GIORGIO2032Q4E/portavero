@@ -1270,3 +1270,277 @@ p,
   margin-top: 18px;
   font-size: .78rem;
 }
+
+
+.print-report-meta,
+.print-vehicle-summary {
+  display: none;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}
+
+@media print {
+  .vehicle-import-page {
+    color: #111 !important;
+    background: #fff !important;
+    font-size: 9.5pt !important;
+    line-height: 1.4 !important;
+  }
+
+  .vehicle-import-page .site-header,
+  .vehicle-import-page .site-footer,
+  .vehicle-import-page nav,
+  .vehicle-import-page .hero-actions,
+  .vehicle-import-page button {
+    display: none !important;
+  }
+
+  .vehicle-import-page .print-report-meta {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10mm;
+    margin: 0 0 5mm;
+    padding: 0 0 3mm;
+    border-bottom: 1px solid #999;
+    color: #111 !important;
+    font-size: 9pt;
+  }
+
+  .vehicle-import-page .print-report-meta span {
+    text-align: right;
+  }
+
+  .vehicle-import-page .print-vehicle-summary {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3mm 5mm;
+    margin: 0 0 5mm;
+    padding: 4mm;
+    border: 1px solid #aaa;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .vehicle-import-page .print-vehicle-summary div {
+    min-width: 0;
+  }
+
+  .vehicle-import-page .print-vehicle-summary span {
+    display: block;
+    margin-bottom: 1mm;
+    color: #444 !important;
+    font-size: 7.5pt;
+  }
+
+  .vehicle-import-page .print-vehicle-summary strong {
+    display: block;
+    color: #111 !important;
+    font-size: 9pt;
+    overflow-wrap: anywhere;
+  }
+
+  .vehicle-import-page .page-hero {
+    padding: 0 0 5mm !important;
+    border: 0 !important;
+    background: #fff !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .vehicle-import-page .page-hero h1 {
+    max-width: none !important;
+    margin: 0 0 2mm !important;
+    color: #111 !important;
+    font-size: 21pt !important;
+  }
+
+  .vehicle-import-page .page-hero p {
+    max-width: none !important;
+    margin-bottom: 0 !important;
+    color: #333 !important;
+    font-size: 9pt !important;
+  }
+
+  .vehicle-import-page .section {
+    padding: 5mm 0 !important;
+    background: #fff !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .vehicle-import-page .container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .vehicle-import-page .tool-layout {
+    display: block !important;
+  }
+
+  .vehicle-import-page .vehicle-panel,
+  .vehicle-import-page .result-panel,
+  .vehicle-import-page .section-tint .panel {
+    position: static !important;
+    margin: 0 0 5mm !important;
+    padding: 5mm !important;
+    border: 1px solid #aaa !important;
+    border-radius: 2mm !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #111 !important;
+    overflow: visible !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .vehicle-import-page .vehicle-section-heading {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .vehicle-import-page .vehicle-panel h2,
+  .vehicle-import-page .section-heading h2 {
+    color: #111 !important;
+    font-size: 14pt !important;
+  }
+
+  .vehicle-import-page .panel-intro,
+  .vehicle-import-page .section-heading p {
+    color: #333 !important;
+    font-size: 8.5pt !important;
+  }
+
+  .vehicle-import-page .form-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3mm 5mm !important;
+  }
+
+  .vehicle-import-page .field {
+    min-width: 0;
+    gap: 1mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .vehicle-import-page .field label {
+    color: #222 !important;
+    font-size: 8pt !important;
+  }
+
+  .vehicle-import-page .field input,
+  .vehicle-import-page .field select {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 1mm 0 !important;
+    border: 0 !important;
+    border-bottom: 0.5pt solid #aaa !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #111 !important;
+    -webkit-text-fill-color: #111 !important;
+    font-size: 9pt !important;
+    box-shadow: none !important;
+    appearance: none;
+  }
+
+  .vehicle-import-page .field small {
+    color: #444 !important;
+    font-size: 7.5pt !important;
+  }
+
+  .vehicle-import-page .notice,
+  .vehicle-import-page .disclaimer {
+    padding: 3mm !important;
+    border: 1px solid #aaa !important;
+    border-left: 2px solid #777 !important;
+    border-radius: 1mm !important;
+    background: #fff !important;
+    color: #222 !important;
+    font-size: 8pt !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .vehicle-import-page .result-panel {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .vehicle-import-page .result-panel * {
+    color: #111 !important;
+  }
+
+  .vehicle-import-page .result-label {
+    font-size: 8pt !important;
+    letter-spacing: 0 !important;
+  }
+
+  .vehicle-import-page .result-total {
+    margin: 2mm 0 !important;
+    font-size: 24pt !important;
+    line-height: 1.1 !important;
+  }
+
+  .vehicle-import-page .result-lines {
+    margin-top: 3mm !important;
+    border-top: 1px solid #999 !important;
+  }
+
+  .vehicle-import-page .result-line {
+    gap: 5mm !important;
+    padding: 2mm 0 !important;
+    border-bottom: 0.5pt solid #ddd !important;
+    color: #111 !important;
+    font-size: 8.5pt !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .vehicle-import-page .result-line span,
+  .vehicle-import-page .result-line strong,
+  .vehicle-import-page .result-line-total span,
+  .vehicle-import-page .result-line-total strong {
+    color: #111 !important;
+    text-align: left !important;
+  }
+
+  .vehicle-import-page .result-line strong {
+    text-align: right !important;
+  }
+
+  .vehicle-import-page .content-narrow {
+    max-width: none !important;
+  }
+
+  .vehicle-import-page .prose,
+  .vehicle-import-page .prose p,
+  .vehicle-import-page .prose li {
+    color: #222 !important;
+    font-size: 8.5pt !important;
+  }
+
+  .vehicle-import-page .prose h2 {
+    margin-top: 4mm !important;
+    font-size: 13pt !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .vehicle-import-page a {
+    color: #111 !important;
+    text-decoration: none !important;
+  }
+
+  .vehicle-import-page .eyebrow,
+  .vehicle-import-page .step-chip {
+    color: #222 !important;
+  }
+}
