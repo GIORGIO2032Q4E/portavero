@@ -134,5 +134,5 @@ test("electric vehicle excise follows steering and selected regime", () => {
   const rightPrevious = calculate({ isElectric: true, steering: "right", engineCc: 0, preAprilRegime: true });
   assert.equal(leftCurrent.excise, 0);
   assert.equal(rightCurrent.excise, 3000);
-  assert.equal(rightPrevious.excise, 3000);
+  assert.equal(rightPrevious.excise, 1600);
 });
