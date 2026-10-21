@@ -117,12 +117,11 @@ export async function signOut() {
   if (session) {
     try {
       await authRequest("logout", {}, session.access_token);
-    } finally {
-      storeSession(null);
+    } catch {
+      // Clear the local session even when the remote logout endpoint is unavailable.
     }
-  } else {
-    storeSession(null);
   }
+  storeSession(null);
 }
 
 export async function updatePassword(password: string, accessToken: string) {
