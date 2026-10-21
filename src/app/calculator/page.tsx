@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { saveCloudEstimate } from "@/lib/auth";
+import NumberField from "@/components/NumberField";
 
 type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
 type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
@@ -40,44 +41,6 @@ function money(value: number, currency: Currency) {
     currency,
     maximumFractionDigits: currency === "JPY" ? 0 : 2
   }).format(value);
-}
-
-function NumberField({
-  id,
-  label,
-  value,
-  onChange,
-  hint
-}: {
-  id: string;
-  label: string;
-  value: number | null;
-  onChange: (value: number | null) => void;
-  hint?: string;
-}) {
-  return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <input
-        id={id}
-        type="number"
-        min="0"
-        step="0.01"
-        inputMode="decimal"
-        value={value ?? ""}
-        onChange={(event) => {
-          const raw = event.target.value;
-          if (raw === "") {
-            onChange(null);
-            return;
-          }
-          const parsed = Number(raw);
-          onChange(Number.isFinite(parsed) && parsed >= 0 ? parsed : null);
-        }}
-      />
-      {hint && <small>{hint}</small>}
-    </div>
-  );
 }
 
 export default function CalculatorPage() {
@@ -285,13 +248,13 @@ export default function CalculatorPage() {
                   <option>Not decided</option>
                 </select>
               </div>
-              <NumberField id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value ?? 1)))} hint="Used to calculate the average cost per item." />
+              <NumberField inputMode="decimal" id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value ?? 1)))} hint="Used to calculate the average cost per item." />
             </div>
             <h2 style={{ marginTop: 34 }}>Verified tax rates</h2>
             <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the customs-value costs entered above, so missing purchase, freight or insurance amounts can make the result too low.</p>
             <div className="form-grid">
-              <NumberField id="duty-rate" label="Import duty rate (%)" value={dutyRate} onChange={(value) => setDutyRate(value === null ? null : Math.min(100, value))} hint="Use the rate for the exact HS / tariff code and origin rules." />
-              <NumberField id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} onChange={(value) => setVatRate(value === null ? null : Math.min(100, value))} hint="Enter 0 only if the applicable import is confirmed to be exempt or zero-rated." />
+              <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} onChange={(value) => setDutyRate(value === null ? null : Math.min(100, value))} hint="Use the rate for the exact HS / tariff code and origin rules." />
+              <NumberField inputMode="decimal" id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} onChange={(value) => setVatRate(value === null ? null : Math.min(100, value))} hint="Enter 0 only if the applicable import is confirmed to be exempt or zero-rated." />
             </div>
             <div className="notice">
               <strong>Check the official tariff before entering rates.</strong>{" "}
@@ -311,7 +274,7 @@ export default function CalculatorPage() {
             <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
             <div className="form-grid">
               {costFields.map((field) => (
-                <NumberField
+                <NumberField inputMode="decimal"
                   key={field.key}
                   id={field.key}
                   label={field.label}
