@@ -70,13 +70,15 @@ export default function CalculatorPage() {
     }
   }, []);
 
-  function persistEstimates(next: SavedEstimate[]) {
-    setSavedEstimates(next);
+  function persistEstimates(next: SavedEstimate[]): boolean {
     try {
       localStorage.setItem("portavero-saved-estimates", JSON.stringify(next));
+      setSavedEstimates(next);
       setSaveMessage("");
+      return true;
     } catch {
       setSaveMessage("Could not save in this browser. Check available storage.");
+      return false;
     }
   }
 
@@ -87,7 +89,7 @@ export default function CalculatorPage() {
       return;
     }
     const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, countryOfOrigin, hsCode, importDate, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
-    persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
+    if (!persistEstimates([snapshot, ...savedEstimates].slice(0, 10))) return;
     setEstimateName("");
     setSaveMessage("Estimate saved in this browser.");
     try {
