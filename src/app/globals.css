@@ -22,7 +22,7 @@ h3 { font-size: 1.18rem; }
 p { color: var(--muted); }
 .site-header { position: sticky; top: 0; z-index: 20; background: rgba(247,247,243,.93); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(226,231,225,.85); }
 .header-inner { max-width: 1200px; margin: auto; padding: 15px 28px; display: flex; align-items: center; justify-content: space-between; gap: 26px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-family: 'Manrope', sans-serif; font-size: 1.3rem; font-weight: 800; letter-spacing: -.06em; white-space: nowrap; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: Arial, Helvetica, sans-serif; font-size: 1.3rem; font-weight: 800; letter-spacing: -.06em; white-space: nowrap; }
 .brand-mark { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px 10px 10px 3px; color: var(--dark); background: var(--green); font-weight: 800; font-size: 1rem; }
 .main-nav { display: flex; gap: clamp(12px, 2vw, 28px); align-items: center; }
 .main-nav a, .footer-links a { color: #566461; font-size: .86rem; font-weight: 600; transition: color .2s; }
@@ -67,7 +67,7 @@ p { color: var(--muted); }
 .result-panel { position: sticky; top: 95px; background: var(--dark); color: white; }
 .result-panel p { color: #c0cdc5; }
 .result-label { color: var(--green); text-transform: uppercase; letter-spacing: .1em; font-weight: 800; font-size: .72rem; }
-.result-total { font-family: 'Manrope', sans-serif; font-size: clamp(2.5rem, 5vw, 3.7rem); letter-spacing: -.06em; font-weight: 800; line-height: 1.2; margin: 10px 0 4px; overflow-wrap: anywhere; }
+.result-total { font-family: Arial, Helvetica, sans-serif; font-size: clamp(2.5rem, 5vw, 3.7rem); letter-spacing: -.06em; font-weight: 800; line-height: 1.2; margin: 10px 0 4px; overflow-wrap: anywhere; }
 .result-lines { margin-top: 24px; border-top: 1px solid rgba(255,255,255,.15); }
 .result-line { display: flex; justify-content: space-between; gap: 15px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.12); font-size: .86rem; }
 .result-line span { color: #bdcbc3; }
@@ -1166,4 +1166,48 @@ p,
   .catalog-grid { grid-template-columns: 1fr; }
   .catalog-toolbar { align-items: stretch; flex-direction: column; gap: 10px; }
   .catalog-count { white-space: normal; }
+}
+
+
+/* Shipping quote comparison */
+.quote-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.quote-entry h3 {
+  margin-bottom: 0;
+}
+
+.quote-insurance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quote-insurance input {
+  width: auto;
+  min-height: auto;
+  margin: 0;
+}
+
+.quote-comparison-results {
+  margin-top: 24px;
+}
+
+.quote-best-price {
+  margin-top: 10px;
+}
+
+.quote-disclaimer {
+  margin-top: 18px;
+}
+
+.field small.field-error {
+  color: #a42828;
 }
