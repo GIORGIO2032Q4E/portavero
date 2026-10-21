@@ -107,7 +107,7 @@ p { color: var(--muted); }
   .brand { font-size: 1.15rem; }
   .container { width: min(100% - 34px, 1120px); }
   .section { padding: 70px 0; }
-  .card-grid{ grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: 1fr; }
   .feature-card { min-height: 0; }
   .page-hero { padding: 55px 0 40px; }
   .form-grid { grid-template-columns: 1fr; }
@@ -513,15 +513,12 @@ h1, h2, h3 { letter-spacing: -.035em; }
 .result-panel { box-shadow: 6px 6px 0 rgba(29, 48, 41, .12); }
 .callout { border-radius: 4px; }
 
-
-
-
 .menu-glyph { display: flex; width: 18px; flex-direction: column; gap: 5px; }
 .menu-glyph span { display: block; width: 18px; height: 2px; background: currentColor; transition: transform .15s ease; }
 .menu-glyph.is-open span:first-child { transform: translateY(3.5px) rotate(45deg); }
 .menu-glyph.is-open span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
 @media (prefers-reduced-motion: reduce) {
-  .menu-glyph span{ transition: none; }
+  .menu-glyph span { transition: none; }
 }
 
 .page-hero {
@@ -616,7 +613,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .menu-glyph span{ transition: none !important; }
+  .menu-glyph span { transition: none !important; }
 }
 
 body {
@@ -976,7 +973,7 @@ p,
   color: #fff;
 }
 
-.result-panel p{
+.result-panel p {
   color: #e0e9e2;
 }
 
