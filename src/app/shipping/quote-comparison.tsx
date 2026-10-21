@@ -6,6 +6,10 @@ type Quote = { provider: string; price: string; currency: "USD" | "EUR" | "GEL";
 
 const blankQuote = (): Quote => ({ provider: "", price: "", currency: "USD", days: "", insurance: false });
 
+function hasValidTransitDays(value: string) {
+  return !value.trim() || (Number.isInteger(Number(value)) && Number(value) >= 0);
+}
+
 export default function QuoteComparison() {
   const [quotes, setQuotes] = useState<Quote[]>([blankQuote(), blankQuote(), blankQuote()]);
   const validQuotes = useMemo(() => quotes
@@ -31,7 +35,7 @@ export default function QuoteComparison() {
         <div className="panel">
           <div className="form-grid">
             {quotes.map((quote, index) => (
-              <section key={index} className="quote-entry" style={{ border: "1px solid var(--border, #ddd)", padding: 16, borderRadius: 8 }}>
+              <section key={index} className="quote-entry">
                 <h3>Quote {index + 1}</h3>
                 <div className="field">
                   <label htmlFor={`quote-provider-${index}`}>Provider name</label>
@@ -49,22 +53,37 @@ export default function QuoteComparison() {
                 </div>
                 <div className="field">
                   <label htmlFor={`quote-days-${index}`}>Estimated transit days (optional)</label>
-                  <input id={`quote-days-${index}`} type="number" min="0" step="1" value={quote.days} onChange={(event) => updateQuote(index, { days: event.target.value })} placeholder="e.g. 24" />
+                  <input
+                    id={`quote-days-${index}`}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={quote.days}
+                    onChange={(event) => updateQuote(index, { days: event.target.value })}
+                    placeholder="e.g. 24"
+                    aria-invalid={!hasValidTransitDays(quote.days)}
+                    aria-describedby={quote.days.trim() && !hasValidTransitDays(quote.days) ? `quote-days-error-${index}` : undefined}
+                  />
+                  {quote.days.trim() && !hasValidTransitDays(quote.days) && (
+                    <small id={`quote-days-error-${index}`} className="field-error">
+                      Enter a whole number of days greater than or equal to zero.
+                    </small>
+                  )}
                 </div>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12 }}>
+                <label className="quote-insurance">
                   <input type="checkbox" checked={quote.insurance} onChange={(event) => updateQuote(index, { insurance: event.target.checked })} />
                   Insurance included in quote
                 </label>
               </section>
             ))}
           </div>
-          <div style={{ marginTop: 24 }}>
+          <div className="quote-comparison-results">
             <h3>Comparison</h3>
             {validQuotes.length === 0 ? <p>Enter a provider name and a price to compare a quote.</p> : (
               <div className="result-lines">
                 {validQuotes.map((quote) => (
                   <div className="result-line" key={quote.index}>
-                    <span><strong>{quote.provider}</strong><br /><small>{quote.days.trim() ? `About ${quote.days} transit days` : "Transit time not entered"} · {quote.insurance ? "Insurance marked as included" : "Insurance not marked as included"}</small></span>
+                    <span><strong>{quote.provider.trim()}</strong><br /><small>{quote.days.trim() && hasValidTransitDays(quote.days) ? `About ${Number(quote.days)} transit days` : "Transit time not entered"} · {quote.insurance ? "Insurance marked as included" : "Insurance not marked as included"}</small></span>
                     <strong>{new Intl.NumberFormat("en-US", { style: "currency", currency: quote.currency, maximumFractionDigits: 2 }).format(quote.amount)}</strong>
                   </div>
                 ))}
@@ -72,9 +91,9 @@ export default function QuoteComparison() {
             )}
             {(["USD", "EUR", "GEL"] as const).map((currency) => {
               const best = bestByCurrency(currency);
-              return best ? <p key={currency} style={{ marginTop: 10 }}>Lowest entered {currency} quote: <strong>{best.provider}</strong> ({new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(best.amount)}).</p> : null;
+              return best ? <p key={currency} className="quote-best-price">Lowest entered {currency} quote: <strong>{best.provider}</strong> ({new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(best.amount)}).</p> : null;
             })}
-            <p className="disclaimer" style={{ marginTop: 18 }}>The lowest price is not always the best offer. Check what is included, quote expiry, cargo limits, insurance terms, destination charges and delivery before choosing a provider. This comparison stays in the current page and is not saved.</p>
+            <p className="disclaimer quote-disclaimer">The lowest price is not always the best offer. Check what is included, quote expiry, cargo limits, insurance terms, destination charges and delivery before choosing a provider. This comparison stays in the current page and is not saved.</p>
           </div>
         </div>
       </div>
