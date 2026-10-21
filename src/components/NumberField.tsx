@@ -15,7 +15,7 @@ export default function NumberField({
   value,
   onChange,
   hint,
-  inputMode = "decimal"
+  inputMode
 }: NumberFieldProps) {
   return (
     <div className="field">
