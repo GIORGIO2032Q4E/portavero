@@ -79,7 +79,7 @@ export default function VehicleImportPage() {
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
 
   return (
-    <>
+    <div className="vehicle-import-page">
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
@@ -89,12 +89,18 @@ export default function VehicleImportPage() {
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/vehicles" className="button button-dark">Browse vehicle catalogue</Link>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
+            <button type="button" className="button button-dark print-trigger" onClick={() => window.print()}>Print / Save as PDF</button>
           </div>
         </div>
       </section>
 
       <section className="section">
-        <div className="container tool-layout">
+        <div className="container">
+          <div className="print-report-meta">
+            <strong>Portavero · Vehicle import estimate</strong>
+            <span>All amounts are shown in Georgian lari (GEL).</span>
+          </div>
+          <div className="tool-layout">
           <section className="panel vehicle-panel">
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
             <p className="panel-intro">This estimate uses a limited set of rules for passenger vehicles classified under HS 8703. Check the official calculator if you are unsure about your vehicle.</p>
@@ -209,6 +215,7 @@ export default function VehicleImportPage() {
             </div>
             <div className="disclaimer"><strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
           </aside>
+          </div>
         </div>
       </section>
 
@@ -242,6 +249,6 @@ export default function VehicleImportPage() {
           <p>Sources: <a href="https://new.matsne.gov.ge/en/document/view/1043717" target="_blank" rel="noreferrer">Tax Code of Georgia, Articles 188, 197 and 199</a> and the <a href="https://voice.rs.ge/Default.aspx?id=3874" target="_blank" rel="noreferrer">Revenue Service notice on the April 2, 2026 change</a>. This estimate is informational, not a binding customs assessment. Verify the final amount with the official <a href={revenueServiceUrl} target="_blank" rel="noreferrer">Revenue Service calculator</a>.</p>
         </div>
       </section>
-    </>
+    </div>
   );
 }
