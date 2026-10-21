@@ -155,7 +155,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
-              <NumberField inputMode={undefined} id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
@@ -221,13 +221,13 @@ export default function VehicleImportPage() {
           </div>
           <div className="panel">
             <div className="form-grid">
-              <NumberField inputMode={undefined} id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} />
-              <NumberField inputMode={undefined} id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} />
-              <NumberField inputMode={undefined} id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} />
-              <NumberField inputMode={undefined} id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} />
-              <NumberField inputMode={undefined} id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} />
-              <NumberField inputMode={undefined} id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
-              <NumberField inputMode={undefined} id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
+              <NumberField id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} />
+              <NumberField id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} />
+              <NumberField id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} />
+              <NumberField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} />
+              <NumberField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} />
+              <NumberField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
+              <NumberField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
             </div>
           </div>
         </div>
