@@ -1,5 +1,5 @@
--- Run this file in the Supabase SQL Editor for the Portavero project.
--- Row Level Security ensures each signed-in user can access only their own estimates.
+-- Run this file in the Supabase SQL Editor.
+-- Each user can only access their own saved estimates.
 
 create table if not exists public.saved_estimates (
   id uuid primary key default gen_random_uuid(),
