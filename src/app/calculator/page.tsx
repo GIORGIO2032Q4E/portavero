@@ -89,14 +89,26 @@ export default function CalculatorPage() {
       return;
     }
     const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, countryOfOrigin, hsCode, importDate, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
-    if (!persistEstimates([snapshot, ...savedEstimates].slice(0, 10))) return;
-    setEstimateName("");
-    setSaveMessage("Estimate saved in this browser.");
+    const savedLocally = persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
+    if (savedLocally) {
+      setEstimateName("");
+      setSaveMessage("Estimate saved in this browser.");
+    }
+
     try {
       const savedToAccount = await saveCloudEstimate(name, snapshot as unknown as Record<string, unknown>);
-      if (savedToAccount) setSaveMessage("Estimate saved to your account and this browser.");
+      if (savedToAccount) {
+        if (!savedLocally) setEstimateName("");
+        setSaveMessage(savedLocally
+          ? "Estimate saved to your account and this browser."
+          : "Estimate saved to your account. Browser storage was unavailable.");
+      } else if (!savedLocally) {
+        setSaveMessage("Could not save in this browser. Sign in to save the estimate to your account.");
+      }
     } catch {
-      setSaveMessage("Saved in this browser, but account sync failed. Check your connection and try again.");
+      setSaveMessage(savedLocally
+        ? "Saved in this browser, but account sync failed. Check your connection and try again."
+        : "Could not save the estimate in the browser or account. Check storage and your connection, then try again.");
     }
   }
 
