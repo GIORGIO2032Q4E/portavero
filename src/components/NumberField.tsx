@@ -21,6 +21,7 @@ export default function NumberField({
       <input
         id={id}
         type="number"
+        aria-describedby={hint ? `${id}-hint` : undefined}
         min="0"
         step="0.01"
         {...(inputMode ? { inputMode } : {})}
@@ -35,7 +36,7 @@ export default function NumberField({
           onChange(Number.isFinite(parsed) && parsed >= 0 ? parsed : null);
         }}
       />
-      {hint && <small>{hint}</small>}
+      {hint && <small id={`${id}-hint`}>{hint}</small>}
     </div>
   );
 }
