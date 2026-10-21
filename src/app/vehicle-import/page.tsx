@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
+import NumberField from "@/components/NumberField";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = 480;
@@ -19,43 +20,6 @@ const enteredGroup = (values: Array<number | null>) =>
   values.every((value) => value === null)
     ? "Not entered"
     : money(values.reduce<number>((sum, value) => sum + (value ?? 0), 0));
-
-function CostField({
-  id,
-  label,
-  value,
-  onChange,
-  hint
-}: {
-  id: string;
-  label: string;
-  value: number | null;
-  onChange: (value: number | null) => void;
-  hint?: string;
-}) {
-  return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <input
-        id={id}
-        type="number"
-        min="0"
-        step="0.01"
-        value={value ?? ""}
-        onChange={(event) => {
-          const raw = event.target.value;
-          if (raw === "") {
-            onChange(null);
-            return;
-          }
-          const parsed = Number(raw);
-          onChange(Number.isFinite(parsed) && parsed >= 0 ? parsed : null);
-        }}
-      />
-      {hint && <small>{hint}</small>}
-    </div>
-  );
-}
 
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
@@ -191,7 +155,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
-              <CostField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
+              <NumberField inputMode={undefined} id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
@@ -257,13 +221,13 @@ export default function VehicleImportPage() {
           </div>
           <div className="panel">
             <div className="form-grid">
-              <CostField id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} />
-              <CostField id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} />
-              <CostField id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} />
-              <CostField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} />
-              <CostField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} />
-              <CostField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
-              <CostField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
+              <NumberField inputMode={undefined} id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} />
+              <NumberField inputMode={undefined} id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} />
+              <NumberField inputMode={undefined} id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} />
+              <NumberField inputMode={undefined} id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} />
+              <NumberField inputMode={undefined} id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} />
+              <NumberField inputMode={undefined} id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
+              <NumberField inputMode={undefined} id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
             </div>
           </div>
         </div>
