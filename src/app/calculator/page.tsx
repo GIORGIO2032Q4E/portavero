@@ -245,6 +245,9 @@ export default function CalculatorPage() {
     setCosts(emptyCosts);
     setDutyRate(null);
     setVatRate(null);
+    setEditingEstimateId(null);
+    setEstimateName("");
+    setSaveMessage("Calculator reset. Saved estimates were not changed.");
   }
 
   function changeCurrency(nextCurrency: Currency) {
