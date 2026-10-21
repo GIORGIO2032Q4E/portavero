@@ -101,3 +101,38 @@ test("future manufacture year is invalid and produces no taxes", () => {
   assert.equal(result.excise, 0);
   assert.equal(result.importDuty, 0);
 });
+
+test("hybrid reduction stops after vehicle age 6", () => {
+  const sixYearsOld = calculate({ manufactureYear: 2020, hybrid: true });
+  const sevenYearsOld = calculate({ manufactureYear: 2019, hybrid: true });
+  assert.ok(Math.abs(sixYearsOld.rate - 0.6) < 1e-9);
+  assert.equal(sevenYearsOld.rate, 4.5);
+  assert.equal(sevenYearsOld.excise, 9000);
+});
+
+test("classic-car threshold is strictly more than 30 years", () => {
+  const exactlyThirty = calculate({ manufactureYear: 1996, declarationYear: 2026, classicCar: true });
+  const thirtyOne = calculate({ manufactureYear: 1995, declarationYear: 2026, classicCar: true });
+  assert.equal(exactlyThirty.validVehicleType, false);
+  assert.equal(exactlyThirty.excise, 0);
+  assert.equal(thirtyOne.validVehicleType, true);
+  assert.equal(thirtyOne.excise, 2000);
+});
+
+test("negative, infinite, and non-numeric engine values are rejected", () => {
+  for (const engineCc of [-1, Infinity, NaN, "2000"]) {
+    const result = calculate({ engineCc });
+    assert.equal(result.validEngine, false);
+    assert.equal(result.excise, 0);
+    assert.equal(result.importDuty, 0);
+  }
+});
+
+test("electric vehicle excise follows steering and selected regime", () => {
+  const leftCurrent = calculate({ isElectric: true, steering: "left", engineCc: 0 });
+  const rightCurrent = calculate({ isElectric: true, steering: "right", engineCc: 0 });
+  const rightPrevious = calculate({ isElectric: true, steering: "right", engineCc: 0, preAprilRegime: true });
+  assert.equal(leftCurrent.excise, 0);
+  assert.equal(rightCurrent.excise, 3000);
+  assert.equal(rightPrevious.excise, 3000);
+});
