@@ -37,7 +37,7 @@ export default function HomePage() {
       <section className="simple-hero">
         <div className="container simple-hero-grid">
           <div className="simple-hero-copy">
-            <p className="simple-status">An independent project · Early version</p>
+            <p className="simple-status">Independent project · Made for import planning in Georgia</p>
             <h1>Planning an import to Georgia?</h1>
             <p className="simple-lede">Portavero helps you put the costs in one place. Enter the prices you know, keep unknown fees blank, and get a clearer starting budget.</p>
             <div className="hero-actions">
