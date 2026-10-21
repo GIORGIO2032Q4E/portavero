@@ -23,6 +23,42 @@ const costFields: { key: CostKey; label: string; hint: string }[] = [
   { key: "other", label: "Storage and other costs", hint: "Any additional known expense." }
 ];
 
+const currencies: Currency[] = ["USD", "EUR", "GBP", "GEL", "JPY"];
+const costKeys: CostKey[] = ["purchase", "supplier", "inland", "freight", "insurance", "customs", "port", "delivery", "other"];
+
+function isNonNegativeAmount(value: unknown): value is number | null {
+  return value === null || (typeof value === "number" && Number.isFinite(value) && value >= 0);
+}
+
+function isSavedEstimate(value: unknown): value is SavedEstimate {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  const estimate = value as Record<string, unknown>;
+  const costs = estimate.costs;
+  if (!costs || typeof costs !== "object" || Array.isArray(costs)) return false;
+
+  const costValues = costs as Record<string, unknown>;
+  const validRate = (rate: unknown) =>
+    rate === undefined || rate === null ||
+    (typeof rate === "number" && Number.isFinite(rate) && rate >= 0 && rate <= 100);
+
+  return Number.isSafeInteger(estimate.id) && Number(estimate.id) >= 0 &&
+    typeof estimate.name === "string" && estimate.name.trim().length > 0 && estimate.name.length <= 60 &&
+    typeof estimate.savedAt === "string" && Number.isFinite(Date.parse(estimate.savedAt)) &&
+    typeof estimate.currency === "string" && currencies.includes(estimate.currency as Currency) &&
+    typeof estimate.category === "string" &&
+    typeof estimate.origin === "string" &&
+    typeof estimate.destination === "string" &&
+    typeof estimate.destinationPort === "string" &&
+    typeof estimate.shippingMethod === "string" &&
+    typeof estimate.quantity === "number" && Number.isFinite(estimate.quantity) && estimate.quantity > 0 &&
+    costKeys.every((key) => key in costValues && isNonNegativeAmount(costValues[key])) &&
+    ["countryOfOrigin", "hsCode", "importDate"].every((key) =>
+      estimate[key] === undefined || typeof estimate[key] === "string"
+    ) &&
+    validRate(estimate.dutyRate) && validRate(estimate.vatRate);
+}
+
 const emptyCosts: CostValues = {
   purchase: null,
   supplier: null,
@@ -64,7 +100,19 @@ export default function CalculatorPage() {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("portavero-saved-estimates");
-      if (stored) setSavedEstimates(JSON.parse(stored) as SavedEstimate[]);
+      if (!stored) return;
+
+      const parsed: unknown = JSON.parse(stored);
+      if (!Array.isArray(parsed)) {
+        setSaveMessage("Saved estimates could not be read in this browser.");
+        return;
+      }
+
+      const validEstimates = parsed.filter(isSavedEstimate);
+      setSavedEstimates(validEstimates.slice(0, 10));
+      if (validEstimates.length !== parsed.length) {
+        setSaveMessage("Some saved estimates were skipped because their data was incomplete.");
+      }
     } catch {
       setSaveMessage("Saved estimates could not be read in this browser.");
     }
