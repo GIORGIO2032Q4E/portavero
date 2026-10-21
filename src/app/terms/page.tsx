@@ -2,21 +2,21 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of use",
-  description: "Review the limits of Portavero's import estimates, user responsibilities, and the terms that need legal review."
+  description: "The purpose, limitations and responsibilities associated with using Portavero's import-planning prototype."
 };
 
 export default function TermsPage() {
   return (
     <>
-      <section className="page-hero"><div className="container"><span className="eyebrow">Legal</span><h1>Terms of use</h1><p>Starter terms for this early-stage planning tool. They must be reviewed before commercial use.</p></div></section>
+      <section className="page-hero"><div className="container"><span className="eyebrow">Project information</span><h1>Terms of use</h1><p>These terms describe the intended use and current limitations of the Portavero project prototype.</p></div></section>
       <section className="section"><div className="container content-narrow prose">
-        <p><strong>Last updated: October 19, 2026</strong></p>
-        <h2>Purpose</h2><p>Portavero provides general import-planning tools to help users organize costs. The calculator performs arithmetic on values entered by the user.</p>
-        <h2>No quote or official tax advice</h2><p>Results are not a binding shipping offer, customs valuation, tax ruling, legal opinion, guarantee of delivery cost or substitute for professional advice. The final amount may differ because of fees, exchange rates, classification, policy changes or circumstances not represented in the estimate.</p>
-        <h2>Your responsibility</h2><p>You are responsible for checking the accuracy of your inputs and verifying carrier quotes, duties, taxes, import eligibility, documentation and other requirements with the relevant providers and authorities before purchasing or shipping goods.</p>
-        <h2>Availability and changes</h2><p>The project is provided during development and may change, become unavailable or contain errors. No service-level commitment is offered in this initial version.</p>
-        <h2>Contact and legal review</h2><p>A verified operator contact method and governing-law terms have not yet been configured. These must be reviewed and completed before Portavero is used as a commercial service.</p>
-        <div className="notice">These starter terms are not a substitute for jurisdiction-specific legal review.</div>
+        <p><strong>Last updated: October 21, 2026</strong></p>
+        <h2>Purpose</h2><p>Portavero is a project prototype for organizing estimated import costs for goods and vehicles brought into Georgia. It is not a customs broker, shipping carrier or government service.</p>
+        <h2>Estimates are not official quotes or tax advice</h2><p>The calculators organize values entered by the user and apply a limited set of planning rules. Results are not a binding shipping offer, official customs valuation, tax ruling, legal opinion or guarantee of the final cost. The vehicle estimate does not cover every vehicle classification, fee or transitional case. Actual costs may differ because of provider charges, exchange rates, classification, eligibility requirements or changes in law.</p>
+        <h2>Your responsibility</h2><p>You are responsible for checking your inputs and confirming carrier quotes, duties, taxes, import eligibility, emissions requirements, documentation and other conditions with the relevant providers and authorities before purchasing or shipping goods. For a vehicle-specific tax estimate, consult the official Revenue Service calculator linked from the website.</p>
+        <h2>Availability and changes</h2><p>The project is provided for demonstration and educational purposes. It may change, become unavailable or contain errors, and no service-level commitment is offered.</p>
+        <h2>Contact</h2><p>This student-developed project prototype does not currently have a dedicated support email address.</p>
+        <div className="notice">These terms describe the current prototype and are not a substitute for legal review before commercial use.</div>
       </div></section>
     </>
   );
