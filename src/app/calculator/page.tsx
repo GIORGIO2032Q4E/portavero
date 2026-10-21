@@ -95,6 +95,7 @@ export default function CalculatorPage() {
   const [costs, setCosts] = useState<CostValues>(emptyCosts);
   const [estimateName, setEstimateName] = useState("");
   const [savedEstimates, setSavedEstimates] = useState<SavedEstimate[]>([]);
+  const [editingEstimateId, setEditingEstimateId] = useState<number | null>(null);
   const [saveMessage, setSaveMessage] = useState("");
 
   useEffect(() => {
@@ -136,12 +137,19 @@ export default function CalculatorPage() {
       setSaveMessage("Enter a name for this estimate first.");
       return;
     }
-    const snapshot: SavedEstimate = { id: Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, countryOfOrigin, hsCode, importDate, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
-    const savedLocally = persistEstimates([snapshot, ...savedEstimates].slice(0, 10));
+    const isUpdating = editingEstimateId !== null;
+    const snapshot: SavedEstimate = { id: editingEstimateId ?? Date.now(), name, savedAt: new Date().toISOString(), currency, category, origin, countryOfOrigin, hsCode, importDate, destination, destinationPort, shippingMethod, quantity, costs: { ...costs }, dutyRate, vatRate };
+    const nextEstimates = isUpdating
+      ? [snapshot, ...savedEstimates.filter((saved) => saved.id !== editingEstimateId)].slice(0, 10)
+      : [snapshot, ...savedEstimates].slice(0, 10);
+    const savedLocally = persistEstimates(nextEstimates);
     if (savedLocally) {
+      setEditingEstimateId(null);
       setEstimateName("");
-      setSaveMessage("Estimate saved in this browser.");
+      setSaveMessage(isUpdating ? "Estimate updated in this browser." : "Estimate saved in this browser.");
     }
+
+    if (isUpdating) return;
 
     try {
       const savedToAccount = await saveCloudEstimate(name, snapshot as unknown as Record<string, unknown>);
@@ -174,11 +182,24 @@ export default function CalculatorPage() {
     setCosts(saved.costs);
     setDutyRate(saved.dutyRate ?? null);
     setVatRate(saved.vatRate ?? null);
-    setSaveMessage(`Loaded “${saved.name}”.`);
+    setEditingEstimateId(saved.id);
+    setEstimateName(saved.name);
+    setSaveMessage(`Loaded “${saved.name}”. Edit the values, then save changes to update this entry.`);
   }
 
   function deleteEstimate(id: number) {
     persistEstimates(savedEstimates.filter((saved) => saved.id !== id));
+    if (editingEstimateId === id) {
+      setEditingEstimateId(null);
+      setEstimateName("");
+      setSaveMessage("The selected estimate was deleted.");
+    }
+  }
+
+  function cancelEstimateEdit() {
+    setEditingEstimateId(null);
+    setEstimateName("");
+    setSaveMessage("Editing cancelled. Changes have not been saved.");
   }
 
   const result = useMemo(() => {
@@ -234,14 +255,14 @@ export default function CalculatorPage() {
 
   return (
     <>
-      <section className="page-hero">
+      <section className="page-hero calculator-hero">
         <div className="container">
           <span className="eyebrow">Import cost calculator</span>
           <h1>Estimate your import costs.</h1>
           <p>Enter the amounts you know to get a subtotal. Leave anything unknown blank and add it later when you have a quote.</p>
         </div>
       </section>
-      <section className="section">
+      <section className="section calculator-page">
         <div className="container tool-layout">
           <section className="panel">
             <h2>Shipment details</h2>
@@ -355,7 +376,8 @@ export default function CalculatorPage() {
               <p className="panel-intro">Saved estimates stay in this browser on this device when you are signed out. <Link href="/account" className="text-link">Sign in or create an account</Link> to sync new estimates across devices.</p>
               <div className="estimate-save-controls">
                 <input className="estimate-name-input" aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} />
-                <button type="button" className="button button-dark" onClick={saveEstimate}>Save estimate</button>
+                <button type="button" className="button button-dark" onClick={saveEstimate}>{editingEstimateId === null ? "Save estimate" : "Save changes"}</button>
+                {editingEstimateId !== null && <button type="button" className="button button-outline" onClick={cancelEstimateEdit}>Cancel edit</button>}
               </div>
               {saveMessage && <p className="estimate-save-message" role="status">{saveMessage}</p>}
               {savedEstimates.length > 0 && <div className="saved-estimates-list">
