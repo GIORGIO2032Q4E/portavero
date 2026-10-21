@@ -41,6 +41,29 @@ test("right-hand-drive non-electric car uses triple excise", () => {
   assert.equal(result.excise, 9000);
 });
 
+test("right-hand-drive hybrid uses triple excise without the left-hand-drive hybrid reduction", () => {
+  const result = calculate({ steering: "right", hybrid: true });
+  assert.equal(result.rate, 4.5);
+  assert.equal(result.excise, 9000);
+});
+
+test("import duty uses engine size and vehicle age, not the steering multiplier", () => {
+  const sixYearsOld = calculate({ manufactureYear: 2020 });
+  const sevenYearsOld = calculate({ manufactureYear: 2019 });
+  const rightHandDrive = calculate({ steering: "right" });
+
+  assert.equal(sixYearsOld.importDuty, 130);
+  assert.equal(sevenYearsOld.importDuty, 135);
+  assert.equal(rightHandDrive.importDuty, 130);
+});
+
+test("invalid engine capacity produces no vehicle taxes", () => {
+  const result = calculate({ engineCc: 0 });
+  assert.equal(result.validEngine, false);
+  assert.equal(result.excise, 0);
+  assert.equal(result.importDuty, 0);
+});
+
 test("left-hand-drive electric car has zero excise and import duty", () => {
   const result = calculate({ isElectric: true, engineCc: 0 });
   assert.equal(result.excise, 0);
