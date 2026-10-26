@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateVin } from "./vin.mjs";
+import { getVinWarnings, validateVin } from "./vin.mjs";
 
 test("accepts and normalizes a correctly shaped VIN", () => {
   assert.deepEqual(validateVin(" 1hgcm82633a004352 "), {
@@ -39,4 +39,19 @@ test("does not claim that format validation proves a VIN exists", () => {
   const result = validateVin("ZZZZZZZZZZZZZZZZZ");
   assert.equal(result.valid, true);
   assert.equal(result.vin, "ZZZZZZZZZZZZZZZZZ");
+});
+
+test("turns NHTSA check-digit errors into a visible warning", () => {
+  assert.match(getVinWarnings("1").join(" "), /check digit in position 9/);
+});
+
+test("does not show a warning for a clean NHTSA decode", () => {
+  assert.deepEqual(getVinWarnings("0, 0"), []);
+});
+
+test("keeps useful warnings when NHTSA returns multiple error codes", () => {
+  const warnings = getVinWarnings("0, 1, 7");
+  assert.equal(warnings.length, 2);
+  assert.match(warnings.join(" "), /check digit/);
+  assert.match(warnings.join(" "), /not registered with NHTSA/);
 });
