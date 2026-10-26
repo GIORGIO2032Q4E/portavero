@@ -49,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <div className="footer-links">
               <Link href="/about">About</Link>
               <Link href="/how-it-works">How it works</Link>
+              <Link href="/vin-check">VIN check</Link>
               <Link href="/vehicles">Vehicle catalogue</Link>
               <Link href="/privacy-policy">Privacy</Link>
               <Link href="/terms">Terms</Link>
