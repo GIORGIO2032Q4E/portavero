@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test src/lib/vehicle-tax.test.mjs"
+    "test": "node --test src/lib/vehicle-tax.test.mjs src/lib/vin.test.mjs"
   },
   "dependencies": {
     "next": "^16.4.2",
