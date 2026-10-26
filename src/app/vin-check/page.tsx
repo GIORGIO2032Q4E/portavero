@@ -128,14 +128,14 @@ export default function VinCheckPage() {
                   <div className="notice">
                     <strong>Technical data returned.</strong> The source found make/model information for this VIN. Compare these details with the vehicle documents before relying on them.
                   </div>
-                  <dl className="vin-details">
+                  <div className="result-lines">
                     {result.fields.map((field) => (
-                      <div className="vin-detail" key={field.label}>
-                        <dt>{field.label}</dt>
-                        <dd>{field.value}</dd>
+                      <div className="result-line" key={field.label}>
+                        <span>{field.label}</span>
+                        <strong>{field.value}</strong>
                       </div>
                     ))}
-                  </dl>
+                  </div>
                   <p className="source-note">{result.note} Source: <a href={result.source.url} target="_blank" rel="noreferrer">{result.source.name}</a>.</p>
                   <p className="source-note">VIN submitted: <code>{result.vin}</code></p>
                   <Link href="/vehicle-import" className="button button-outline">Continue to import estimate ↗</Link>
