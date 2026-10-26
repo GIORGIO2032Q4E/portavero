@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { validateVin } from "@/lib/vin.mjs";
+import { getVinWarnings, validateVin } from "@/lib/vin.mjs";
 
 export const runtime = "nodejs";
 
@@ -18,6 +18,8 @@ const decodedFields: Array<{ key: string; label: string }> = [
   { key: "Series", label: "Series" },
   { key: "Trim", label: "Trim" },
   { key: "EngineCylinders", label: "Engine cylinders" },
+  { key: "EngineConfiguration", label: "Engine configuration" },
+  { key: "EngineModel", label: "Engine model" },
   { key: "DisplacementL", label: "Engine displacement (L)" },
   { key: "FuelTypePrimary", label: "Primary fuel type" },
   { key: "DriveType", label: "Drive type" },
@@ -71,6 +73,7 @@ export async function POST(request: Request) {
       .map(({ key, label }) => ({ label, value: fieldValue(row, key) }))
       .filter((field) => field.value.length > 0);
 
+    const providerWarnings = getVinWarnings(row.ErrorCode);
     const hasIdentity = Boolean(fieldValue(row, "Make") || fieldValue(row, "Model"));
     if (!hasIdentity) {
       const providerMessage = fieldValue(row, "ErrorText");
@@ -78,6 +81,7 @@ export async function POST(request: Request) {
         {
           error: "NHTSA could not return a usable make or model for this VIN. Check the characters and vehicle documents. This does not prove that the vehicle is fake.",
           providerMessage: providerMessage || undefined,
+          providerWarnings,
           fields,
           source: { name: "NHTSA vPIC", url: "https://vpic.nhtsa.dot.gov/api/" }
         },
@@ -88,6 +92,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       vin: checked.vin,
       fields,
+      providerWarnings,
       source: { name: "NHTSA vPIC", url: "https://vpic.nhtsa.dot.gov/api/" },
       note: "These are manufacturer-reported technical details available in NHTSA vPIC. Availability and accuracy can vary, especially for vehicles not built for the United States market."
     });
