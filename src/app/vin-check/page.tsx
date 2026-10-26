@@ -131,6 +131,11 @@ export default function VinCheckPage() {
                   <div className="notice">
                     <strong>Technical data returned.</strong> The source found make/model information for this VIN. Compare these details with the vehicle documents before relying on them.
                   </div>
+                  {result.providerWarnings.length > 0 && (
+                    <div className="notice" role="alert">
+                      <strong>NHTSA decoder warning:</strong> {result.providerWarnings.join(" ")}
+                    </div>
+                  )}
                   <div className="result-lines">
                     {result.fields.map((field) => (
                       <div className="result-line" key={field.label}>
