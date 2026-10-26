@@ -9,6 +9,7 @@ type DecodeResult = {
   fields: DecodedField[];
   source: { name: string; url: string };
   note: string;
+  providerWarnings: string[];
 };
 type ApiResponse = {
   error?: string;
@@ -17,6 +18,7 @@ type ApiResponse = {
   source?: { name: string; url: string };
   note?: string;
   providerMessage?: string;
+  providerWarnings?: string[];
 };
 
 export default function VinCheckPage() {
@@ -40,7 +42,7 @@ export default function VinCheckPage() {
       const payload = await response.json() as ApiResponse;
 
       if (!response.ok || !payload.vin || !payload.source || !payload.fields) {
-        setError(payload.error || "The VIN could not be decoded. Check it and try again.");
+        setError([payload.error, payload.providerMessage, ...(payload.providerWarnings || [])].filter(Boolean).join(" "));
         return;
       }
 
@@ -48,7 +50,8 @@ export default function VinCheckPage() {
         vin: payload.vin,
         fields: payload.fields,
         source: payload.source,
-        note: payload.note || "Technical data returned by the source."
+        note: payload.note || "Technical data returned by the source.",
+        providerWarnings: payload.providerWarnings || []
       });
     } catch {
       setError("Could not reach the decoder. Check your connection and try again.");
