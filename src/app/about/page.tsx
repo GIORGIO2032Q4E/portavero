@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Portavero",
-  description: "Why I built Portavero and what its import-planning tools can and can't do."
+  description: "Why I built Portavero, what it helps with, and where its estimates have limits."
 };
 
 export default function AboutPage() {
@@ -11,28 +11,28 @@ export default function AboutPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">About</span>
-          <h1>A small project for planning import costs.</h1>
-          <p>I built Portavero to make it easier to keep track of the costs involved in bringing goods or a car into Georgia.</p>
+          <h1>A practical way to keep import costs together.</h1>
+          <p>I built Portavero as a small project to help me organise the costs involved in bringing goods or a vehicle into Georgia.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
           <h2>Why I made it</h2>
-          <p>The price paid to the seller is only one part of an import. Shipping, insurance, customs charges and local delivery can all add up, and you may not know every amount at the beginning. I wanted a way to put the costs I know in one place, see what's missing and get a starting estimate.</p>
+          <p>The price you pay for an item or car is only the beginning. Shipping, insurance, customs charges and delivery can change the final cost, and you might not have every number when you start planning. Portavero gives those figures one place to live and helps show what still needs checking.</p>
 
-          <h2>What it can do</h2>
+          <h2>What you can use it for</h2>
           <ul>
-            <li>Add up costs entered in the import calculator and show what is still missing.</li>
-            <li>Keep estimates in the browser and print them or save them as a PDF.</li>
-            <li>Give a preliminary estimate of selected vehicle taxes using the details you enter.</li>
-            <li>Browse common vehicles and compare shipping quotes you enter yourself.</li>
+            <li>Add up the import costs you enter and see which amounts you haven't included.</li>
+            <li>Save estimates in your browser and print them or save them as a PDF.</li>
+            <li>Get a preliminary estimate of selected vehicle taxes from the details you provide.</li>
+            <li>Browse a starter vehicle catalogue and work through a shipping checklist with quotes you've collected.</li>
           </ul>
 
           <h2>How it's built</h2>
-          <p>The site uses Next.js, React, TypeScript and CSS. The vehicle-tax calculations live in a separate file and have tests for common cases. Supabase handles accounts and saved estimates when configured.</p>
+          <p>Portavero uses Next.js, React, TypeScript and CSS. The vehicle-tax calculations are kept in a separate module with tests for common cases. Supabase can handle accounts and saved estimates when the project is configured for it.</p>
 
-          <h2>What it doesn't do</h2>
-          <p>Portavero doesn't fetch live shipping prices, track cargo or replace the official customs calculator. The vehicle list is limited, and the tax estimate doesn't cover every case. Check charges with the relevant provider and confirm vehicle-specific tax rules with the Georgian Revenue Service before making a decision.</p>
+          <h2>What to double-check</h2>
+          <p>Portavero doesn't fetch live shipping prices, track cargo or replace official customs guidance. The vehicle catalogue covers selected models, and tax estimates don't cover every situation. Use quotes from your provider and confirm vehicle-specific tax rules with the Georgian Revenue Service before relying on a figure.</p>
         </div>
       </section>
     </>
