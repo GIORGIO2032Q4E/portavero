@@ -52,7 +52,7 @@ export function getVinWarnings(value) {
   if (typeof value !== "string" && typeof value !== "number") return [];
   const codes = String(value)
     .split(",")
-    .map((part) => part.trim().match(/^\\d+/)?.[0])
+    .map((part) => part.trim().match(/^\d+/)?.[0])
     .filter((code) => Boolean(code) && code !== "0");
   return [...new Set(codes.map((code) =>
     nhtsaWarningByCode[code] || `NHTSA returned VIN decoder code ${code}. Check the source response before relying on this result.`
