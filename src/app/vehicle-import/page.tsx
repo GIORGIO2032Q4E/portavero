@@ -76,6 +76,7 @@ export default function VehicleImportPage() {
       knownCosts: costSummary.knownCosts,
       unknownCosts: costSummary.unknownCosts.length,
       invalidCosts: costSummary.invalidCosts,
+      invalidTaxAmounts: costSummary.invalidTaxAmounts,
       officialFees: standardStateFees,
       total: costSummary.total,
       rate: taxes.rate,
