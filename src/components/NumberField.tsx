@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { parseNonNegativeNumber } from "@/lib/number-input.mjs";
 
 type NumberFieldProps = {
@@ -27,6 +27,20 @@ export default function NumberField({
   max
 }: NumberFieldProps) {
   const [error, setError] = useState("");
+  const skipValueResetRef = useRef(false);
+
+  useEffect(() => {
+    if (skipValueResetRef.current) {
+      skipValueResetRef.current = false;
+      return;
+    }
+    setError("");
+  }, [value]);
+
+  useEffect(() => {
+    setError("");
+  }, [step, min, max]);
+
   const decimalPlaces = String(step).includes(".") ? String(step).split(".")[1].length : 0;
   const inputMax = max ?? Number.MAX_SAFE_INTEGER / (10 ** decimalPlaces);
   const describedBy = [
@@ -50,6 +64,7 @@ export default function NumberField({
         onChange={(event) => {
           const parsed = parseNonNegativeNumber(event.target.value, { step, min, max });
           setError(parsed.error ?? "");
+          skipValueResetRef.current = Boolean(parsed.error) && !Object.is(value, parsed.value);
           onChange(parsed.value);
         }}
       />
