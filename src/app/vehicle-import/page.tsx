@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
+import { summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = 480;
@@ -63,16 +64,20 @@ export default function VehicleImportPage() {
       isElectric,
       preAprilRegime
     });
-    const enteredCosts = [purchase, auction, inland, shipping, insurance, port, delivery];
-    const knownCosts = enteredCosts.reduce<number>((sum, value) => sum + (value ?? 0), 0);
-    const unknownCosts = enteredCosts.filter((value) => value === null).length;
+    const costSummary = summarizeVehicleImportCosts(
+      { purchase, auction, inland, shipping, insurance, port, delivery },
+      taxes.excise,
+      taxes.importDuty,
+      standardStateFees
+    );
     return {
       excise: taxes.excise,
       importDuty: taxes.importDuty,
-      knownCosts,
-      unknownCosts,
+      knownCosts: costSummary.knownCosts,
+      unknownCosts: costSummary.unknownCosts.length,
+      invalidCosts: costSummary.invalidCosts,
       officialFees: standardStateFees,
-      total: taxes.excise + taxes.importDuty + standardStateFees + knownCosts,
+      total: costSummary.total,
       rate: taxes.rate,
       registrationRestricted: taxes.registrationRestricted
     };
@@ -169,7 +174,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
-              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} inputMode="numeric" onChange={(value) => { setEngineCc(value ?? 0); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Use whole cubic centimetres. Auto-filled from a selected variant; confirm it against the vehicle documents." />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
