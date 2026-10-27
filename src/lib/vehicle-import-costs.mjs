@@ -12,7 +12,7 @@ export const VEHICLE_IMPORT_COST_KEYS = [
  * Sum only entered vehicle-import expenses. Tax calculations are supplied by
  * the existing vehicle-tax module and are deliberately not changed here.
  *
- * @param {Record<string, number | null>} costs
+ * @param {{purchase: number|null, auction: number|null, inland: number|null, shipping: number|null, insurance: number|null, port: number|null, delivery: number|null}} costs
  * @param {number} excise
  * @param {number} importDuty
  * @param {number} officialFees
@@ -30,12 +30,18 @@ export function summarizeVehicleImportCosts(costs, excise, importDuty, officialF
     return sum + (typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0);
   }, 0);
 
+  const total = knownCosts + excise + importDuty + officialFees;
+  const invalidTaxAmounts = [excise, importDuty, officialFees].some(
+    (value) => !Number.isFinite(value) || value < 0
+  );
+
   return {
     knownCosts,
     unknownCosts,
     invalidCosts,
-    total: invalidCosts.length > 0
+    invalidTaxAmounts,
+    total: invalidCosts.length > 0 || invalidTaxAmounts || !Number.isFinite(total)
       ? null
-      : knownCosts + excise + importDuty + officialFees
+      : total
   };
 }
