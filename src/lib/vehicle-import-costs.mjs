@@ -8,6 +8,15 @@ export const VEHICLE_IMPORT_COST_KEYS = [
   "delivery"
 ];
 
+const maxSafeMoney = Number.MAX_SAFE_INTEGER / 100;
+
+function isSafeMoney(value) {
+  return typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= 0 &&
+    value <= maxSafeMoney;
+}
+
 /**
  * Sum only entered vehicle-import expenses. Tax calculations are supplied by
  * the existing vehicle-tax module and are deliberately not changed here.
@@ -20,28 +29,29 @@ export const VEHICLE_IMPORT_COST_KEYS = [
 export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = 480) {
   const invalidCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => {
     const value = costs[key];
-    return value !== null && (
-      typeof value !== "number" || !Number.isFinite(value) || value < 0
-    );
+    return value !== null && !isSafeMoney(value);
   });
   const unknownCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => costs[key] === null);
-  const knownCosts = VEHICLE_IMPORT_COST_KEYS.reduce((sum, key) => {
+  const knownCostsRaw = VEHICLE_IMPORT_COST_KEYS.reduce((sum, key) => {
     const value = costs[key];
-    return sum + (typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0);
+    return sum + (isSafeMoney(value) ? value : 0);
   }, 0);
-
-  const total = knownCosts + excise + importDuty + officialFees;
-  const invalidTaxAmounts = [excise, importDuty, officialFees].some(
-    (value) => !Number.isFinite(value) || value < 0
-  );
+  const knownCosts = isSafeMoney(knownCostsRaw) ? knownCostsRaw : null;
+  const invalidTaxAmounts = !isSafeMoney(excise) ||
+    !isSafeMoney(importDuty) ||
+    !isSafeMoney(officialFees);
+  const total = (knownCosts ?? 0) + excise + importDuty + officialFees;
+  const invalidAmounts = invalidCosts.length > 0 ||
+    invalidTaxAmounts ||
+    knownCosts === null ||
+    !isSafeMoney(total);
 
   return {
     knownCosts,
     unknownCosts,
     invalidCosts,
     invalidTaxAmounts,
-    total: invalidCosts.length > 0 || invalidTaxAmounts || !Number.isFinite(total)
-      ? null
-      : total
+    invalidAmounts,
+    total: invalidAmounts ? null : total
   };
 }
