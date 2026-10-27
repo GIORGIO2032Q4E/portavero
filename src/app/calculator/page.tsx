@@ -27,8 +27,14 @@ const costFields: { key: CostKey; label: string; hint: string }[] = [
 const currencies: Currency[] = ["USD", "EUR", "GBP", "GEL", "JPY"];
 const costKeys: CostKey[] = ["purchase", "supplier", "inland", "freight", "insurance", "customs", "port", "delivery", "other"];
 
-function isNonNegativeAmount(value: unknown): value is number | null {
-  return value === null || (typeof value === "number" && Number.isFinite(value) && value >= 0);
+function isNonNegativeAmount(value: unknown, currency: Currency): value is number | null {
+  if (value === null) return true;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) return false;
+  const scale = currency === "JPY" ? 1 : 100;
+  const scaled = value * scale;
+  return Number.isFinite(scaled) &&
+    scaled <= Number.MAX_SAFE_INTEGER &&
+    Math.abs(scaled - Math.round(scaled)) <= 1e-7;
 }
 
 function isSavedEstimate(value: unknown): value is SavedEstimate {
@@ -41,7 +47,7 @@ function isSavedEstimate(value: unknown): value is SavedEstimate {
   const costValues = costs as Record<string, unknown>;
   const validRate = (rate: unknown) =>
     rate === undefined || rate === null ||
-    (typeof rate === "number" && Number.isFinite(rate) && rate >= 0 && rate <= 100);
+    (typeof rate === "number" && Number.isFinite(rate) && rate >= 0 && rate <= 100 && Math.abs(rate * 100 - Math.round(rate * 100)) <= 1e-7);
 
   return Number.isSafeInteger(estimate.id) && Number(estimate.id) >= 0 &&
     typeof estimate.name === "string" && estimate.name.trim().length > 0 && estimate.name.length <= 60 &&
@@ -52,8 +58,8 @@ function isSavedEstimate(value: unknown): value is SavedEstimate {
     typeof estimate.destination === "string" &&
     typeof estimate.destinationPort === "string" &&
     typeof estimate.shippingMethod === "string" &&
-    typeof estimate.quantity === "number" && Number.isFinite(estimate.quantity) && estimate.quantity > 0 &&
-    costKeys.every((key) => key in costValues && isNonNegativeAmount(costValues[key])) &&
+    Number.isSafeInteger(estimate.quantity) && Number(estimate.quantity) >= 1 &&
+    costKeys.every((key) => key in costValues && isNonNegativeAmount(costValues[key], estimate.currency as Currency)) &&
     ["countryOfOrigin", "hsCode", "importDate"].every((key) =>
       estimate[key] === undefined || typeof estimate[key] === "string"
     ) &&
