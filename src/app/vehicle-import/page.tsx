@@ -77,6 +77,7 @@ export default function VehicleImportPage() {
       unknownCosts: costSummary.unknownCosts.length,
       invalidCosts: costSummary.invalidCosts,
       invalidTaxAmounts: costSummary.invalidTaxAmounts,
+      invalidAmounts: costSummary.invalidAmounts,
       officialFees: standardStateFees,
       total: costSummary.total,
       rate: taxes.rate,
@@ -215,19 +216,19 @@ export default function VehicleImportPage() {
 
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
-            <div className="result-total">{eligibleYear && validEngine && validVehicleType ? money(result.excise) : "Check details"}</div>
+            <div className="result-total">{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
             <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rule</span><strong>{isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rate × 2,000" : "GEL 3,000 fixed") : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
               <div className="result-line"><span>Transport and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
-              <div className="result-line"><span>Estimated import duty</span><strong>{eligibleYear && validEngine && validVehicleType ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
+              <div className="result-line"><span>Estimated import duty</span><strong>{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
               <div className="result-line"><span>Standard listed customs and registration fees</span><strong>{money(result.officialFees)}</strong></div>
               <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
-              <div className="result-line"><span>Other entered costs subtotal</span><strong>{money(result.knownCosts)}</strong></div>
-              <div className="result-line result-line-total"><span>Known costs + estimated taxes + standard fees</span><strong>{eligibleYear && validEngine && validVehicleType && result.total !== null && result.invalidCosts.length === 0 ? money(result.total) : "Check details"}</strong></div>
+              <div className="result-line"><span>Other entered costs subtotal</span><strong>{result.knownCosts === null ? "Check details" : money(result.knownCosts)}</strong></div>
+              <div className="result-line result-line-total"><span>Known costs + estimated taxes + standard fees</span><strong>{eligibleYear && validEngine && validVehicleType && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
             </div>
-            <div className="disclaimer">{(result.invalidCosts.length > 0 || result.invalidTaxAmounts) && <><strong>Check the cost and tax inputs.</strong> One or more amounts cannot be calculated safely, so a total is not shown. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
+            <div className="disclaimer">{result.invalidAmounts && <><strong>Check the cost and tax inputs.</strong> One or more amounts cannot be calculated safely, so a total is not shown. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
           </aside>
           </div>
         </div>
