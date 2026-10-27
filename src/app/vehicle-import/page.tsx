@@ -224,9 +224,9 @@ export default function VehicleImportPage() {
               <div className="result-line"><span>Standard listed customs and registration fees</span><strong>{money(result.officialFees)}</strong></div>
               <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
               <div className="result-line"><span>Other entered costs subtotal</span><strong>{money(result.knownCosts)}</strong></div>
-              <div className="result-line result-line-total"><span>Known costs + estimated taxes + standard fees</span><strong>{eligibleYear && validEngine && validVehicleType ? money(result.total) : "Check details"}</strong></div>
+              <div className="result-line result-line-total"><span>Known costs + estimated taxes + standard fees</span><strong>{eligibleYear && validEngine && validVehicleType && result.total !== null && result.invalidCosts.length === 0 ? money(result.total) : "Check details"}</strong></div>
             </div>
-            <div className="disclaimer"><strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
+            <div className="disclaimer">{result.invalidCosts.length > 0 && <><strong>Check the highlighted cost inputs.</strong> One or more amounts are invalid, so a total is not shown. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
           </aside>
           </div>
         </div>
