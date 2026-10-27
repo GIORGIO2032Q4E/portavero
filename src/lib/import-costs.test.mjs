@@ -100,3 +100,13 @@ test("does not present a combined total when individually finite costs exceed sa
   assert.equal(result.estimatedTotal, null);
   assert.equal(result.totalUnavailable, true);
 });
+
+test("VAT estimate warns through its result state when excise and other taxes are blank", () => {
+  const costs = blankCosts();
+  costs.purchase = 1000;
+  const result = calculateImportCostSummary(costs, 1, 5, 18);
+  assert.equal(costs.customs, null);
+  assert.equal(result.importDuty, 50);
+  assert.equal(result.importVat, 189);
+  assert.equal(result.estimatedTotal, 1239);
+});
