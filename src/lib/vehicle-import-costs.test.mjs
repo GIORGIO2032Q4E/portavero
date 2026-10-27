@@ -48,3 +48,17 @@ test("decimal GEL expenses are counted without changing the tax inputs", () => {
   assert.equal(result.knownCosts, 100.25);
   assert.equal(result.total, 581.8);
 });
+
+test("invalid tax amounts and overflowing totals are not presented as valid", () => {
+  const invalidTax = summarizeVehicleImportCosts(blankCosts(), Infinity, 0, 480);
+  assert.equal(invalidTax.invalidTaxAmounts, true);
+  assert.equal(invalidTax.total, null);
+
+  const overflow = summarizeVehicleImportCosts(
+    { ...blankCosts(), purchase: Number.MAX_VALUE },
+    0,
+    0,
+    480
+  );
+  assert.equal(overflow.total, null);
+});
