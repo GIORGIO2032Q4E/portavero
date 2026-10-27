@@ -3,7 +3,7 @@
  * The default step is one cent; step=1 is used for whole-number fields.
  *
  * @param {string} raw
- * @param {{step?: number, max?: number}} options
+ * @param {{step?: number, min?: number, max?: number}} options
  * @returns {{value: number | null, error: string | null}}
  */
 export function parseNonNegativeNumber(raw, options = {}) {
@@ -19,8 +19,12 @@ export function parseNonNegativeNumber(raw, options = {}) {
   if (!Number.isFinite(value)) {
     return { value: null, error: "Enter a valid number." };
   }
-  if (value < 0) {
-    return { value: null, error: "Amount cannot be negative." };
+  const min = options.min ?? 0;
+  if (value < min) {
+    return {
+      value: null,
+      error: min === 0 ? "Amount cannot be negative." : `Enter a value of at least ${min}.`
+    };
   }
   if (!Number.isFinite(step) || step <= 0) {
     return { value: null, error: "This field has an invalid step setting." };
