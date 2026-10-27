@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
+import { summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = 480;
@@ -16,10 +17,13 @@ const money = (value: number) =>
     maximumFractionDigits: 2
   }).format(value);
 
-const enteredGroup = (values: Array<number | null>) =>
-  values.every((value) => value === null)
-    ? "Not entered"
-    : money(values.reduce<number>((sum, value) => sum + (value ?? 0), 0));
+const enteredGroup = (values: Array<number | null>) => {
+  if (values.every((value) => value === null)) return "Not entered";
+  const total = values.reduce<number>((sum, value) => sum + (value ?? 0), 0);
+  return Number.isFinite(total) && total <= Number.MAX_SAFE_INTEGER / 100
+    ? money(total)
+    : "Check details";
+};
 
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
@@ -63,16 +67,22 @@ export default function VehicleImportPage() {
       isElectric,
       preAprilRegime
     });
-    const enteredCosts = [purchase, auction, inland, shipping, insurance, port, delivery];
-    const knownCosts = enteredCosts.reduce<number>((sum, value) => sum + (value ?? 0), 0);
-    const unknownCosts = enteredCosts.filter((value) => value === null).length;
+    const costSummary = summarizeVehicleImportCosts(
+      { purchase, auction, inland, shipping, insurance, port, delivery },
+      taxes.excise,
+      taxes.importDuty,
+      standardStateFees
+    );
     return {
       excise: taxes.excise,
       importDuty: taxes.importDuty,
-      knownCosts,
-      unknownCosts,
+      knownCosts: costSummary.knownCosts,
+      unknownCosts: costSummary.unknownCosts.length,
+      invalidCosts: costSummary.invalidCosts,
+      invalidTaxAmounts: costSummary.invalidTaxAmounts,
+      invalidAmounts: costSummary.invalidAmounts,
       officialFees: standardStateFees,
-      total: taxes.excise + taxes.importDuty + standardStateFees + knownCosts,
+      total: costSummary.total,
       rate: taxes.rate,
       registrationRestricted: taxes.registrationRestricted
     };
@@ -169,7 +179,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
-              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} onChange={(value) => { setEngineCc(Math.round(value ?? 0)); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Auto-filled from a selected variant. Edit to match the vehicle documents." />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} inputMode="numeric" onChange={(value) => { setEngineCc(value ?? 0); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Use whole cubic centimetres. Auto-filled from a selected variant; confirm it against the vehicle documents." />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
@@ -209,19 +219,19 @@ export default function VehicleImportPage() {
 
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
-            <div className="result-total">{eligibleYear && validEngine && validVehicleType ? money(result.excise) : "Check details"}</div>
+            <div className="result-total">{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
             <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rule</span><strong>{isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rate × 2,000" : "GEL 3,000 fixed") : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
               <div className="result-line"><span>Transport and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
-              <div className="result-line"><span>Estimated import duty</span><strong>{eligibleYear && validEngine && validVehicleType ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
+              <div className="result-line"><span>Estimated import duty</span><strong>{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
               <div className="result-line"><span>Standard listed customs and registration fees</span><strong>{money(result.officialFees)}</strong></div>
               <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
-              <div className="result-line"><span>Other entered costs subtotal</span><strong>{money(result.knownCosts)}</strong></div>
-              <div className="result-line result-line-total"><span>Known costs + estimated taxes + standard fees</span><strong>{eligibleYear && validEngine && validVehicleType ? money(result.total) : "Check details"}</strong></div>
+              <div className="result-line"><span>Other entered costs subtotal</span><strong>{result.knownCosts === null ? "Check details" : money(result.knownCosts)}</strong></div>
+              <div className="result-line result-line-total"><span>Known costs + estimated taxes + standard fees</span><strong>{eligibleYear && validEngine && validVehicleType && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
             </div>
-            <div className="disclaimer"><strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
+            <div className="disclaimer">{result.invalidAmounts && <><strong>Check the cost and tax inputs.</strong> One or more amounts cannot be calculated safely, so a total is not shown. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "The displayed budget excludes blank costs, so it is not a final landed-cost total." : "All additional cost fields have an entered amount."} The total includes GEL 480 in standard listed customs and registration fees. Broker charges, storage, special handling, classification exceptions and transitional rules may add costs or change the tax treatment.</div>
           </aside>
           </div>
         </div>
