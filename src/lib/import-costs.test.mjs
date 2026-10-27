@@ -88,3 +88,15 @@ test("quantity changes only the displayed average per item, not the total", () =
   assert.equal(one.estimatedTotal, four.estimatedTotal);
   assert.equal(four.perItem, 25);
 });
+
+test("does not present a combined total when individually finite costs exceed safe money precision", () => {
+  const costs = Object.fromEntries(IMPORT_COST_KEYS.map((key) => [
+    key,
+    Number.MAX_SAFE_INTEGER / 100
+  ]));
+  const result = calculateImportCostSummary(costs, 1, 100, 100);
+  assert.equal(result.knownSubtotal, null);
+  assert.equal(result.customsValue, null);
+  assert.equal(result.estimatedTotal, null);
+  assert.equal(result.totalUnavailable, true);
+});
