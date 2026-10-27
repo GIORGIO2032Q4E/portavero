@@ -23,7 +23,7 @@ export const CUSTOMS_VALUE_COST_KEYS = [
  * This function applies the calculator's existing arithmetic only. It does
  * not select or validate tax rates or determine a country's legal tax base.
  *
- * @param {Record<string, number | null>} costs
+ * @param {{purchase: number|null, supplier: number|null, inland: number|null, freight: number|null, insurance: number|null, customs: number|null, port: number|null, delivery: number|null, other: number|null}} costs
  * @param {number} quantity
  * @param {number | null} dutyRate
  * @param {number | null} vatRate
