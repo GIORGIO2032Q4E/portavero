@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { saveCloudEstimate } from "@/lib/auth";
 import NumberField from "@/components/NumberField";
+import { calculateImportCostSummary } from "@/lib/import-costs.mjs";
 
 type Currency = "USD" | "EUR" | "GBP" | "GEL" | "JPY";
 type CostKey = "purchase" | "supplier" | "inland" | "freight" | "insurance" | "customs" | "port" | "delivery" | "other";
@@ -202,30 +203,10 @@ export default function CalculatorPage() {
     setSaveMessage("Editing cancelled. Changes have not been saved.");
   }
 
-  const result = useMemo(() => {
-    const enteredCosts = costFields.filter(({ key }) => costs[key] !== null);
-    const knownSubtotal = enteredCosts.reduce((sum, { key }) => sum + (costs[key] ?? 0), 0);
-    const unknownCosts = costFields.filter(({ key }) => costs[key] === null);
-    const customsValueKeys: CostKey[] = ["purchase", "supplier", "inland", "freight", "insurance"];
-    const customsValue = customsValueKeys.reduce((sum, key) => sum + (costs[key] ?? 0), 0);
-    const missingCustomsValue = customsValueKeys.filter((key) => costs[key] === null).length;
-    const importDuty = dutyRate === null ? null : customsValue * dutyRate / 100;
-    const importVat = dutyRate === null || vatRate === null
-      ? null
-      : (customsValue + (importDuty ?? 0) + (costs.customs ?? 0)) * vatRate / 100;
-    const estimatedTotal = knownSubtotal + (importDuty ?? 0) + (importVat ?? 0);
-    return {
-      knownSubtotal,
-      unknownCosts,
-      enteredCount: enteredCosts.length,
-      customsValue,
-      missingCustomsValue,
-      importDuty,
-      importVat,
-      estimatedTotal,
-      perItem: quantity > 0 ? estimatedTotal / quantity : estimatedTotal
-    };
-  }, [costs, quantity, dutyRate, vatRate]);
+  const result = useMemo(
+    () => calculateImportCostSummary(costs, quantity, dutyRate, vatRate),
+    [costs, quantity, dutyRate, vatRate]
+  );
 
   function updateCost(key: CostKey, value: number | null) {
     setCosts((current) => ({ ...current, [key]: value }));
@@ -334,13 +315,13 @@ export default function CalculatorPage() {
                   <option>Not decided</option>
                 </select>
               </div>
-              <NumberField inputMode="decimal" id="quantity" label="Number of items" value={quantity} onChange={(value) => setQuantity(Math.max(1, Math.round(value ?? 1)))} hint="Used to calculate the average cost per item." />
+              <NumberField inputMode="numeric" id="quantity" label="Number of items" value={quantity} step={1} min={1} onChange={(value) => setQuantity(value ?? 1)} hint="Use a whole number of items. This also calculates the average cost per item." />
             </div>
             <h2 className="calculator-subheading">Verified tax rates</h2>
             <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the customs-value costs entered above, so missing purchase, freight or insurance amounts can make the result too low.</p>
             <div className="form-grid">
-              <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} onChange={(value) => setDutyRate(value === null ? null : Math.min(100, value))} hint="Use the rate for the exact HS / tariff code and origin rules." />
-              <NumberField inputMode="decimal" id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} onChange={(value) => setVatRate(value === null ? null : Math.min(100, value))} hint="Enter 0 only if the applicable import is confirmed to be exempt or zero-rated." />
+              <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} min={0} max={100} onChange={setDutyRate} hint="Enter a percentage from 0 to 100 for the exact HS / tariff code and origin rules." />
+              <NumberField inputMode="decimal" id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} min={0} max={100} onChange={setVatRate} hint="Enter a percentage from 0 to 100. Use 0 only if the import is confirmed exempt or zero-rated." />
             </div>
             <div className="notice">
               <strong>Check the official tariff before entering rates.</strong>{" "}
@@ -361,6 +342,7 @@ export default function CalculatorPage() {
             <div className="form-grid">
               {costFields.map((field) => (
                 <NumberField inputMode="decimal"
+                  step={currency === "JPY" ? 1 : 0.01}
                   key={field.key}
                   id={field.key}
                   label={field.label}
