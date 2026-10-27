@@ -406,7 +406,7 @@ export default function CalculatorPage() {
             <div className="disclaimer">
               <strong>{result.unknownCosts.length} of {costFields.length} cost categories still unknown.</strong>
               {result.unknownCosts.length > 0
-                ? ` Add or verify: ${result.unknownCosts.map(({ label }) => label.toLowerCase()).join(", ")}.`
+                ? ` Add or verify: ${result.unknownCosts.map((key) => costFields.find((field) => field.key === key)?.label.toLowerCase() ?? key).join(", ")}.`
                 : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
             </div>
             <p className="calculator-footer-note">
