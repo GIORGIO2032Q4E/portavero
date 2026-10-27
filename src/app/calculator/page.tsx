@@ -386,8 +386,8 @@ export default function CalculatorPage() {
 
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">{dutyRate !== null && vatRate !== null ? "Estimated total using entered rates" : dutyRate !== null ? "Subtotal including entered duty estimate" : "Known-cost subtotal"}</span>
-            <div className="result-total">{money(result.estimatedTotal, currency)}</div>
-            <p>{dutyRate !== null && vatRate !== null ? "Includes estimated duty and VAT/GST using the rates you entered. Confirm the tax base and any country-specific rules before relying on it." : dutyRate !== null ? "Includes the duty estimate from your entered rate, but excludes VAT/GST until both rates are available. Confirm the tax base and country-specific rules." : vatRate !== null ? "VAT/GST cannot be estimated yet because the duty rate needed for its tax base is missing. The displayed amount is only your entered costs." : "Enter verified duty and VAT/GST rates below to add a preliminary tax estimate. Until then, this is only the sum of entered costs."}</p>
+            <div className="result-total">{result.estimatedTotal === null ? "Check amounts" : money(result.estimatedTotal, currency)}</div>
+            <p>{result.totalUnavailable ? "One or more amounts or combined totals cannot be calculated safely. Correct invalid fields or reduce unusually large values to see the total." : dutyRate !== null && vatRate !== null ? "Includes estimated duty and VAT/GST using the rates you entered. Confirm the tax base and any country-specific rules before relying on it." : dutyRate !== null ? "Includes the duty estimate from your entered rate, but excludes VAT/GST until both rates are available. Confirm the tax base and country-specific rules." : vatRate !== null ? "VAT/GST cannot be estimated yet because the duty rate needed for its tax base is missing. The displayed amount is only your entered costs." : "Enter verified duty and VAT/GST rates below to add a preliminary tax estimate. Until then, this is only the sum of entered costs."}</p>
             <div className="result-lines">
               {costFields.map(({ key, label }) => (
                 <div className="result-line" key={key}>
@@ -395,12 +395,12 @@ export default function CalculatorPage() {
                   <strong>{costs[key] === null ? "Not entered" : money(costs[key] ?? 0, currency)}</strong>
                 </div>
               ))}
-              <div className="result-line"><span>Customs-value costs entered</span><strong>{money(result.customsValue, currency)}</strong></div>
-              <div className="result-line"><span>Import duty {dutyRate === null ? "(rate missing)" : `(${dutyRate}%)`}</span><strong>{result.importDuty === null ? "Enter verified rate" : money(result.importDuty, currency)}</strong></div>
-              <div className="result-line"><span>Import VAT / GST {vatRate === null ? "(rate missing)" : `(${vatRate}%)`}</span><strong>{result.importVat === null ? "Enter both duty and VAT/GST rates" : money(result.importVat, currency)}</strong></div>
+              <div className="result-line"><span>Customs-value costs entered</span><strong>{result.customsValue === null ? "Check amounts" : money(result.customsValue, currency)}</strong></div>
+              <div className="result-line"><span>Import duty {dutyRate === null ? "(rate missing)" : `(${dutyRate}%)`}</span><strong>{result.importDuty === null ? (dutyRate === null ? "Enter verified rate" : "Check amounts") : money(result.importDuty, currency)}</strong></div>
+              <div className="result-line"><span>Import VAT / GST {vatRate === null ? "(rate missing)" : `(${vatRate}%)`}</span><strong>{result.importVat === null ? (dutyRate === null || vatRate === null ? "Enter both duty and VAT/GST rates" : "Check amounts") : money(result.importVat, currency)}</strong></div>
               <div className="result-line result-line-total">
                 <span>Average per item</span>
-                <strong>{money(result.perItem, currency)}</strong>
+                <strong>{result.perItem === null ? "Check amounts" : money(result.perItem, currency)}</strong>
               </div>
             </div>
             <div className="disclaimer">
@@ -408,6 +408,7 @@ export default function CalculatorPage() {
               {result.unknownCosts.length > 0
                 ? ` Add or verify: ${result.unknownCosts.map((key) => costFields.find((field) => field.key === key)?.label.toLowerCase() ?? key).join(", ")}.`
                 : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
+            {result.totalUnavailable && <p className="calculator-footer-note">One or more amounts, tax inputs or combined totals are outside the calculator’s safe range. Check the fields and use confirmed values before relying on the estimate.</p>}
             </div>
             <p className="calculator-footer-note">
               Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. Goods origin: {countryOfOrigin.trim() || "not specified"} · HS code: {hsCode.trim() || "not entered"} · import date: {importDate || "not entered"}. No live freight rates, currency conversion or automatic tariff lookup is connected. This calculator applies the rates you enter and does not replace the destination country’s official customs calculation.
