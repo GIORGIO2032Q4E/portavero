@@ -17,10 +17,13 @@ const money = (value: number) =>
     maximumFractionDigits: 2
   }).format(value);
 
-const enteredGroup = (values: Array<number | null>) =>
-  values.every((value) => value === null)
-    ? "Not entered"
-    : money(values.reduce<number>((sum, value) => sum + (value ?? 0), 0));
+const enteredGroup = (values: Array<number | null>) => {
+  if (values.every((value) => value === null)) return "Not entered";
+  const total = values.reduce<number>((sum, value) => sum + (value ?? 0), 0);
+  return Number.isFinite(total) && total <= Number.MAX_SAFE_INTEGER / 100
+    ? money(total)
+    : "Check details";
+};
 
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
