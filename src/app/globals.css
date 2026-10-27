@@ -100,6 +100,8 @@ p { color: var(--muted); }
 .field input, .field select { width: 100%; min-height: 47px; padding: 0 12px; border: 1px solid #d6ded6; border-radius: 8px; background: #fff; color: var(--ink); }
 .field input:focus, .field select:focus { border-color: #6c987b; outline: 2px solid rgba(108,152,123,.15); }
 .field small { color: var(--muted); font-size: .74rem; }
+.field small.field-error { color: #a12a25; font-weight: 700; }
+.field input[aria-invalid="true"] { border-color: #a12a25; outline-color: rgba(161,42,37,.12); }
 .result-panel { position: sticky; top: 95px; background: var(--dark); color: white; }
 .result-panel p { color: #c0cdc5; }
 .result-label { color: var(--green); text-transform: uppercase; letter-spacing: .1em; font-weight: 800; font-size: .72rem; }
