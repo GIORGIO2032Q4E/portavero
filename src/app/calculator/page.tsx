@@ -324,7 +324,7 @@ export default function CalculatorPage() {
               <NumberField inputMode="numeric" id="quantity" label="Number of items" value={quantity} step={1} min={1} onChange={(value) => setQuantity(value ?? 1)} hint="Use a whole number of items. This also calculates the average cost per item." />
             </div>
             <h2 className="calculator-subheading">Verified tax rates</h2>
-            <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the customs-value costs entered above, so missing purchase, freight or insurance amounts can make the result too low.</p>
+            <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the costs entered above, so missing purchase, freight, insurance or excise/other-tax amounts can make the result too low.</p>
             <div className="form-grid">
               <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} min={0} max={100} onChange={setDutyRate} hint="Enter a percentage from 0 to 100 for the exact HS / tariff code and origin rules." />
               <NumberField inputMode="decimal" id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} min={0} max={100} onChange={setVatRate} hint="Enter a percentage from 0 to 100. Use 0 only if the import is confirmed exempt or zero-rated." />
@@ -407,7 +407,7 @@ export default function CalculatorPage() {
               <strong>{result.unknownCosts.length} of {costFields.length} cost categories still unknown.</strong>
               {result.unknownCosts.length > 0
                 ? ` Add or verify: ${result.unknownCosts.map((key) => costFields.find((field) => field.key === key)?.label.toLowerCase() ?? key).join(", ")}.`
-                : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
+                : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate !== null && vatRate !== null && costs.customs === null ? " The VAT/GST estimate treats the blank excise/other-tax field as 0, so it may be too low until you confirm the amount or enter a verified zero." : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
             {result.totalUnavailable && <p className="calculator-footer-note">One or more amounts, tax inputs or combined totals are outside the calculator’s safe range. Check the fields and use confirmed values before relying on the estimate.</p>}
             </div>
             <p className="calculator-footer-note">
