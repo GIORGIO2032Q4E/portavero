@@ -210,8 +210,8 @@ export default function CalculatorPage() {
   }
 
   const result = useMemo(
-    () => calculateImportCostSummary(costs, quantity, dutyRate, vatRate),
-    [costs, quantity, dutyRate, vatRate]
+    () => calculateImportCostSummary(costs, quantity, dutyRate, vatRate, currency),
+    [costs, quantity, dutyRate, vatRate, currency]
   );
 
   function updateCost(key: CostKey, value: number | null) {
