@@ -17,6 +17,13 @@ function isSafeMoney(value) {
     value <= maxSafeMoney;
 }
 
+function isSafeExpense(value) {
+  if (!isSafeMoney(value)) return false;
+  const scaled = value * 100;
+  return Number.isFinite(scaled) &&
+    Math.abs(scaled - Math.round(scaled)) <= 1e-7;
+}
+
 /**
  * Sum only entered vehicle-import expenses. Tax calculations are supplied by
  * the existing vehicle-tax module and are deliberately not changed here.
@@ -29,12 +36,12 @@ function isSafeMoney(value) {
 export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = 480) {
   const invalidCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => {
     const value = costs[key];
-    return value !== null && !isSafeMoney(value);
+    return value !== null && !isSafeExpense(value);
   });
   const unknownCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => costs[key] === null);
   const knownCostsRaw = VEHICLE_IMPORT_COST_KEYS.reduce((sum, key) => {
     const value = costs[key];
-    return sum + (isSafeMoney(value) ? value : 0);
+    return sum + (isSafeExpense(value) ? value : 0);
   }, 0);
   const knownCosts = isSafeMoney(knownCostsRaw) ? knownCostsRaw : null;
   const invalidTaxAmounts = !isSafeMoney(excise) ||
