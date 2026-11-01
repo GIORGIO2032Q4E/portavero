@@ -64,10 +64,10 @@ export function calculateImportCostSummary(costs, quantity, dutyRate, vatRate, c
   const valueOf = (key) => isSafeEnteredCost(costs[key], currency) ? costs[key] ?? 0 : 0;
 
   const knownSubtotalRaw = IMPORT_COST_KEYS.reduce((sum, key) => sum + valueOf(key), 0);
-  const knownSubtotal = isSafeMoney(knownSubtotalRaw) ? knownSubtotalRaw : null;
+  const knownSubtotal = isSafeMoney(knownSubtotalRaw, currency) ? knownSubtotalRaw : null;
   const customsValueHasInvalidInput = CUSTOMS_VALUE_COST_KEYS.some((key) => invalidCosts.includes(key));
   const customsValueRaw = CUSTOMS_VALUE_COST_KEYS.reduce((sum, key) => sum + valueOf(key), 0);
-  const customsValue = !customsValueHasInvalidInput && isSafeMoney(customsValueRaw)
+  const customsValue = !customsValueHasInvalidInput && isSafeMoney(customsValueRaw, currency)
     ? customsValueRaw
     : null;
   const missingCustomsValue = CUSTOMS_VALUE_COST_KEYS.filter((key) => costs[key] === null).length;
