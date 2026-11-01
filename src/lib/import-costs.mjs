@@ -18,13 +18,22 @@ export const CUSTOMS_VALUE_COST_KEYS = [
   "insurance"
 ];
 
-const maxSafeMoney = Number.MAX_SAFE_INTEGER / 100;
+function safeMoneyScale(currency) {
+  return currency === "JPY" ? 1 : 100;
+}
 
-function isSafeMoney(value) {
+function isSafeMoney(value, currency) {
   return typeof value === "number" &&
     Number.isFinite(value) &&
     value >= 0 &&
-    value <= maxSafeMoney;
+    value <= Number.MAX_SAFE_INTEGER / safeMoneyScale(currency);
+}
+
+function isSafeEnteredCost(value, currency) {
+  if (!isSafeMoney(value, currency)) return false;
+  const scaled = value * safeMoneyScale(currency);
+  return Number.isFinite(scaled) &&
+    Math.abs(scaled - Math.round(scaled)) <= 1e-7;
 }
 
 function isValidRate(value) {
@@ -47,18 +56,18 @@ function isValidRate(value) {
  * @param {number | null} dutyRate
  * @param {number | null} vatRate
  */
-export function calculateImportCostSummary(costs, quantity, dutyRate, vatRate) {
+export function calculateImportCostSummary(costs, quantity, dutyRate, vatRate, currency = "USD") {
   const invalidCosts = IMPORT_COST_KEYS.filter((key) =>
-    costs[key] !== null && !isSafeMoney(costs[key])
+    costs[key] !== null && !isSafeEnteredCost(costs[key], currency)
   );
   const unknownCosts = IMPORT_COST_KEYS.filter((key) => costs[key] === null);
-  const valueOf = (key) => isSafeMoney(costs[key]) ? costs[key] ?? 0 : 0;
+  const valueOf = (key) => isSafeEnteredCost(costs[key], currency) ? costs[key] ?? 0 : 0;
 
   const knownSubtotalRaw = IMPORT_COST_KEYS.reduce((sum, key) => sum + valueOf(key), 0);
-  const knownSubtotal = isSafeMoney(knownSubtotalRaw) ? knownSubtotalRaw : null;
+  const knownSubtotal = isSafeMoney(knownSubtotalRaw, currency) ? knownSubtotalRaw : null;
   const customsValueHasInvalidInput = CUSTOMS_VALUE_COST_KEYS.some((key) => invalidCosts.includes(key));
   const customsValueRaw = CUSTOMS_VALUE_COST_KEYS.reduce((sum, key) => sum + valueOf(key), 0);
-  const customsValue = !customsValueHasInvalidInput && isSafeMoney(customsValueRaw)
+  const customsValue = !customsValueHasInvalidInput && isSafeMoney(customsValueRaw, currency)
     ? customsValueRaw
     : null;
   const missingCustomsValue = CUSTOMS_VALUE_COST_KEYS.filter((key) => costs[key] === null).length;
@@ -67,7 +76,7 @@ export function calculateImportCostSummary(costs, quantity, dutyRate, vatRate) {
   let importDuty = null;
   if (dutyRate !== null && isValidRate(dutyRate) && customsValue !== null) {
     const amount = customsValue * dutyRate / 100;
-    importDuty = isSafeMoney(amount) ? amount : null;
+    importDuty = isSafeMoney(amount, currency) ? amount : null;
   }
 
   let importVat = null;
@@ -81,7 +90,7 @@ export function calculateImportCostSummary(costs, quantity, dutyRate, vatRate) {
   ) {
     const taxBase = customsValue + importDuty + (costs.customs ?? 0);
     const amount = taxBase * vatRate / 100;
-    if (isSafeMoney(taxBase) && isSafeMoney(amount)) importVat = amount;
+    if (isSafeMoney(taxBase, currency) && isSafeMoney(amount, currency)) importVat = amount;
   }
 
   const taxCalculationUnavailable =
@@ -92,7 +101,7 @@ export function calculateImportCostSummary(costs, quantity, dutyRate, vatRate) {
     invalidRates ||
     knownSubtotal === null ||
     taxCalculationUnavailable ||
-    !isSafeMoney(rawTotal);
+    !isSafeMoney(rawTotal, currency);
   const estimatedTotal = totalUnavailable ? null : rawTotal;
   const perItem = estimatedTotal !== null &&
     Number.isSafeInteger(quantity) &&
