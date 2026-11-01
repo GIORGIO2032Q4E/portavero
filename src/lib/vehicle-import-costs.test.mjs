@@ -62,3 +62,15 @@ test("invalid tax amounts and overflowing totals are not presented as valid", ()
   );
   assert.equal(overflow.total, null);
 });
+
+
+test("rejects GEL expenses with more than two decimal places", () => {
+  const result = summarizeVehicleImportCosts(
+    { ...blankCosts(), purchase: 12.345 },
+    0,
+    0,
+    480
+  );
+  assert.deepEqual(result.invalidCosts, ["purchase"]);
+  assert.equal(result.total, null);
+});
