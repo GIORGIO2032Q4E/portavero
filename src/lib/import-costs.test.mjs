@@ -110,3 +110,26 @@ test("VAT estimate warns through its result state when excise and other taxes ar
   assert.equal(result.importVat, 189);
   assert.equal(result.estimatedTotal, 1239);
 });
+
+
+test("uses whole-yen precision and the larger safe-integer range for JPY", () => {
+  const costs = blankCosts();
+  costs.purchase = 100_000_000_000_000;
+  const result = calculateImportCostSummary(costs, 1, null, null, "JPY");
+  assert.deepEqual(result.invalidCosts, []);
+  assert.equal(result.knownSubtotal, 100_000_000_000_000);
+  assert.equal(result.estimatedTotal, 100_000_000_000_000);
+});
+
+test("rejects fractional yen and sub-cent currency inputs before adding them", () => {
+  const costs = blankCosts();
+  costs.purchase = 100.5;
+  const yen = calculateImportCostSummary(costs, 1, null, null, "JPY");
+  assert.deepEqual(yen.invalidCosts, ["purchase"]);
+  assert.equal(yen.estimatedTotal, null);
+
+  costs.purchase = 0.001;
+  const dollars = calculateImportCostSummary(costs, 1, null, null, "USD");
+  assert.deepEqual(dollars.invalidCosts, ["purchase"]);
+  assert.equal(dollars.estimatedTotal, null);
+});
