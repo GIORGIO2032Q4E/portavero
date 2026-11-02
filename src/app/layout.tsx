@@ -51,6 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/how-it-works">How it works</Link>
               <Link href="/vin-check">VIN check</Link>
               <Link href="/vehicles">Vehicle catalogue</Link>
+              <Link href="/compare">Compare cars</Link>
               <Link href="/privacy-policy">Privacy</Link>
               <Link href="/terms">Terms</Link>
               <Link href="/account">Account</Link>
