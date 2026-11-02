@@ -84,7 +84,7 @@ export function isSavedVehicleCandidate(value) {
     Number.isSafeInteger(candidate.engineCc) && candidate.engineCc >= 0 && candidate.engineCc <= 100000 &&
     typeof candidate.engineVerified === "boolean" &&
     Number.isSafeInteger(candidate.year) && candidate.year >= 1960 && candidate.year <= 2200 &&
-    Number.isSafeInteger(candidate.declarationYear) && candidate.declarationYear >= candidate.year && candidate.declarationYear <= candidate.year + 10 &&
+    Number.isSafeInteger(candidate.declarationYear) && candidate.declarationYear >= candidate.year && candidate.declarationYear <= 2200 &&
     typeof candidate.sourceCountry === "string" && candidate.sourceCountry.length <= 100 &&
     (candidate.steering === "left" || candidate.steering === "right") &&
     typeof candidate.hybrid === "boolean" &&
