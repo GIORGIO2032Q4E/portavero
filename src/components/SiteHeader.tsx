@@ -9,6 +9,7 @@ const navigation = [
   { href: "/vehicle-import", label: "Vehicle import" },
   { href: "/vin-check", label: "VIN check" },
   { href: "/vehicles", label: "Vehicle catalogue" },
+  { href: "/compare", label: "Compare cars" },
   { href: "/shipping", label: "Shipping" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/account", label: "Account" }
