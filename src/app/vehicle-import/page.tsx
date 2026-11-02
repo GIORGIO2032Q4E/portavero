@@ -32,6 +32,8 @@ const enteredGroup = (values: Array<number | null>) => {
     : "Check details";
 };
 
+const roundMoney = (value: number) => Number(value.toFixed(2));
+
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
   const [declarationYear, setDeclarationYear] = useState(new Date().getFullYear());
@@ -196,11 +198,11 @@ export default function VehicleImportPage() {
         vin: savedVin,
         historyNotes: historyNotes.trim(),
         costs: { purchase, auction, inland, shipping, insurance, port, delivery },
-        knownCosts: result.knownCosts,
-        excise: result.excise,
-        importDuty: result.importDuty,
-        officialFees: result.officialFees,
-        estimatedTotal: result.total,
+        knownCosts: roundMoney(result.knownCosts),
+        excise: roundMoney(result.excise),
+        importDuty: roundMoney(result.importDuty),
+        officialFees: roundMoney(result.officialFees),
+        estimatedTotal: roundMoney(result.total),
         unknownCosts: result.unknownCosts,
         registrationRestricted: result.registrationRestricted,
         riskReasons
