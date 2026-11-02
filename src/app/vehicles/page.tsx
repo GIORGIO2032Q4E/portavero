@@ -1,12 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { vehicleCatalog } from "@/data/vehicle-catalog";
+import { parseSavedVehicleCandidates, SAVED_VEHICLES_STORAGE_KEY } from "@/lib/saved-vehicles.mjs";
 
 export default function VehicleCatalogPage() {
   const [search, setSearch] = useState("");
+  const [savedVehicleCount, setSavedVehicleCount] = useState(0);
   const query = search.trim().toLowerCase();
+
+  useEffect(() => {
+    try {
+      const saved = parseSavedVehicleCandidates(
+        window.localStorage.getItem(SAVED_VEHICLES_STORAGE_KEY)
+      );
+      setSavedVehicleCount(saved.items.length);
+    } catch {
+      setSavedVehicleCount(0);
+    }
+  }, []);
 
   const makes = useMemo(() => vehicleCatalog.map((make) => ({
     ...make,
@@ -32,6 +45,7 @@ export default function VehicleCatalogPage() {
           <p>Browse the makes, models and common engine variants currently included in Portavero. Exact engines vary by year and market, so confirm the details from the vehicle documents.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Estimate import costs ↗</Link>
+            <Link href="/compare" className="button button-outline">Compare saved vehicles ({savedVehicleCount})</Link>
           </div>
         </div>
       </section>
