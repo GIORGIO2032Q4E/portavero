@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
+import { validateVin } from "@/lib/vin.mjs";
+import {
+  MAX_SAVED_VEHICLES,
+  parseSavedVehicleCandidates,
+  SAVED_VEHICLES_STORAGE_KEY,
+  type SavedVehicleCandidate
+} from "@/lib/saved-vehicles.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = 480;
@@ -24,6 +31,8 @@ const enteredGroup = (values: Array<number | null>) => {
     ? money(total)
     : "Check details";
 };
+
+const roundMoney = (value: number) => Number(value.toFixed(2));
 
 export default function VehicleImportPage() {
   const [year, setYear] = useState(2020);
@@ -44,6 +53,25 @@ export default function VehicleImportPage() {
   const [insurance, setInsurance] = useState<number | null>(null);
   const [port, setPort] = useState<number | null>(null);
   const [delivery, setDelivery] = useState<number | null>(null);
+  const [candidateName, setCandidateName] = useState("");
+  const [vin, setVin] = useState("");
+  const [historyNotes, setHistoryNotes] = useState("");
+  const [savedVehicleCount, setSavedVehicleCount] = useState(0);
+  const [candidateMessage, setCandidateMessage] = useState("");
+
+  useEffect(() => {
+    try {
+      const saved = parseSavedVehicleCandidates(
+        window.localStorage.getItem(SAVED_VEHICLES_STORAGE_KEY)
+      );
+      setSavedVehicleCount(saved.items.length);
+      if (saved.skipped) {
+        setCandidateMessage("Some older comparison entries were skipped because their data was incomplete.");
+      }
+    } catch {
+      setCandidateMessage("Browser storage is unavailable. Vehicles cannot be saved for comparison in this browser.");
+    }
+  }, []);
 
   const selectedMake = vehicleCatalog.find((make) => make.name === makeName);
   const selectedModel = selectedMake?.models.find((model) => model.name === modelName);
@@ -88,6 +116,107 @@ export default function VehicleImportPage() {
     };
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
 
+  function saveVehicleForComparison() {
+    setCandidateMessage("");
+
+    if (!makeName || !modelName) {
+      setCandidateMessage("Choose a make and model before saving this vehicle.");
+      return;
+    }
+
+    if (!eligibleYear || !validEngine || !validVehicleType || result.invalidAmounts || result.total === null || result.knownCosts === null) {
+      setCandidateMessage("Check the vehicle details and cost fields first. A safe estimate is needed before this candidate can be saved.");
+      return;
+    }
+
+    const savedVin = vin.trim().toUpperCase();
+    if (savedVin) {
+      const validation = validateVin(savedVin);
+      if (!validation.valid) {
+        setCandidateMessage(validation.message);
+        return;
+      }
+    }
+
+    try {
+      const existing = parseSavedVehicleCandidates(
+        window.localStorage.getItem(SAVED_VEHICLES_STORAGE_KEY)
+      );
+      if (existing.items.length >= MAX_SAVED_VEHICLES) {
+        setSavedVehicleCount(existing.items.length);
+        setCandidateMessage("You can compare up to four vehicles. Remove one from the comparison page before adding another.");
+        return;
+      }
+
+      const riskReasons: string[] = [];
+      if (result.unknownCosts > 0) {
+        riskReasons.push(`${result.unknownCosts} cost categories are still unknown, so this is not a final landed-cost figure.`);
+      }
+      if (!selectedEngine) {
+        riskReasons.push("The engine configuration was entered manually. Confirm it against the vehicle documents.");
+      } else {
+        riskReasons.push("The catalogue variant is a guide, not a VIN-level confirmation. Check the exact engine against the documents.");
+      }
+      if (savedVin) {
+        riskReasons.push("The VIN is recorded for reference only. This comparison did not run a VIN decode or search vehicle history.");
+      } else {
+        riskReasons.push("No VIN was recorded or decoded for this candidate.");
+      }
+      if (historyNotes.trim()) {
+        riskReasons.push("History and condition notes were entered by the user and have not been independently verified.");
+      } else {
+        riskReasons.push("No accident, title, mileage, service or auction-history details were recorded. Unknown does not mean accident-free.");
+      }
+      if (result.registrationRestricted) {
+        riskReasons.push("The current calculator flags a general registration restriction for this vehicle age. Verify applicable exceptions with the Revenue Service.");
+      }
+      if (preAprilRegime) {
+        riskReasons.push("Previous tax rules were selected. Eligibility for transitional treatment has not been verified.");
+      }
+      if (classicCar) {
+        riskReasons.push("Classic-car classification must be confirmed by the relevant authority.");
+      }
+
+      const candidate: SavedVehicleCandidate = {
+        id: window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`,
+        name: candidateName.trim() || `${makeName} ${modelName} · ${year}`,
+        savedAt: new Date().toISOString(),
+        make: makeName,
+        model: modelName,
+        engineLabel: selectedEngine?.label ?? "Manual engine entry",
+        fuel: selectedEngine?.fuel ?? (isElectric ? "Electric" : hybrid ? "Hybrid" : "Not confirmed"),
+        engineCc,
+        engineVerified: Boolean(selectedEngine),
+        year,
+        declarationYear,
+        sourceCountry,
+        steering: steering === "right" ? "right" : "left",
+        hybrid,
+        isElectric,
+        classicCar,
+        preAprilRegime,
+        vin: savedVin,
+        historyNotes: historyNotes.trim(),
+        costs: { purchase, auction, inland, shipping, insurance, port, delivery },
+        knownCosts: roundMoney(result.knownCosts),
+        excise: roundMoney(result.excise),
+        importDuty: roundMoney(result.importDuty),
+        officialFees: roundMoney(result.officialFees),
+        estimatedTotal: roundMoney(result.total),
+        unknownCosts: result.unknownCosts,
+        registrationRestricted: result.registrationRestricted,
+        riskReasons
+      };
+
+      const next = [candidate, ...existing.items];
+      window.localStorage.setItem(SAVED_VEHICLES_STORAGE_KEY, JSON.stringify(next));
+      setSavedVehicleCount(next.length);
+      setCandidateMessage("Vehicle saved in this browser. Add another candidate or open Compare to review them side by side.");
+    } catch {
+      setCandidateMessage("Could not save this vehicle. Check whether browser storage is available.");
+    }
+  }
+
   return (
     <div className="vehicle-import-page">
       <section className="page-hero">
@@ -99,6 +228,7 @@ export default function VehicleImportPage() {
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/vehicles" className="button button-dark">Browse vehicle catalogue</Link>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
+            <Link href="/compare" className="button button-outline">Compare saved vehicles ({savedVehicleCount})</Link>
             <button type="button" className="button button-dark print-trigger" onClick={() => window.print()}>Print / Save as PDF</button>
           </div>
         </div>
@@ -254,6 +384,40 @@ export default function VehicleImportPage() {
               <NumberField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
               <NumberField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className="panel compare-save-panel">
+            <span className="eyebrow">Keep a shortlist</span>
+            <h2>Save this vehicle to compare.</h2>
+            <p className="panel-intro">Save the current specifications and estimate in this browser. Add any history or condition details you already know, and note their source. Portavero does not verify these notes or retrieve accident, title, mileage, service or auction records.</p>
+            <div className="form-grid">
+              <div className="field">
+                <label htmlFor="candidate-name">Comparison name (optional)</label>
+                <input id="candidate-name" value={candidateName} onChange={(event) => setCandidateName(event.target.value)} maxLength={100} placeholder={makeName && modelName ? `${makeName} ${modelName} · ${year}` : "e.g. Prius from auction listing A"} />
+              </div>
+              <div className="field">
+                <label htmlFor="candidate-vin">VIN (optional)</label>
+                <input id="candidate-vin" value={vin} onChange={(event) => setVin(event.target.value.toUpperCase())} maxLength={17} autoComplete="off" spellCheck={false} placeholder="17-character VIN" />
+                <small>The VIN is stored as a reference only. Use <Link href="/vin-check" className="text-link">VIN Check</Link> separately for available technical decoding.</small>
+              </div>
+              <label className="field compare-notes-field" htmlFor="history-notes">
+                <span>Known history / condition notes (optional)</span>
+                <textarea id="history-notes" rows={4} value={historyNotes} onChange={(event) => setHistoryNotes(event.target.value)} maxLength={1200} placeholder="Record only what you know, for example: seller says rear bumper damage; inspection report dated… Include the source where possible." />
+                <small>These are your notes, not independently verified Portavero records. Missing notes do not mean the vehicle has a clean history.</small>
+              </label>
+            </div>
+            <div className="hero-actions">
+              <button type="button" className="button button-dark" onClick={saveVehicleForComparison} disabled={savedVehicleCount >= MAX_SAVED_VEHICLES}>
+                Save for comparison ({savedVehicleCount}/{MAX_SAVED_VEHICLES})
+              </button>
+              <Link href="/compare" className="button button-outline">Open vehicle comparison ↗</Link>
+            </div>
+            {candidateMessage && <p className="estimate-save-message" role="status">{candidateMessage}</p>}
+            <p className="calculator-footer-note">Saved candidates stay on this device and browser. They are not synced to a Portavero account or another device.</p>
           </div>
         </div>
       </section>
