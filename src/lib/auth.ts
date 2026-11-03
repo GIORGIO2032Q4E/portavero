@@ -21,6 +21,16 @@ export type CloudEstimate = {
   updated_at: string;
 };
 
+class AuthRequestError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "AuthRequestError";
+    this.status = status;
+  }
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -36,14 +46,25 @@ function config() {
 }
 
 function normaliseSession(value: Record<string, unknown>): PortaveroSession | null {
-  if (typeof value.access_token !== "string" || typeof value.refresh_token !== "string" || !value.user || typeof value.user !== "object") {
+  if (
+    typeof value.access_token !== "string" || !value.access_token ||
+    typeof value.refresh_token !== "string" || !value.refresh_token ||
+    !value.user || typeof value.user !== "object"
+  ) {
     return null;
   }
+
   const user = value.user as Record<string, unknown>;
-  if (typeof user.id !== "string") return null;
-  const expiresAt = typeof value.expires_at === "number"
+  if (typeof user.id !== "string" || !user.id.trim()) return null;
+
+  const expiresAt = typeof value.expires_at === "number" && Number.isFinite(value.expires_at)
     ? value.expires_at
-    : typeof value.expires_in === "number" ? Math.floor(Date.now() / 1000) + value.expires_in : undefined;
+    : typeof value.expires_in === "number" && Number.isFinite(value.expires_in) && value.expires_in > 0
+      ? Math.floor(Date.now() / 1000) + value.expires_in
+      : null;
+
+  if (expiresAt === null || expiresAt <= 0) return null;
+
   return {
     access_token: value.access_token,
     refresh_token: value.refresh_token,
@@ -89,7 +110,7 @@ async function authRequest(path: string, body?: Record<string, unknown>, accessT
       : typeof result.error_description === "string" ? result.error_description
       : typeof result.error === "string" ? result.error
       : "Authentication request failed.";
-    throw new Error(message);
+    throw new AuthRequestError(message, response.status);
   }
   return result;
 }
@@ -174,15 +195,32 @@ export async function sendPasswordReset(email: string) {
 export async function getSession(): Promise<PortaveroSession | null> {
   const session = readStoredSession();
   if (!session) return null;
-  if (!session.expires_at || session.expires_at > Math.floor(Date.now() / 1000) + 60) return session;
+  if (session.expires_at && session.expires_at > Math.floor(Date.now() / 1000) + 60) return session;
+
   try {
     const result = await authRequest("token?grant_type=refresh_token", { refresh_token: session.refresh_token });
     const refreshed = normaliseSession(result);
     storeSession(refreshed);
     return refreshed;
-  } catch {
-    storeSession(null);
-    return null;
+  } catch (error) {
+    // Another tab may already have rotated the refresh token.
+    const latestSession = readStoredSession();
+    if (
+      latestSession &&
+      (latestSession.access_token !== session.access_token ||
+        latestSession.refresh_token !== session.refresh_token)
+    ) {
+      return latestSession;
+    }
+
+    // Only discard the session when Supabase rejects the refresh token.
+    // Network failures, rate limits and server errors should not sign users out.
+    if (error instanceof AuthRequestError && (error.status === 400 || error.status === 401)) {
+      storeSession(null);
+      return null;
+    }
+
+    return session;
   }
 }
 
@@ -214,9 +252,21 @@ export async function listCloudEstimates() {
 }
 
 export async function saveCloudEstimate(name: string, data: Record<string, unknown>) {
+  const cleanName = name.trim();
+  if (!cleanName || cleanName.length > 60) {
+    throw new Error("Estimate names must contain 1 to 60 characters.");
+  }
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("The estimate data is not in a supported format.");
+  }
+
   const session = await getSession();
   if (!session) return false;
-  await databaseRequest<CloudEstimate[]>("saved_estimates", "POST", session, { name, data, user_id: session.user.id });
+  await databaseRequest<CloudEstimate[]>("saved_estimates", "POST", session, {
+    name: cleanName,
+    data,
+    user_id: session.user.id
+  });
   return true;
 }
 
