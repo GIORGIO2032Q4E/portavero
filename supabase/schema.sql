@@ -17,7 +17,7 @@ create index if not exists saved_estimates_user_updated_idx
 
 -- Apply the same checks when this script is run against an existing table.
 -- NOT VALID preserves existing rows while enforcing the rules for new writes.
-do $
+do $$
 begin
   if not exists (
     select 1 from pg_constraint
@@ -38,7 +38,7 @@ begin
       add constraint saved_estimates_data_object
       check (jsonb_typeof(data) = 'object') not valid;
   end if;
-end $;
+end $$;
 
 alter table public.saved_estimates enable row level security;
 
@@ -71,7 +71,7 @@ create or replace function public.set_estimate_updated_at()
 returns trigger
 language plpgsql
 set search_path = pg_catalog
-as $
+as $$
 begin
   new.updated_at = pg_catalog.now();
   return new;
