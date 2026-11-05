@@ -7,17 +7,17 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Portavero | Import cost planner",
+    default: "Portavero | Vehicle import planning",
     template: "%s | Portavero"
   },
   description:
-    "A simple tool for organizing import costs, with a focus on goods and vehicles brought into Georgia.",
+    "A project for decoding available VIN technical data and estimating the cost of importing a car into Georgia.",
   applicationName: "Portavero",
   icons: { icon: "/favicon.svg" },
-  keywords: ["import cost calculator", "shipping estimator", "Georgia imports", "vehicle import"],
+  keywords: ["VIN decoder", "vehicle import estimate", "Georgia vehicle import", "vehicle tax estimate"],
   openGraph: {
-    title: "Portavero | Know the full cost before you import",
-    description: "A simple starting point for planning import costs.",
+    title: "Portavero | VIN decoding and vehicle import estimates",
+    description: "Check available technical details from a VIN and build a preliminary vehicle import-cost estimate for Georgia.",
     type: "website",
     siteName: "Portavero"
   },
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-mark" aria-hidden="true">P</span>
                 <span>Portavero</span>
               </Link>
-              <p>A small tool for planning import costs.</p>
+              <p>A vehicle-import project focused on VIN data and preliminary cost estimates for Georgia.</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>
@@ -61,7 +61,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span>© {new Date().getFullYear()} Portavero. Independent project.</span>
             <span>Estimates are planning tools, not customs declarations or binding quotes.</span>
           </div>
-        </footer>
+        </div>
       </body>
     </html>
   );
