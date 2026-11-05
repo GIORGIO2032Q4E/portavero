@@ -61,7 +61,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span>© {new Date().getFullYear()} Portavero. Independent project.</span>
             <span>Estimates are planning tools, not customs declarations or binding quotes.</span>
           </div>
-        </div>
+        </footer>
       </body>
     </html>
   );
