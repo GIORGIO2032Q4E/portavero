@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const navigation = [
-  { href: "/vin-check", label: "VIN check" },
+  { href: "/calculator", label: "Import calculator" },
   { href: "/vehicle-import", label: "Vehicle import" },
+  { href: "/vin-check", label: "VIN check" },
   { href: "/vehicles", label: "Vehicle catalogue" },
   { href: "/compare", label: "Compare cars" },
   { href: "/shipping", label: "Shipping" },
-  { href: "/calculator", label: "Import calculator" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/account", label: "Account" }
 ];
@@ -63,8 +63,8 @@ export default function SiteHeader() {
           })}
         </nav>
 
-        <Link href="/vehicle-import" className="button button-small button-dark header-cta" onClick={closeMenu}>
-          Vehicle estimate <span aria-hidden="true">↗</span>
+        <Link href="/calculator" className="button button-small button-dark header-cta" onClick={closeMenu}>
+          Calculate cost <span aria-hidden="true">↗</span>
         </Link>
       </div>
     </header>
