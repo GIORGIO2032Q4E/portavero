@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Portavero",
-  description: "A vehicle-import project focused on VIN technical data and preliminary import-cost estimates for Georgia."
+  description: "Why I built Portavero, what it helps with, and where its estimates have limits."
 };
 
 export default function AboutPage() {
@@ -10,31 +10,29 @@ export default function AboutPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">About Portavero</span>
-          <h1>A project about vehicle information and import costs.</h1>
-          <p>I built Portavero as a web project focused on two related tasks: checking the technical information available from a vehicle's VIN and estimating the cost of importing a car into Georgia.</p>
+          <span className="eyebrow">About</span>
+          <h1>A practical way to keep import costs together.</h1>
+          <p>I built Portavero as a small project to help me organise the costs involved in bringing goods or a vehicle into Georgia.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <h2>What the project is for</h2>
-          <p>Vehicle research and import planning involve different kinds of information. A VIN decoder can return technical specifications, while an import estimate brings purchase, transport, tax and other expenses together. Portavero puts tools for both tasks in one application and makes it clear when information is entered by the user, returned by an external source or still needs to be checked.</p>
+          <h2>Why I made it</h2>
+          <p>The price you pay for an item or car is only the beginning. Shipping, insurance, customs charges and delivery can change the final cost, and you might not have every number when you start planning. Portavero gives those figures one place to live and helps show what still needs checking.</p>
 
-          <h2>What it includes</h2>
+          <h2>What you can use it for</h2>
           <ul>
-            <li><strong>VIN decoding:</strong> sends a 17-character VIN to the NHTSA vPIC service and displays the technical fields returned for that vehicle.</li>
-            <li><strong>Vehicle import estimate:</strong> uses the vehicle details entered by the user to calculate selected tax amounts under the rules implemented in the project, then adds the known expenses entered for that car.</li>
-            <li><strong>Vehicle catalogue and comparison:</strong> provides a limited list of makes, models and engine variants, and lets users save up to four vehicle candidates in the current browser.</li>
-            <li><strong>Supporting calculators:</strong> includes a general import-cost calculator and a tool for comparing shipping quotes entered by the user.</li>
+            <li>Add up the import costs you enter and see which amounts you haven't included.</li>
+            <li>Save estimates in your browser and print them or save them as a PDF.</li>
+            <li>Get a preliminary estimate of selected vehicle taxes from the details you provide.</li>
+            <li>Browse a starter vehicle catalogue and work through a shipping checklist with quotes you've collected.</li>
           </ul>
 
-          <h2>How it is built</h2>
-          <p>Portavero uses Next.js, React, TypeScript and CSS. Calculation and validation logic is kept in separate modules and covered by tests for important cases. NHTSA vPIC supplies the VIN technical data. Supabase provides optional accounts and saved estimates when the project is configured for it.</p>
+          <h2>How it's built</h2>
+          <p>Portavero uses Next.js, React, TypeScript and CSS. The vehicle-tax calculations are kept in a separate module with tests for common cases. Supabase can handle accounts and saved estimates when the project is configured for it.</p>
 
-          <h2>What it does not do</h2>
-          <p>The VIN decoder does not search accident, title, ownership, odometer, service or auction records, and it does not retrieve auction photos. A missing result is not evidence of a clean history. Some vehicles, especially those built for markets outside the United States, may return limited VIN information.</p>
-          <p>Portavero does not fetch live shipping prices, book or track transport, or provide an official tax assessment. The vehicle catalogue is limited, and the estimator only covers the cases represented by its current inputs and rules. It currently includes a GEL 480 fee amount configured in the calculator; confirm the applicable fees and tax treatment with the <a href="https://www.rs.ge/CarClearance-en" target="_blank" rel="noreferrer">Georgian Revenue Service</a> before relying on an estimate.</p>
-          <p>The aim is to make the information and assumptions visible, not to present a preliminary calculation as a final import price.</p>
+          <h2>What to double-check</h2>
+          <p>Portavero doesn't fetch live shipping prices, track cargo or replace official customs guidance. The vehicle catalogue covers selected models, and tax estimates don't cover every situation. Use quotes from your provider and confirm vehicle-specific tax rules with the Georgian Revenue Service before relying on a figure.</p>
         </div>
       </section>
     </>
