@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Portavero",
-  description: "Why I built Portavero, what it helps with, and where its estimates have limits."
+  description: "The thinking behind Portavero, the tools in the project, and what they do not check."
 };
 
 export default function AboutPage() {
@@ -11,28 +11,30 @@ export default function AboutPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">About</span>
-          <h1>A practical way to keep import costs together.</h1>
-          <p>I built Portavero as a small project to help me organise the costs involved in bringing goods or a vehicle into Georgia.</p>
+          <h1>Why I built Portavero.</h1>
+          <p>I wanted a way to work through import costs without keeping the purchase price, freight quotes and tax estimates in separate notes. Portavero is the project I built to bring those pieces together.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <h2>Why I made it</h2>
-          <p>The price you pay for an item or car is only the beginning. Shipping, insurance, customs charges and delivery can change the final cost, and you might not have every number when you start planning. Portavero gives those figures one place to live and helps show what still needs checking.</p>
+          <h2>The problem I wanted to work on</h2>
+          <p>The price of a car or other item is usually the easiest number to find. The rest can be spread across an auction invoice, a transport quote, port charges, insurance and customs rules. You may not have all of those figures on the same day. I built the project around that situation: enter what is known, keep track of what is missing, and update the estimate when better information arrives.</p>
 
-          <h2>What you can use it for</h2>
+          <h2>What is in the project</h2>
           <ul>
-            <li>Add up the import costs you enter and see which amounts you haven't included.</li>
-            <li>Save estimates in your browser and print them or save them as a PDF.</li>
-            <li>Get a preliminary estimate of selected vehicle taxes from the details you provide.</li>
-            <li>Browse a starter vehicle catalogue and work through a shipping checklist with quotes you've collected.</li>
+            <li><strong>Import cost calculator.</strong> Add the costs you know and see their total. A blank field is excluded; the calculator does not invent a price for a charge you have not entered.</li>
+            <li><strong>Vehicle import planner.</strong> Enter a passenger car's details to get a preliminary estimate of selected Georgian vehicle taxes and listed fees. The rules cover a limited set of cases, so the result needs to be checked against the Revenue Service.</li>
+            <li><strong>VIN decoder.</strong> Request available technical details from the U.S. NHTSA vPIC service. It does not search accident, title, ownership, odometer, service or auction records.</li>
+            <li><strong>Vehicle comparison.</strong> Keep up to four candidates in this browser and compare their specifications, entered costs and notes. The notes are not independently checked, and the list does not sync to another device.</li>
+            <li><strong>Shipping tools.</strong> Work through a booking checklist and enter freight offers you have received. Portavero does not fetch live carrier prices or track a shipment.</li>
           </ul>
 
-          <h2>How it's built</h2>
-          <p>Portavero uses Next.js, React, TypeScript and CSS. The vehicle-tax calculations are kept in a separate module with tests for common cases. Supabase can handle accounts and saved estimates when the project is configured for it.</p>
+          <h2>How I built it</h2>
+          <p>The site uses Next.js, React and TypeScript. I kept the vehicle-tax calculations in a separate module so they can be tested apart from the page. The VIN lookup calls NHTSA vPIC, while comparison candidates are stored in the browser. Supabase can provide account and saved-estimate storage when the project and its database schema are configured.</p>
 
-          <h2>What to double-check</h2>
-          <p>Portavero doesn't fetch live shipping prices, track cargo or replace official customs guidance. The vehicle catalogue covers selected models, and tax estimates don't cover every situation. Use quotes from your provider and confirm vehicle-specific tax rules with the Georgian Revenue Service before relying on a figure.</p>
+          <h2>What still needs checking</h2>
+          <p>Portavero is a planning tool, not a source of official prices or a customs decision. Shipping quotes, exchange rates and customs charges are not fetched automatically. The vehicle catalogue is a starting list, not a complete database, and a catalogue engine choice is not confirmation of the exact car. The VIN tool returns technical data only; no history result here means the history is unknown, not clean.</p>
+          <p>Before buying or shipping, compare the vehicle documents with the details entered, ask providers what their quotes include, and confirm the applicable taxes and fees with the Georgian Revenue Service or a qualified broker.</p>
         </div>
       </section>
     </>
