@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
-import { summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
+import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 import { validateVin } from "@/lib/vin.mjs";
 import { getEngineCapacityForSelection, getManualVehicleTypeSelection } from "@/lib/vehicle-selection.mjs";
 import {
@@ -16,7 +16,7 @@ import {
 } from "@/lib/saved-vehicles.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
-const standardStateFees = 480;
+const standardStateFees = STANDARD_VEHICLE_FEES_GEL;
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-US", {
