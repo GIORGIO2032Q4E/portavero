@@ -260,7 +260,7 @@ export default function VehicleImportPage() {
                 <select id="source-country" value={sourceCountry} onChange={(event) => setSourceCountry(event.target.value)}>
                   {importCountries.map((country) => <option key={country} value={country}>{country}</option>)}
                 </select>
-                <small>Where the vehicle is bought, not necessarily where it was built.</small>
+                <small>Saved for reference and comparison. The current vehicle-tax formula does not use the purchase country.</small>
               </div>
               <div className="field">
                 <label htmlFor="make">Make</label>
