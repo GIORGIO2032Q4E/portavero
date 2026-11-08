@@ -86,36 +86,36 @@ export const vehicleCatalog: VehicleMake[] = [
     ] },
     { name: "5 Series", engines: [
       e("bmw-520i", "520i · 2.0 Petrol", 1998, "Petrol", "varies by generation"),
-      e("bmw-530i", "530i · 2.0/3.0 Petrol", 1998, "Petrol", "engine depends on generation"),
-      e("bmw-540i", "540i · 3.0/4.0/4.4 Petrol", 2998, "Petrol", "engine depends on generation"),
+      e("bmw-530i", "530i · Petrol · capacity varies", 0, "Petrol", "varies by generation", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("bmw-540i", "540i · Petrol · capacity varies", 0, "Petrol", "varies by generation", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
       e("bmw-520d", "520d · 2.0 Diesel", 1995, "Diesel", "varies by generation"),
       e("bmw-530d", "530d · 3.0 Diesel", 2993, "Diesel", "varies by generation"),
     ] },
     { name: "X3", engines: [
       e("bmw-x3-20i", "20i · 2.0 Petrol", 1998, "Petrol", "varies by generation"),
-      e("bmw-x3-30i", "30i · 2.0/3.0 Petrol", 1998, "Petrol", "engine depends on generation"),
+      e("bmw-x3-30i", "30i · Petrol · capacity varies", 0, "Petrol", "varies by generation", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
       e("bmw-x3-20d", "20d · 2.0 Diesel", 1995, "Diesel", "varies by generation"),
       e("bmw-x3-30d", "30d · 3.0 Diesel", 2993, "Diesel", "varies by generation"),
       ] }
   ]},
   { name: "Mercedes-Benz", models: [
     { name: "C-Class", engines: [
-      e("mb-c180", "C 180 · 1.6/1.8/2.0 Petrol", 1595, "Petrol", "engine depends on year"),
-      e("mb-c200", "C 200 · 1.5/1.8/2.0 Petrol", 1991, "Petrol", "engine depends on year"),
-      e("mb-c300", "C 300 · 2.0/3.0 Petrol", 1991, "Petrol", "engine depends on year"),
-      e("mb-c220d", "C 220 d · 2.0/2.1 Diesel", 2143, "Diesel", "engine depends on year"),
+      e("mb-c180", "C 180 · Petrol · capacity varies", 0, "Petrol", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("mb-c200", "C 200 · Petrol · capacity varies", 0, "Petrol", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("mb-c300", "C 300 · Petrol · capacity varies", 0, "Petrol", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("mb-c220d", "C 220 d · Diesel · capacity varies", 0, "Diesel", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
     ] },
     { name: "E-Class", engines: [
       e("mb-e200", "E 200 · 2.0 Petrol", 1991, "Petrol", "varies by generation"),
-      e("mb-e300", "E 300 · 2.0/3.0 Petrol", 1991, "Petrol", "engine depends on year"),
-      e("mb-e350", "E 350 · 3.0/3.5 Petrol", 3498, "Petrol", "engine depends on year"),
-      e("mb-e220d", "E 220 d · 2.0/2.1 Diesel", 2143, "Diesel", "engine depends on year"),
+      e("mb-e300", "E 300 · Petrol · capacity varies", 0, "Petrol", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("mb-e350", "E 350 · Petrol · capacity varies", 0, "Petrol", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("mb-e220d", "E 220 d · Diesel · capacity varies", 0, "Diesel", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
       e("mb-e350d", "E 350 d · 3.0 Diesel", 2987, "Diesel", "varies by generation"),
     ] },
     { name: "GLC", engines: [
       e("mb-glc300", "GLC 300 · 2.0 Petrol", 1991, "Petrol", "2016 onward"),
-      e("mb-glc220d", "GLC 220 d · 2.0/2.1 Diesel", 2143, "Diesel", "engine depends on year"),
-      e("mb-glc300d", "GLC 300 d · 2.0/3.0 Diesel", 1950, "Diesel", "engine depends on year"),
+      e("mb-glc220d", "GLC 220 d · Diesel · capacity varies", 0, "Diesel", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
+      e("mb-glc300d", "GLC 300 d · Diesel · capacity varies", 0, "Diesel", "varies by year", "Enter the exact engine capacity from the vehicle documents before using the estimate."),
       ] }
   ]},
   { name: "Volkswagen", models: [
@@ -224,7 +224,7 @@ export const vehicleCatalog: VehicleMake[] = [
       e("nis-x-15t", "1.5 VC-Turbo", 1497, "Petrol", "selected recent models"),
     ] },
     { name: "Leaf", engines: [
-      e("nis-leaf-ev", "Electric motor", 0, "Electric", "all generations", "Electric vehicles need the official tax calculator; this estimator does not calculate EV rules."),
+      e("nis-leaf-ev", "Electric motor", 0, "Electric", "all generations", "A limited electric-vehicle estimate is included; confirm the current treatment and vehicle classification with the Revenue Service."),
       ] }
   ]},
   { name: "Mazda", models: [
@@ -444,10 +444,10 @@ export const vehicleCatalog: VehicleMake[] = [
   ]},
   { name: "Tesla", models: [
     { name: "Model 3", engines: [
-      e("tesla-m3-ev", "Electric motor", 0, "Electric", "all generations", "Electric vehicles need the official tax calculator; this estimator does not calculate EV rules."),
+      e("tesla-m3-ev", "Electric motor", 0, "Electric", "all generations", "A limited electric-vehicle estimate is included; confirm the current treatment and vehicle classification with the Revenue Service."),
     ] },
     { name: "Model Y", engines: [
-      e("tesla-my-ev", "Electric motor", 0, "Electric", "all generations", "Electric vehicles need the official tax calculator; this estimator does not calculate EV rules."),
+      e("tesla-my-ev", "Electric motor", 0, "Electric", "all generations", "A limited electric-vehicle estimate is included; confirm the current treatment and vehicle classification with the Revenue Service."),
       ] }
   ]}
 ];
