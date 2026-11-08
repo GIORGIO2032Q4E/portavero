@@ -73,6 +73,7 @@ Use a test VIN only. A correctly shaped VIN is not proof that a vehicle exists.
 - [ ] Enter a VIN and history note in a candidate. Confirm the page labels them as recorded or user-entered, not verified history.
 - [ ] Test malformed stored data in a disposable browser profile or test harness. Confirm invalid entries are skipped without crashing the comparison page.
 - [ ] Confirm candidates do not appear on another browser/device or automatically sync to an account.
+- [ ] Print or save the comparison as PDF with one to four candidates. Check that the landscape table fits the page, column headings repeat when it spans multiple pages, long notes remain readable and controls are excluded.
 
 ## 5. Shipping checklist and quote comparison
 
