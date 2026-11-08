@@ -1,5 +1,7 @@
 # Portavero
 
+[![CI](https://github.com/GIORGIO2032Q4E/portavero/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GIORGIO2032Q4E/portavero/actions/workflows/ci.yml)
+
 Portavero is a student-built project for planning the cost of bringing a vehicle or other goods into Georgia. It started with a practical question about auction-car imports: the bid is only one part of the price. Buyer fees, transport to the export port, sea freight, customs and delivery all come later.
 
 The project brings those figures into one place. It also includes a limited vehicle-tax estimator, a VIN technical-data lookup and a small vehicle comparison tool. It is a working prototype, not a customs service or a source of live market prices.
@@ -77,6 +79,19 @@ flowchart TD
 ```
 
 The general import calculator and vehicle planner do not call a customs API. Their results are produced from entered values and the rules included in the source code. The VIN route is different: it makes a server-side request to NHTSA vPIC, with a request timeout, and returns the fields that source supplies.
+
+## Implementation decisions
+
+A few choices in the code are deliberate trade-offs rather than claims that the prototype solves every part of importing:
+
+- **Keep calculation rules separate from the interface.** The import-cost, vehicle-tax, number-input and saved-data modules can be tested with Node without mounting a React page. This also keeps page components focused on collecting inputs and showing results.
+- **Validate before calculating.** Blank values remain different from confirmed zero values. Negative, malformed and unsafe values are rejected so an invalid amount does not silently become part of a total.
+- **Send VIN requests through a server route.** The route validates the VIN shape, calls NHTSA vPIC with a timeout and returns selected fields plus provider warnings. It keeps the external request in one place and makes the source of the returned data visible.
+- **Use local storage for small personal working lists.** General estimates and vehicle candidates stay in the current browser, with fixed limits. Supabase is optional for general saved estimates rather than being required just to use the calculators.
+- **Do not imply live information that is not connected.** Freight prices, exchange rates and customs rates are either entered by the user or checked against linked official sources. The site labels the result as a planning estimate instead of presenting it as a quote or ruling.
+- **Keep legal calculations conservative.** The vehicle-tax module is limited to selected passenger-vehicle cases. When the catalogue does not know a single engine displacement, the form asks for the capacity rather than choosing one arbitrarily.
+
+These choices keep the current build understandable, but they also leave work to do. In particular, the browser-stored Supabase session should be revisited before the account feature is used for sensitive data, and browser-level tests should be added before relying on every user journey.
 
 ## Calculation notes and source material
 
