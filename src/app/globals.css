@@ -1870,3 +1870,160 @@ p,
     padding: 12px;
   }
 }
+
+
+/* Printable vehicle comparison */
+@page compare-report {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+.compare-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media print {
+  .compare-page {
+    page: compare-report;
+    color: #111 !important;
+    background: #fff !important;
+    font-size: 8pt !important;
+  }
+
+  .compare-page .site-header,
+  .compare-page .site-footer,
+  .compare-page .hero-actions,
+  .compare-page .compare-toolbar,
+  .compare-page .section-tint,
+  .compare-page .compare-candidate-heading button {
+    display: none !important;
+  }
+
+  .compare-page .page-hero {
+    padding: 0 0 5mm !important;
+    border: 0 !important;
+    background: #fff !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .compare-page .page-hero::after {
+    display: none !important;
+  }
+
+  .compare-page .page-hero h1 {
+    margin: 0 0 2mm !important;
+    color: #111 !important;
+    font-size: 19pt !important;
+  }
+
+  .compare-page .page-hero p {
+    margin: 0 !important;
+    color: #333 !important;
+    font-size: 8pt !important;
+  }
+
+  .compare-page .section {
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .compare-page .container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .compare-page .compare-notice {
+    padding: 3mm !important;
+    margin: 0 0 3mm !important;
+    border: 1px solid #999 !important;
+    background: #fff !important;
+    color: #222 !important;
+  }
+
+  .compare-page .compare-table-wrap {
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .compare-page .compare-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    font-size: 7pt !important;
+  }
+
+  .compare-page .compare-table thead {
+    display: table-header-group;
+  }
+
+  .compare-page .compare-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .compare-page .compare-table th,
+  .compare-page .compare-table td {
+    width: auto;
+    min-width: 0 !important;
+    padding: 2mm 1.5mm !important;
+    border: 0.5pt solid #bbb !important;
+    color: #111 !important;
+    background: #fff !important;
+    font-size: 7pt !important;
+    line-height: 1.3 !important;
+    vertical-align: top !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .compare-page .compare-table thead th:first-child,
+  .compare-page .compare-table tbody th {
+    width: 18% !important;
+    color: #222 !important;
+    background: #f0f2ed !important;
+    font-weight: 700 !important;
+  }
+
+  .compare-page .compare-candidate-heading {
+    gap: 1mm !important;
+  }
+
+  .compare-page .compare-candidate-heading strong {
+    color: #111 !important;
+    font-size: 8pt !important;
+  }
+
+  .compare-page .compare-candidate-heading small,
+  .compare-page .compare-detail {
+    color: #444 !important;
+    font-size: 6.5pt !important;
+  }
+
+  .compare-page .compare-history-notes,
+  .compare-page .compare-risk-list,
+  .compare-page .compare-total,
+  .compare-page .compare-risk {
+    color: #111 !important;
+    font-size: 6.5pt !important;
+  }
+
+  .compare-page .compare-risk-list {
+    padding-left: 3mm !important;
+  }
+
+  .compare-page .compare-footnote {
+    margin-top: 3mm !important;
+    color: #333 !important;
+    font-size: 7pt !important;
+    line-height: 1.35 !important;
+  }
+}
