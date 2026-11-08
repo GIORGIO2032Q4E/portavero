@@ -7,7 +7,7 @@ import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 import { validateVin } from "@/lib/vin.mjs";
-import { getManualVehicleTypeSelection } from "@/lib/vehicle-selection.mjs";
+import { getEngineCapacityForSelection, getManualVehicleTypeSelection } from "@/lib/vehicle-selection.mjs";
 import {
   MAX_SAVED_VEHICLES,
   parseSavedVehicleCandidates,
@@ -282,9 +282,7 @@ export default function VehicleImportPage() {
                   const id = event.target.value;
                   const engine = selectedModel?.engines.find((item) => item.id === id);
                   setEngineId(id);
-                  setEngineCc(engine
-                    ? engine.cc > 0 || engine.fuel === "Electric" ? engine.cc : null
-                    : null);
+                  setEngineCc(getEngineCapacityForSelection(engine));
                   setHybrid(engine?.fuel === "Hybrid" || engine?.fuel === "Plug-in hybrid");
                   setClassicCar(false);
                 }}>
