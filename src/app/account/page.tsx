@@ -146,7 +146,7 @@ export default function AccountPage() {
         <div className="container">
           <span className="eyebrow">Your Portavero account</span>
           <h1>{session ? "Your import workspace." : "Keep your import plans together."}</h1>
-          <p>Sign in to keep saved estimates connected to your account instead of only one browser.</p>
+          <p>Sign in to save new general import estimates to your account. Vehicle comparison candidates are kept only in this browser.</p>
         </div>
       </section>
       <section className="section">
@@ -170,7 +170,7 @@ export default function AccountPage() {
                 <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Portavero user"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
-              <p>Your estimates saved while signed in can be accessed from other devices using the same account.</p>
+              <p>New general estimates saved while signed in can be opened from another device using the same account. Loading one here creates a browser copy; editing that copy does not update the cloud record.</p>
               <h3>Saved estimates ({estimates.length})</h3>
               {estimates.length === 0 ? <p className="empty-state">No cloud estimates yet. Open the import calculator and save an estimate while signed in.</p> : (
                 <div className="account-estimate-list">
@@ -189,7 +189,7 @@ export default function AccountPage() {
             </section>
           ) : (
             <section className="panel account-panel">
-              <div className="account-heading"><div><span className="eyebrow">Secure access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
+              <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
               <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to keep your saved import estimates available across devices." : "Sign in to access your Portavero workspace."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
