@@ -287,7 +287,7 @@ export default function VehicleImportPage() {
                   setClassicCar(false);
                 }}>
                   <option value="">Choose an engine variant</option>
-                  {selectedModel?.engines.map((engine) => <option key={engine.id} value={engine.id}>{engine.label} · {engine.cc ? engine.cc.toLocaleString("en-US") + " cm³" : "EV"}</option>)}
+                  {selectedModel?.engines.map((engine) => <option key={engine.id} value={engine.id}>{engine.label} · {engine.cc > 0 ? engine.cc.toLocaleString("en-US") + " cm³" : engine.fuel === "Electric" ? "EV" : "capacity varies"}</option>)}
                 </select>
                 <small>{selectedEngine ? [selectedEngine.fuel, selectedEngine.years, selectedEngine.note].filter(Boolean).join(" · ") : "Variants are a starting guide; confirm the exact engine code."}</small>
               </div>
