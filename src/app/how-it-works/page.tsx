@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "How import estimates work",
-  description: "See how Portavero combines user-entered costs, calculated totals, and clearly identified unknowns."
+  description: "Where Portavero's entered costs and vehicle-tax estimates come from, and what is left out."
 };
 
 export default function HowItWorksPage() {
@@ -12,27 +12,35 @@ export default function HowItWorksPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">How Portavero works</span>
-          <h1>How the estimate works.</h1>
-          <p>The calculator adds the amounts you enter. It does not include unknown costs or fetch shipping prices and official tax amounts automatically.</p>
+          <h1>Where the numbers come from.</h1>
+          <p>There are two kinds of estimate here: one adds the costs you enter, and the other applies the project's selected vehicle-tax rules to the car details you provide. Neither one fetches a live shipping quote or an official customs assessment.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <h2>1. Enter known costs</h2>
-          <p>Add purchase value, freight, insurance, taxes and local charges using a consistent currency. Use actual provider quotes when you have them.</p>
-          <h2>2. Read the breakdown</h2>
-          <p>The current calculator sums the values entered. It can show a helpful planning total, but it cannot know that a fee applies unless you include it or a verified future integration supplies it.</p>
-          <h2>3. Confirm what is missing</h2>
-          <p>Ask the carrier, port, broker or relevant government authority to confirm any unknown amount. Tax treatment can depend on details such as product classification, origin, vehicle characteristics and the purpose of import.</p>
-          <div className="notice"><strong>Estimates are not official determinations.</strong> Portavero is a planning aid, not a customs declaration, legal opinion, tax ruling, insurance policy or binding transport offer.</div>
+          <h2>1. Add the costs you already have</h2>
+          <p>In the general import calculator, enter the purchase price, freight, insurance and other charges in the same currency. The total is the sum of those entries. A blank field stays out of the total, so it is worth checking the missing categories before treating the result as a full import cost.</p>
+
+          <h2>2. Use the vehicle planner for a car</h2>
+          <p>The vehicle planner takes the manufacture year, declaration year, engine capacity and selected vehicle configuration, then calculates preliminary excise and import duty using rules included in this project. It also adds GEL 480 in listed standard fees. These are built-in estimates, not amounts retrieved from the Revenue Service, and the rules may not cover every vehicle or situation.</p>
+          <p>You can add known purchase, auction, transport, shipping, insurance, port and delivery costs as well. Those entries are kept separate from costs you have not supplied. Check the exact engine and vehicle details against the documents; a catalogue selection is not a VIN-level confirmation.</p>
+
+          <h2>3. Read the result as a working total</h2>
+          <p>The amount shown is based on the information in the form. It does not include a charge simply because that charge might apply. A missing freight quote, destination fee or document cost can change the final amount, so add it when you have a confirmed figure.</p>
+
+          <h2>4. Verify before making a decision</h2>
+          <p>Check what each transport quote includes and whether it has separate origin or destination charges. For a vehicle, confirm the specifications, registration eligibility, tax treatment and current fees with the Georgian Revenue Service or a qualified customs broker. Use the calculator to organise your figures, not as a substitute for those checks.</p>
+
+          <div className="notice"><strong>One important limit:</strong> Portavero does not automatically retrieve shipping prices, exchange rates or current customs charges. The vehicle-tax rules and GEL 480 fee amount are part of this project's code and should be checked against current official information before use.</div>
+
           <h2>What the labels mean</h2>
           <ul>
-            <li><strong>User-entered:</strong> a value supplied by you.</li>
-            <li><strong>Calculated:</strong> arithmetic performed on the entered values.</li>
-            <li><strong>Estimated:</strong> a planning figure that may differ from the final charge.</li>
-            <li><strong>Not yet verified:</strong> information that should be confirmed before relying on it.</li>
+            <li><strong>User-entered:</strong> an amount or detail you supplied.</li>
+            <li><strong>Calculated:</strong> arithmetic performed using the supplied values.</li>
+            <li><strong>Estimated:</strong> a planning result from the project's built-in vehicle rules.</li>
+            <li><strong>Not yet verified:</strong> a detail or amount that still needs confirmation from a document, provider or official source.</li>
           </ul>
-          <p><Link href="/calculator" className="text-link">Try the calculator <span aria-hidden="true">↗</span></Link></p>
+          <p><Link href="/calculator" className="text-link">Open the import cost calculator <span aria-hidden="true">↗</span></Link></p>
         </div>
       </section>
     </>
