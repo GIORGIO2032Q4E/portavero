@@ -18,7 +18,7 @@
  */
 
 // Historical age-based excise table used only when the user selects the
- // previous regime for a case they believe meets the transitional conditions.
+// previous regime for a case they believe meets the transitional conditions.
 const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
 
 /**
