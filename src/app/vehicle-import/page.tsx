@@ -353,7 +353,7 @@ export default function VehicleImportPage() {
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
             <div className="result-total">{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
-            <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
+            <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${(engineCc ?? 0).toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rule</span><strong>{isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rate × 2,000" : "GEL 3,000 fixed") : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
