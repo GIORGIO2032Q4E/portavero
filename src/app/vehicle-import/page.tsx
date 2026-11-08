@@ -331,6 +331,7 @@ export default function VehicleImportPage() {
                 <select id="hybrid" value={isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
                   const next = getManualVehicleTypeSelection(event.target.value);
                   setEngineId(next.engineId);
+                  setEngineCc(null);
                   setHybrid(next.hybrid);
                   setClassicCar(next.classicCar);
                 }}>
