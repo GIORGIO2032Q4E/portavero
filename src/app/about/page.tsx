@@ -12,13 +12,13 @@ export default function AboutPage() {
         <div className="container">
           <span className="eyebrow">About</span>
           <h1>Why I built Portavero.</h1>
-          <p>I wanted a way to work through import costs without keeping the purchase price, freight quotes and tax estimates in separate notes. Portavero is the project I built to bring those pieces together.</p>
+          <p>I started Portavero with a question: what does a car bought overseas actually cost by the time it reaches Georgia? The purchase price is only the start, and I wanted a way to keep the other costs in one place.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <h2>The problem I wanted to work on</h2>
-          <p>The price of a car or other item is usually the easiest number to find. The rest can be spread across an auction invoice, a transport quote, port charges, insurance and customs rules. You may not have all of those figures on the same day. I built the project around that situation: enter what is known, keep track of what is missing, and update the estimate when better information arrives.</p>
+          <h2>It started with car imports</h2>
+          <p>The first idea was to estimate the cost of bringing an auction car to Georgia. The bid is only one line: buyer fees, transport to an export port, sea freight, customs and delivery come after it. I wanted to enter those numbers in one place and see which ones were still assumptions. The project grew to include a general import calculator and a few vehicle-specific tools, but that is still the problem behind it.</p>
 
           <h2>What is in the project</h2>
           <ul>
