@@ -38,7 +38,7 @@ For each case, record **Pass**, **Fail**, **Blocked** or **Not run**, and includ
 - [ ] Change the model after selecting an engine. Confirm the old engine selection and capacity are cleared.
 - [ ] Choose a catalogue entry whose engine capacity varies by year or market. Confirm the planner requires manual capacity entry and does not calculate from a guessed default.
 - [ ] Enter a valid whole-number capacity from the vehicle's documents. Confirm the estimate becomes available.
-- [ ] Change the manual vehicle type to Hybrid, Non-hybrid and Classic. Confirm the catalogue engine selection is cleared and a capacity must be entered again.
+- [ ] Change the manual vehicle type to Hybrid, Non-hybrid and Classic. Confirm the catalogue engine selection and capacity are cleared, then enter a capacity and confirm the selected type remains set.
 - [ ] Select an electric catalogue variant. Confirm the capacity field is treated as electric and the displayed estimate is clearly marked as limited and subject to official verification.
 - [ ] Try an invalid or blank engine capacity. Confirm the page does not present it as a valid estimate.
 - [ ] Check vehicle age at the supported boundary years, including ages 6 and 7. Compare the displayed rate with the source code and current official material.
