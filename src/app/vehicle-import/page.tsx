@@ -308,7 +308,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
-              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint={selectedEngine?.cc === 0 && !isElectric ? "More than one engine size is used for this model. Enter the exact capacity from the vehicle documents; no default is assumed." : "Use whole cubic centimetres. Auto-filled from a selected variant; confirm it against the vehicle documents."} />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); }} hint={selectedEngine?.cc === 0 && !isElectric ? "More than one engine size is used for this model. Enter the exact capacity from the vehicle documents; no default is assumed." : "Use whole cubic centimetres. Auto-filled from a selected variant; confirm it against the vehicle documents."} />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
