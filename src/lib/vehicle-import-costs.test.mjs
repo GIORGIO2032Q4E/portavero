@@ -1,8 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { VEHICLE_IMPORT_COST_KEYS, summarizeVehicleImportCosts } from "./vehicle-import-costs.mjs";
+import { STANDARD_VEHICLE_FEES_GEL, VEHICLE_IMPORT_COST_KEYS, summarizeVehicleImportCosts } from "./vehicle-import-costs.mjs";
 
 const blankCosts = () => Object.fromEntries(VEHICLE_IMPORT_COST_KEYS.map((key) => [key, null]));
+
+test("uses the shared Revenue Service fee snapshot when no fee amount is supplied", () => {
+  assert.equal(STANDARD_VEHICLE_FEES_GEL, 480);
+  const result = summarizeVehicleImportCosts(blankCosts(), 0, 0);
+  assert.equal(result.total, STANDARD_VEHICLE_FEES_GEL);
+});
 
 test("blank optional expenses do not count as zero-confirmed entries", () => {
   const result = summarizeVehicleImportCosts(blankCosts(), 3000, 130, 480);
