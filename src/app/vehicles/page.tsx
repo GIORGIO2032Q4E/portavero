@@ -95,6 +95,7 @@ export default function VehicleCatalogPage() {
                             <li key={engine.id}>
                               <span>{engine.label}</span>
                               <small>{engine.cc > 0 ? `${engine.cc.toLocaleString("en-US")} cm³ · ` : ""}{engine.fuel} · {engine.years}</small>
+                              {engine.note && <small>{engine.note}</small>}
                             </li>
                           ))}
                         </ul>
