@@ -207,6 +207,10 @@ GitHub Actions runs the dependency audit, lint, TypeScript check, unit tests and
 
 **What the automated checks do not cover:** there is no browser end-to-end test suite at present. CI does not make live calls to NHTSA or Supabase and does not verify real account email delivery, tax determinations, responsive layouts in every browser or the print dialog on every platform. Use the [manual QA checklist](docs/MANUAL_QA.md) for those checks. A checklist item is not evidence that it has been completed; record the date and result when running it.
 
+## License
+
+There is currently no license file in this repository. The source is publicly viewable, but that alone does not grant permission to reuse or redistribute it. Add an explicit license only after deciding how the project should be shared.
+
 ## Deployment
 
 The repository is connected to Vercel. Pull requests receive preview deployments. Merges to `main` trigger a production deployment at https://portavero.vercel.app.
