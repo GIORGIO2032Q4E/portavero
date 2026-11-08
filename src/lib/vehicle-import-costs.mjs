@@ -8,6 +8,15 @@ export const VEHICLE_IMPORT_COST_KEYS = [
   "delivery"
 ];
 
+/**
+ * Snapshot of the seven standard vehicle-clearance and registration fees
+ * listed by the Georgian Revenue Service, reviewed on 8 November 2026.
+ * This is not a live lookup; verify the current fee schedule before use.
+ *
+ * Source: https://www.rs.ge/CarClearance-en
+ */
+export const STANDARD_VEHICLE_FEES_GEL = 480;
+
 const maxSafeMoney = Number.MAX_SAFE_INTEGER / 100;
 
 function isSafeMoney(value) {
@@ -33,7 +42,7 @@ function isSafeExpense(value) {
  * @param {number} importDuty
  * @param {number} officialFees
  */
-export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = 480) {
+export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = STANDARD_VEHICLE_FEES_GEL) {
   const invalidCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => {
     const value = costs[key];
     return value !== null && !isSafeExpense(value);

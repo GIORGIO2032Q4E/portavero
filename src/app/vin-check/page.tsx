@@ -129,7 +129,7 @@ export default function VinCheckPage() {
               {result && (
                 <div className="vin-result" aria-live="polite">
                   <div className="notice">
-                    <strong>Technical data returned.</strong> The source found make/model information for this VIN. Compare these details with the vehicle documents before relying on them.
+                    <strong>Technical data returned.</strong> The decoder returned vehicle identity data for this VIN. Compare every available field with the vehicle documents before relying on it.
                   </div>
                   {result.providerWarnings.length > 0 && (
                     <div className="notice" role="alert">

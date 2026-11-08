@@ -364,7 +364,7 @@ export default function CalculatorPage() {
             </div>
             <section className="saved-estimates print-hide">
               <h2>Save this estimate</h2>
-              <p className="panel-intro">Saved estimates stay in this browser on this device when you are signed out. <Link href="/account" className="text-link">Sign in or create an account</Link> to sync new estimates across devices.</p>
+              <p className="panel-intro">Saved estimates stay in this browser on this device when you are signed out. <Link href="/account" className="text-link">Sign in or create an account</Link> to save new estimates to your account. Loading a cloud estimate makes a browser copy; later edits to that copy do not update the cloud record.</p>
               <div className="estimate-save-controls">
                 <input className="estimate-name-input" aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} />
                 <button type="button" className="button button-dark" onClick={saveEstimate}>{editingEstimateId === null ? "Save estimate" : "Save changes"}</button>

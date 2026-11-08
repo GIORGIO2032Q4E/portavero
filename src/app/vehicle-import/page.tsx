@@ -5,8 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
-import { summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
+import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 import { validateVin } from "@/lib/vin.mjs";
+import { getEngineCapacityForSelection, getManualVehicleTypeSelection } from "@/lib/vehicle-selection.mjs";
 import {
   MAX_SAVED_VEHICLES,
   parseSavedVehicleCandidates,
@@ -15,7 +16,7 @@ import {
 } from "@/lib/saved-vehicles.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
-const standardStateFees = 480;
+const standardStateFees = STANDARD_VEHICLE_FEES_GEL;
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -41,7 +42,7 @@ export default function VehicleImportPage() {
   const [modelName, setModelName] = useState("");
   const [engineId, setEngineId] = useState("");
   const [sourceCountry, setSourceCountry] = useState("United States");
-  const [engineCc, setEngineCc] = useState(2000);
+  const [engineCc, setEngineCc] = useState<number | null>(null);
   const [steering, setSteering] = useState("left");
   const [hybrid, setHybrid] = useState(false);
   const [classicCar, setClassicCar] = useState(false);
@@ -81,14 +82,14 @@ export default function VehicleImportPage() {
   const currentYear = new Date().getFullYear();
   const vehicleAge = declarationYear - year;
   const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
-  const validEngine = isElectric || (Number.isFinite(engineCc) && engineCc > 0);
+  const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || vehicleAge > 30;
 
   const result = useMemo(() => {
     const taxes = calculateVehicleTaxes({
       manufactureYear: year,
       declarationYear,
-      engineCc,
+      engineCc: engineCc ?? 0,
       steering,
       hybrid,
       classicCar,
@@ -185,7 +186,7 @@ export default function VehicleImportPage() {
         model: modelName,
         engineLabel: selectedEngine?.label ?? "Manual engine entry",
         fuel: selectedEngine?.fuel ?? (isElectric ? "Electric" : hybrid ? "Hybrid" : "Not confirmed"),
-        engineCc,
+        engineCc: engineCc ?? 0,
         engineVerified: Boolean(selectedEngine),
         year,
         declarationYear,
@@ -242,7 +243,7 @@ export default function VehicleImportPage() {
           </div>
           <div className="print-vehicle-summary">
             <div><span>Vehicle</span><strong>{[makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
-            <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (isElectric ? "Electric" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
+            <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (engineCc === null ? "Not entered" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
             <div><span>Purchase country</span><strong>{sourceCountry}</strong></div>
             <div><span>Manufacture year</span><strong>{year}</strong></div>
             <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge} year(s)</strong></div>
@@ -259,18 +260,18 @@ export default function VehicleImportPage() {
                 <select id="source-country" value={sourceCountry} onChange={(event) => setSourceCountry(event.target.value)}>
                   {importCountries.map((country) => <option key={country} value={country}>{country}</option>)}
                 </select>
-                <small>Where the vehicle is bought, not necessarily where it was built.</small>
+                <small>Saved for reference and comparison. The current vehicle-tax formula does not use the purchase country.</small>
               </div>
               <div className="field">
                 <label htmlFor="make">Make</label>
-                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setHybrid(false); setClassicCar(false); }}>
+                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setClassicCar(false); }}>
                   <option value="">Choose a make</option>
                   {vehicleCatalog.map((make) => <option key={make.name} value={make.name}>{make.name}</option>)}
                 </select>
               </div>
               <div className="field">
                 <label htmlFor="model">Model</label>
-                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setHybrid(false); setClassicCar(false); }}>
+                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setClassicCar(false); }}>
                   <option value="">Choose a model</option>
                   {selectedMake?.models.map((model) => <option key={model.name} value={model.name}>{model.name}</option>)}
                 </select>
@@ -279,18 +280,16 @@ export default function VehicleImportPage() {
                 <label htmlFor="engine-variant">Engine / powertrain</label>
                 <select id="engine-variant" value={engineId} disabled={!selectedModel} onChange={(event) => {
                   const id = event.target.value;
-                  setEngineId(id);
                   const engine = selectedModel?.engines.find((item) => item.id === id);
-                  if (engine) {
-                    setEngineCc(engine.cc);
-                    setHybrid(engine.fuel === "Hybrid" || engine.fuel === "Plug-in hybrid");
-                    setClassicCar(false);
-                  }
+                  setEngineId(id);
+                  setEngineCc(getEngineCapacityForSelection(engine));
+                  setHybrid(engine?.fuel === "Hybrid" || engine?.fuel === "Plug-in hybrid");
+                  setClassicCar(false);
                 }}>
                   <option value="">Choose an engine variant</option>
-                  {selectedModel?.engines.map((engine) => <option key={engine.id} value={engine.id}>{engine.label} · {engine.cc ? engine.cc.toLocaleString("en-US") + " cm³" : "EV"}</option>)}
+                  {selectedModel?.engines.map((engine) => <option key={engine.id} value={engine.id}>{engine.label} · {engine.cc > 0 ? engine.cc.toLocaleString("en-US") + " cm³" : engine.fuel === "Electric" ? "EV" : "capacity varies"}</option>)}
                 </select>
-                <small>{selectedEngine ? `${selectedEngine.fuel} · ${selectedEngine.years}` : "Variants are a starting guide; confirm the exact engine code."}</small>
+                <small>{selectedEngine ? [selectedEngine.fuel, selectedEngine.years, selectedEngine.note].filter(Boolean).join(" · ") : "Variants are a starting guide; confirm the exact engine code."}</small>
               </div>
               <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
@@ -309,7 +308,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>Vehicle age is calculated from this year, as required by the Tax Code.</small>
               </div>
-              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} inputMode="numeric" onChange={(value) => { setEngineCc(value ?? 0); setEngineId(""); setHybrid(false); setClassicCar(false); }} hint="Use whole cubic centimetres. Auto-filled from a selected variant; confirm it against the vehicle documents." />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); }} hint={selectedEngine?.cc === 0 && !isElectric ? "More than one engine size is used for this model. Enter the exact capacity from the vehicle documents; no default is assumed." : "Use whole cubic centimetres. Auto-filled from a selected variant; confirm it against the vehicle documents."} />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
@@ -328,8 +327,11 @@ export default function VehicleImportPage() {
               <div className="field">
                 <label htmlFor="hybrid">Vehicle type</label>
                 <select id="hybrid" value={isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
-                  setHybrid(event.target.value === "hybrid");
-                  setClassicCar(event.target.value === "classic");
+                  const next = getManualVehicleTypeSelection(event.target.value);
+                  setEngineId(next.engineId);
+                  setEngineCc(null);
+                  setHybrid(next.hybrid);
+                  setClassicCar(next.classicCar);
                 }}>
                   <option value="electric" disabled>Electric (from selected engine variant)</option>
                   <option value="other">Non-hybrid</option>
@@ -350,7 +352,7 @@ export default function VehicleImportPage() {
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Preliminary excise estimate</span>
             <div className="result-total">{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
-            <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${engineCc.toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
+            <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${(engineCc ?? 0).toLocaleString("en-US")} cm³`) : "Enter valid details and verify special cases."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rule</span><strong>{isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rate × 2,000" : "GEL 3,000 fixed") : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
