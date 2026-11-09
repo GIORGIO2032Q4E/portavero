@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "How import estimates work",
-  description: "Where Portavero's entered costs and vehicle-tax estimates come from, and what is left out."
+  description: "How Portavero calculates entered costs and selected vehicle taxes."
 };
 
 export default function HowItWorksPage() {
@@ -12,35 +12,27 @@ export default function HowItWorksPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">How Portavero works</span>
-          <h1>Where the numbers come from.</h1>
-          <p>There are two kinds of estimate here: one adds the costs you enter, and the other applies the project's selected vehicle-tax rules to the car details you provide. Neither one fetches a live shipping quote or an official customs assessment.</p>
+          <h1>How the estimates are put together.</h1>
+          <p>The vehicle planner uses car details and tax rules stored in the project. The general calculator adds the amounts and rates you enter. The VIN page requests technical data from NHTSA vPIC.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <h2>1. Add the costs you already have</h2>
-          <p>In the general import calculator, enter the purchase price, freight, insurance and other charges in the same currency. The total is the sum of those entries. A blank field stays out of the total, so it is worth checking the missing categories before treating the result as a full import cost.</p>
+          <h2>For a car</h2>
+          <p>Choose the manufacture year, expected declaration year, engine capacity and vehicle configuration. The planner uses those values to estimate excise and import duty under the selected rules. It is intended for selected passenger vehicles under HS 8703; it does not decide the vehicle's legal classification or confirm eligibility for transitional treatment.</p>
+          <p>You can then add the purchase price, auction fees, inland transport, shipping, insurance, port charges and local delivery. Amounts are entered in GEL. Blank fields are left out of the total and shown as unknown.</p>
+          <p>The planner also adds GEL 480 in listed standard fees. That amount is stored in the code and is not retrieved live, so check the current fee schedule before using it.</p>
 
-          <h2>2. Use the vehicle planner for a car</h2>
-          <p>The vehicle planner takes the manufacture year, declaration year, engine capacity and selected vehicle configuration, then calculates preliminary excise and import duty using rules included in this project. It also adds GEL 480 in listed standard fees. These are built-in estimates, not amounts retrieved from the Revenue Service, and the rules may not cover every vehicle or situation.</p>
-          <p>You can add known purchase, auction, transport, shipping, insurance, port and delivery costs as well. Those entries are kept separate from costs you have not supplied. Check the exact engine and vehicle details against the documents; a catalogue selection is not a VIN-level confirmation.</p>
+          <h2>For other goods</h2>
+          <p>The general calculator adds the costs you enter in the selected currency. You can enter duty and VAT/GST rates after checking them with the destination customs authority. Portavero does not select a tariff code, look up a rate or convert currencies using a live exchange rate.</p>
 
-          <h2>3. Read the result as a working total</h2>
-          <p>The amount shown is based on the information in the form. It does not include a charge simply because that charge might apply. A missing freight quote, destination fee or document cost can change the final amount, so add it when you have a confirmed figure.</p>
+          <h2>VIN and comparison</h2>
+          <p>The VIN checker sends a correctly formatted 17-character VIN to NHTSA vPIC and displays the technical fields that service returns. Some cars, especially those built for markets outside the United States, may have limited results. The service does not provide the accident, title, ownership, mileage or auction history in this project.</p>
+          <p>The comparison page stores up to four cars in the current browser. It shows the specifications, entered costs and notes you saved; it does not verify those notes or sync the list to another device.</p>
 
-          <h2>4. Verify before making a decision</h2>
-          <p>Check what each transport quote includes and whether it has separate origin or destination charges. For a vehicle, confirm the specifications, registration eligibility, tax treatment and current fees with the Georgian Revenue Service or a qualified customs broker. Use the calculator to organise your figures, not as a substitute for those checks.</p>
-
-          <div className="notice"><strong>One important limit:</strong> Portavero does not automatically retrieve shipping prices, exchange rates or current customs charges. The vehicle-tax rules and GEL 480 fee amount are part of this project's code and should be checked against current official information before use.</div>
-
-          <h2>What the labels mean</h2>
-          <ul>
-            <li><strong>User-entered:</strong> an amount or detail you supplied.</li>
-            <li><strong>Calculated:</strong> arithmetic performed using the supplied values.</li>
-            <li><strong>Estimated:</strong> a planning result from the project's built-in vehicle rules.</li>
-            <li><strong>Not yet verified:</strong> a detail or amount that still needs confirmation from a document, provider or official source.</li>
-          </ul>
-          <p><Link href="/calculator" className="text-link">Open the import cost calculator <span aria-hidden="true">↗</span></Link></p>
+          <h2>Before using the result</h2>
+          <p>A total can only include the amounts and rules available to the calculator. It may be incomplete when you have not entered freight, port, broker or document charges. Check vehicle details and the current tax treatment with the Georgian Revenue Service or a qualified customs broker before buying or shipping.</p>
+          <p><Link href="/vehicle-import" className="text-link">Open the vehicle import planner <span aria-hidden="true">↗</span></Link></p>
         </div>
       </section>
     </>
