@@ -41,3 +41,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: https://example.invalid
+      - name: Production server smoke tests
+        run: npm run test:smoke
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.invalid
