@@ -113,7 +113,6 @@ export default function VehicleImportPage() {
       officialFees: standardStateFees,
       total: costSummary.total,
       rate: taxes.rate,
-      registrationRestricted: taxes.registrationRestricted
     };
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
 
@@ -168,8 +167,8 @@ export default function VehicleImportPage() {
       } else {
         riskReasons.push("No accident, title, mileage, service or auction-history details were recorded. Unknown does not mean accident-free.");
       }
-      if (result.registrationRestricted) {
-        riskReasons.push("The current calculator flags a general registration restriction for this vehicle age. Verify applicable exceptions with the Revenue Service.");
+      if (!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar) {
+        riskReasons.push("The current base excise rate for a vehicle over 6 years old is GEL 4.50 per cm³ before applicable adjustments. This is a tax band, not a general age-based import ban.");
       }
       if (preAprilRegime) {
         riskReasons.push("Previous tax rules were selected. Eligibility for transitional treatment has not been verified.");
@@ -205,7 +204,6 @@ export default function VehicleImportPage() {
         officialFees: roundMoney(result.officialFees),
         estimatedTotal: roundMoney(result.total),
         unknownCosts: result.unknownCosts,
-        registrationRestricted: result.registrationRestricted,
         riskReasons
       };
 
