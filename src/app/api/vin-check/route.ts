@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getVinWarnings, parseNhtsaVinResponse, validateVin } from "@/lib/vin.mjs";
+import { parseNhtsaVinResponse, validateVin } from "@/lib/vin.mjs";
 
 export const runtime = "nodejs";
 
