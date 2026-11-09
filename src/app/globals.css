@@ -1885,6 +1885,12 @@ p,
 }
 
 @media print {
+  body:has(.compare-page) .skip-link,
+  body:has(.compare-page) .site-header,
+  body:has(.compare-page) .site-footer {
+    display: none !important;
+  }
+
   .compare-page {
     page: compare-report;
     color: #111 !important;
