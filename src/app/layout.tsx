@@ -7,17 +7,17 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Portavero | Import cost planner for Georgia",
+    default: "Portavero | Car import planner for Georgia",
     template: "%s | Portavero"
   },
   description:
-    "A student-built project for planning vehicle and goods imports to Georgia, with a vehicle-tax estimator and VIN technical-data lookup.",
+    "A student-built car-import planning project for Georgia. Estimate selected vehicle taxes, organise known costs, compare cars and check available VIN technical data.",
   applicationName: "Portavero",
   icons: { icon: "/favicon.svg" },
-  keywords: ["import cost calculator", "shipping estimator", "Georgia imports", "vehicle import"],
+  keywords: ["car import Georgia", "vehicle import costs", "Georgia vehicle taxes", "VIN technical data", "vehicle comparison"],
   openGraph: {
-    title: "Portavero | Plan an import to Georgia",
-    description: "Organise known import costs, estimate selected vehicle taxes and decode available VIN technical data.",
+    title: "Portavero | Plan a car import to Georgia",
+    description: "Estimate selected vehicle taxes, organise known import costs, compare cars and request available VIN technical data.",
     type: "website",
     siteName: "Portavero"
   },
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-mark" aria-hidden="true">P</span>
                 <span>Portavero</span>
               </Link>
-              <p>A student project for planning vehicle and goods imports to Georgia.</p>
+              <p>A student-built project for planning car imports to Georgia.</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>
