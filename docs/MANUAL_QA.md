@@ -42,6 +42,7 @@ For each case, record **Pass**, **Fail**, **Blocked** or **Not run**, and includ
 - [ ] Select an electric catalogue variant. Confirm the capacity field is treated as electric and the displayed estimate is clearly marked as limited and subject to official verification.
 - [ ] Try an invalid or blank engine capacity. Confirm the page does not present it as a valid estimate.
 - [ ] Check vehicle age at the supported boundary years, including ages 6 and 7. Compare the displayed rate with the source code and current official material.
+- [ ] For a current-regime vehicle older than 6 years, confirm the page shows the GEL 4.50/cm³ base excise band and does not describe age alone as a general registration ban. Check emissions, vehicle category and registration requirements separately.
 - [ ] Check left-hand-drive hybrid and right-hand-drive/converted cases. Confirm the correct warning and estimate are displayed for the selected inputs.
 - [ ] Check a classic-car selection at 30 and 31 years. Confirm the age threshold and legal-classification warning are visible.
 - [ ] Select the previous regime. Confirm the page explains that transitional eligibility must be independently established from the required documents.
@@ -77,6 +78,7 @@ Use a test VIN only. A correctly shaped VIN is not proof that a vehicle exists.
 - [ ] Reload the page. Confirm browser-saved candidates remain available in the same browser.
 - [ ] Enter a VIN and history note in a candidate. Confirm the page labels them as recorded or user-entered, not verified history.
 - [ ] Test malformed stored data in a disposable browser profile or test harness. Confirm invalid entries are skipped without crashing the comparison page.
+- [ ] Load a legacy comparison entry containing the retired `registrationRestricted` field. Confirm it remains readable and the old age-ban flag is not shown as a current restriction.
 - [ ] Confirm candidates do not appear on another browser/device or automatically sync to an account.
 - [ ] Print or save the comparison as PDF with one to four candidates. Check that the landscape table fits the page, column headings repeat when it spans multiple pages, long notes remain readable and controls are excluded.
 
