@@ -35,6 +35,7 @@ export default function AboutPage() {
           <h2>What it does not do</h2>
           <p>Portavero does not fetch freight prices, exchange rates or customs tariff rates. The vehicle planner covers selected passenger-car cases, not every vehicle or legal exception. Its GEL 480 fee amount is a code snapshot, not a live lookup. A VIN result contains technical data only; it is not a vehicle-history report.</p>
           <p>Before relying on an estimate, check the car's documents, ask the carrier or broker what their price includes, and confirm the tax treatment with the Georgian Revenue Service.</p>
+          <p>The source code, calculation modules and manual QA checklist are available in the <a href="https://github.com/GIORGIO2032Q4E/portavero" target="_blank" rel="noreferrer">Portavero GitHub repository</a>.</p>
         </div>
       </section>
     </>
