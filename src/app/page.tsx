@@ -3,31 +3,45 @@ import Link from "next/link";
 const tools = [
   {
     number: "01",
-    title: "Import cost calculator",
-    description: "Add the purchase price, freight and other charges you have. The total is based on the amounts you enter; missing costs are not filled in for you.",
-    href: "/calculator",
-    link: "Open calculator"
+    title: "Vehicle import estimate",
+    description: "Enter the car's year, engine capacity and configuration, then add the purchase, auction and transport costs you know. The tax rules cover selected cases only.",
+    href: "/vehicle-import",
+    link: "Estimate car costs"
   },
   {
     number: "02",
-    title: "Vehicle import estimate",
-    description: "Enter a car's year, engine and configuration to estimate selected vehicle taxes in Georgia, then add the costs you know.",
-    href: "/vehicle-import",
-    link: "Estimate vehicle costs"
+    title: "VIN check",
+    description: "Request available technical details from NHTSA vPIC. It can return specifications, but it does not provide accident or auction history.",
+    href: "/vin-check",
+    link: "Check a VIN"
   },
   {
     number: "03",
-    title: "Vehicle catalogue",
-    description: "Browse a starter list of makes, models and engine variants. Check the exact engine against the car's documents.",
-    href: "/vehicles",
-    link: "Browse vehicles"
+    title: "Compare vehicles",
+    description: "Save up to four cars in this browser and compare their specifications, entered costs and your own notes.",
+    href: "/compare",
+    link: "Compare cars"
   },
   {
     number: "04",
+    title: "Vehicle catalogue",
+    description: "Browse a short list of common makes, models and engine options. Confirm the exact engine from the car's documents.",
+    href: "/vehicles",
+    link: "Browse the catalogue"
+  },
+  {
+    number: "05",
     title: "Shipping checklist",
-    description: "Check what a freight quote includes and compare offers you have collected before booking.",
+    description: "Compare freight offers you have received and check what each one includes. No live carrier prices are connected.",
     href: "/shipping",
-    link: "View checklist"
+    link: "Review shipping offers"
+  },
+  {
+    number: "06",
+    title: "General import calculator",
+    description: "For other goods, add the costs and tax rates you have checked. The calculator does not look up tariff rates for you.",
+    href: "/calculator",
+    link: "Calculate other imports"
   }
 ];
 
@@ -37,25 +51,25 @@ export default function HomePage() {
       <section className="simple-hero">
         <div className="container simple-hero-grid">
           <div className="simple-hero-copy">
-            <p className="simple-status">An independent project for imports to Georgia</p>
-            <h1>Planning to bring something into Georgia?</h1>
-            <p className="simple-lede">The purchase price is only one part of an import. Freight, insurance, port charges and taxes can come from different quotes, and some figures may still be unknown. Portavero gives you one place to work through the costs and see what you still need to check.</p>
+            <p className="simple-status">A student project about car imports to Georgia</p>
+            <h1>Estimate what it may cost to bring a car to Georgia.</h1>
+            <p className="simple-lede">An auction or listing price is only the start. There may also be buyer fees, transport to the port, shipping, customs and local delivery. I built Portavero to keep those figures together. Enter what you know and leave the rest blank until you have a real amount.</p>
             <div className="hero-actions">
-              <Link href="/calculator" className="button button-dark">Build a cost estimate</Link>
-              <Link href="/vehicle-import" className="simple-text-link">Importing a car? <span aria-hidden="true">→</span></Link>
+              <Link href="/vehicle-import" className="button button-dark">Estimate a car import</Link>
+              <Link href="/calculator" className="simple-text-link">Importing other goods? <span aria-hidden="true">→</span></Link>
             </div>
-            <p className="simple-note">Shipping prices and customs charges are not fetched automatically.</p>
+            <p className="simple-note">No live shipping quotes, exchange rates or automatic customs-rate lookup.</p>
           </div>
           <aside className="simple-example">
             <div className="simple-example-heading">
-              <span>EXAMPLE COST LIST</span>
-              <span>USD</span>
+              <span>CAR IMPORT COSTS</span>
+              <span>GEL</span>
             </div>
-            <div className="simple-example-row"><span>Purchase price</span><strong>Enter amount</strong></div>
-            <div className="simple-example-row"><span>Shipping</span><strong>Add a quote</strong></div>
-            <div className="simple-example-row"><span>Insurance</span><strong>Not entered</strong></div>
-            <div className="simple-example-row"><span>Customs and fees</span><strong>Confirm first</strong></div>
-            <p className="simple-example-foot">These are example fields, not a calculated quote.</p>
+            <div className="simple-example-row"><span>Car price</span><strong>Enter amount</strong></div>
+            <div className="simple-example-row"><span>Auction fees</span><strong>Add if known</strong></div>
+            <div className="simple-example-row"><span>Shipping</span><strong>Quote needed</strong></div>
+            <div className="simple-example-row"><span>Customs charges</span><strong>Check with RS</strong></div>
+            <p className="simple-example-foot">Example fields only. This is not a quote.</p>
           </aside>
         </div>
       </section>
@@ -64,8 +78,8 @@ export default function HomePage() {
         <div className="container">
           <div className="simple-section-heading">
             <p className="editorial-label">WHAT'S IN THE PROJECT</p>
-            <h2>Tools for different parts of an import.</h2>
-            <p>You can use a single calculator or combine the tools as you collect more information.</p>
+            <h2>The car tools, and a few extras.</h2>
+            <p>The vehicle planner is the main tool. The other pages help check a VIN, keep a shortlist or work out a separate import cost.</p>
           </div>
           <div className="simple-tool-list">
             {tools.map((tool) => (
@@ -85,22 +99,22 @@ export default function HomePage() {
       <section className="simple-how-section">
         <div className="container simple-how-grid">
           <div>
-            <p className="editorial-label">BEFORE YOU RELY ON A TOTAL</p>
-            <h2>Know which numbers are confirmed.</h2>
+            <p className="editorial-label">WHEN USING THE ESTIMATE</p>
+            <h2>Start with the details you can confirm.</h2>
           </div>
           <ol>
-            <li><strong>Start with a real price.</strong><span>Use the seller's price, invoice or auction result when you have it.</span></li>
-            <li><strong>Leave missing costs out.</strong><span>An empty shipping or port charge is still an unknown, not a free service.</span></li>
-            <li><strong>Check taxes and fees.</strong><span>Confirm the vehicle details and applicable charges with the Georgian Revenue Service or your broker.</span></li>
+            <li><strong>Check the car.</strong><span>Use the engine capacity and year from the vehicle documents where possible.</span></li>
+            <li><strong>Add the costs you have.</strong><span>Leave shipping, port or broker charges blank until you have a quote.</span></li>
+            <li><strong>Verify the tax result.</strong><span>The planner covers selected cases. Check the vehicle with the Georgian Revenue Service before buying or shipping.</span></li>
           </ol>
         </div>
       </section>
 
       <section className="simple-bottom-cta">
         <div className="container">
-          <h2>Have one or two figures already?</h2>
-          <p>Put those in first. You can come back and update the estimate when the other costs are confirmed.</p>
-          <Link href="/calculator" className="button button-dark">Open calculator</Link>
+          <h2>Start with the car and price you have.</h2>
+          <p>You do not need every figure at once. Add the confirmed amounts and update the estimate when you get another quote.</p>
+          <Link href="/vehicle-import" className="button button-dark">Open vehicle planner</Link>
         </div>
       </section>
     </>
