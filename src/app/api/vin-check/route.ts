@@ -1,49 +1,25 @@
 import { NextResponse } from "next/server";
-import { getVinWarnings, validateVin } from "@/lib/vin.mjs";
+import { getVinWarnings, parseNhtsaVinResponse, validateVin } from "@/lib/vin.mjs";
 
 export const runtime = "nodejs";
 
-type VpicRow = Record<string, string | number | null | undefined>;
-type VpicResponse = { Results?: VpicRow[] };
-
 const sourceUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended";
 
-const decodedFields: Array<{ key: string; label: string }> = [
-  { key: "Make", label: "Make" },
-  { key: "Model", label: "Model" },
-  { key: "ModelYear", label: "Model year" },
-  { key: "Manufacturer", label: "Manufacturer" },
-  { key: "VehicleType", label: "Vehicle type" },
-  { key: "BodyClass", label: "Body class" },
-  { key: "Series", label: "Series" },
-  { key: "Trim", label: "Trim" },
-  { key: "EngineCylinders", label: "Engine cylinders" },
-  { key: "EngineConfiguration", label: "Engine configuration" },
-  { key: "EngineModel", label: "Engine model" },
-  { key: "DisplacementL", label: "Engine displacement (L)" },
-  { key: "FuelTypePrimary", label: "Primary fuel type" },
-  { key: "DriveType", label: "Drive type" },
-  { key: "TransmissionStyle", label: "Transmission" },
-  { key: "PlantCountry", label: "Manufacturing country" },
-  { key: "PlantCity", label: "Manufacturing city" }
-];
-
-function fieldValue(row: VpicRow, key: string): string {
-  const value = row[key];
-  if (value === null || value === undefined) return "";
-  return String(value).trim();
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null) as { vin?: unknown } | null;
-  const checked = validateVin(body?.vin);
+  const body: unknown = await request.json().catch(() => null);
+  const checked = validateVin(isRecord(body) ? body.vin : undefined);
 
   if (!checked.valid) {
     return NextResponse.json({ error: checked.message }, { status: 400 });
   }
 
+  let response: Response;
   try {
-    const response = await fetch(
+    response = await fetch(
       `${sourceUrl}/${encodeURIComponent(checked.vin)}?format=json`,
       {
         headers: { Accept: "application/json" },
@@ -51,55 +27,73 @@ export async function POST(request: Request) {
         signal: AbortSignal.timeout(12000)
       }
     );
+  } catch (error) {
+    const timedOut = error instanceof Error && error.name === "TimeoutError";
+    return NextResponse.json(
+      {
+        error: timedOut
+          ? "The NHTSA decoder took too long to respond. Try again in a moment."
+          : "Could not reach the NHTSA decoder. Check your connection and try again."
+      },
+      { status: timedOut ? 504 : 502 }
+    );
+  }
 
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "The NHTSA decoder is temporarily unavailable. Please try again shortly." },
-        { status: 502 }
-      );
-    }
+  if (!response.ok) {
+    const rateLimited = response.status === 429;
+    const unavailable = response.status >= 500;
+    const headers = response.headers.get("retry-after");
+    return NextResponse.json(
+      {
+        error: rateLimited
+          ? "NHTSA is receiving too many requests. Wait a little before trying again."
+          : unavailable
+            ? "The NHTSA decoder is temporarily unavailable. Please try again shortly."
+            : "NHTSA could not process this VIN request. Check the number and try again."
+      },
+      {
+        status: rateLimited || unavailable ? 503 : 502,
+        ...(headers ? { headers: { "Retry-After": headers } } : {})
+      }
+    );
+  }
 
-    const payload = await response.json() as VpicResponse;
-    const row = payload.Results?.[0];
-
-    if (!row) {
-      return NextResponse.json(
-        { error: "The decoder returned no result for this VIN. Check the number and try again." },
-        { status: 422 }
-      );
-    }
-
-    const fields = decodedFields
-      .map(({ key, label }) => ({ label, value: fieldValue(row, key) }))
-      .filter((field) => field.value.length > 0);
-
-    const providerWarnings = getVinWarnings(row.ErrorCode);
-    const hasIdentity = Boolean(fieldValue(row, "Make") || fieldValue(row, "Model"));
-    if (!hasIdentity) {
-      const providerMessage = fieldValue(row, "ErrorText");
-      return NextResponse.json(
-        {
-          error: "NHTSA could not return a usable make or model for this VIN. Check the characters and vehicle documents. This does not prove that the vehicle is fake.",
-          providerMessage: providerMessage || undefined,
-          providerWarnings,
-          fields,
-          source: { name: "NHTSA vPIC", url: "https://vpic.nhtsa.dot.gov/api/" }
-        },
-        { status: 422 }
-      );
-    }
-
-    return NextResponse.json({
-      vin: checked.vin,
-      fields,
-      providerWarnings,
-      source: { name: "NHTSA vPIC", url: "https://vpic.nhtsa.dot.gov/api/" },
-      note: "These are manufacturer-reported technical details available in NHTSA vPIC. Availability and accuracy can vary, especially for vehicles not built for the United States market."
-    });
+  let payload: unknown;
+  try {
+    payload = await response.json();
   } catch {
     return NextResponse.json(
-      { error: "Could not reach the NHTSA decoder. Check your connection and try again. No VIN history was created or inferred." },
+      { error: "NHTSA returned a response Portavero could not read. Please try again later." },
       { status: 502 }
     );
   }
+
+  const decoded = parseNhtsaVinResponse(payload, checked.vin);
+
+  if (decoded.kind === "invalid-response") {
+    return NextResponse.json(
+      { error: "NHTSA returned an unexpected response. Please try again later." },
+      { status: 502 }
+    );
+  }
+
+  if (decoded.kind === "no-result") {
+    return NextResponse.json(
+      { error: "The decoder returned no result for this VIN. Check the number and try again." },
+      { status: 422 }
+    );
+  }
+
+  if (decoded.kind === "no-data") {
+    return NextResponse.json(
+      {
+        error: "NHTSA did not return usable technical details for this VIN. Check the characters and vehicle documents.",
+        providerMessage: decoded.providerMessage,
+        providerWarnings: decoded.providerWarnings
+      },
+      { status: 422 }
+    );
+  }
+
+  return NextResponse.json(decoded.result);
 }
