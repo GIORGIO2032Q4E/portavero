@@ -91,7 +91,7 @@ A few choices in the code are deliberate trade-offs rather than claims that the 
 - **Do not imply live information that is not connected.** Freight prices, exchange rates and customs rates are either entered by the user or checked against linked official sources. The site labels the result as a planning estimate instead of presenting it as a quote or ruling.
 - **Keep legal calculations conservative.** The vehicle-tax module is limited to selected passenger-vehicle cases. When the catalogue does not know a single engine displacement, the form asks for the capacity rather than choosing one arbitrarily.
 
-These choices keep the current build understandable, but they also leave work to do. In particular, the browser-stored Supabase session should be revisited before the account feature is used for sensitive data, and browser-level tests should be added before relying on every user journey.
+These choices keep the current build understandable, but they also leave work to do. The CI pipeline now starts the compiled production server and checks the main routes, metadata endpoints, baseline HTTP security headers and local rejection of invalid VINs. This is a server smoke test, not a browser interaction test. The browser-stored Supabase session should be revisited before the account feature is used for sensitive data, and the key user journeys still need manual or browser-level testing.
 
 ## Calculation notes and source material
 
