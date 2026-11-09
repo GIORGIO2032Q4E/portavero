@@ -41,3 +41,14 @@ test("rejects non-finite values", () => {
   assert.match(parseNonNegativeNumber("Infinity").error, /valid number/);
   assert.match(parseNonNegativeNumber("NaN").error, /valid number/);
 });
+
+test("enforces the saved-vehicle engine-capacity limit on whole-number fields", () => {
+  assert.deepEqual(
+    parseNonNegativeNumber("100000", { step: 1, max: 100000 }),
+    { value: 100000, error: null }
+  );
+  assert.deepEqual(
+    parseNonNegativeNumber("100001", { step: 1, max: 100000 }),
+    { value: null, error: "Enter a value no greater than 100000." }
+  );
+});
