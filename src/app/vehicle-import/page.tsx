@@ -113,7 +113,6 @@ export default function VehicleImportPage() {
       officialFees: standardStateFees,
       total: costSummary.total,
       rate: taxes.rate,
-      registrationRestricted: taxes.registrationRestricted
     };
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
 
@@ -168,8 +167,8 @@ export default function VehicleImportPage() {
       } else {
         riskReasons.push("No accident, title, mileage, service or auction-history details were recorded. Unknown does not mean accident-free.");
       }
-      if (result.registrationRestricted) {
-        riskReasons.push("The current calculator flags a general registration restriction for this vehicle age. Verify applicable exceptions with the Revenue Service.");
+      if (!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar) {
+        riskReasons.push("The current base excise rate for a vehicle over 6 years old is GEL 4.50 per cm³ before applicable adjustments. This is a tax band, not a general age-based import ban.");
       }
       if (preAprilRegime) {
         riskReasons.push("Previous tax rules were selected. Eligibility for transitional treatment has not been verified.");
@@ -205,7 +204,6 @@ export default function VehicleImportPage() {
         officialFees: roundMoney(result.officialFees),
         estimatedTotal: roundMoney(result.total),
         unknownCosts: result.unknownCosts,
-        registrationRestricted: result.registrationRestricted,
         riskReasons
       };
 
@@ -342,7 +340,7 @@ export default function VehicleImportPage() {
               </div>
             </div>
             {preAprilRegime && <div className="notice" role="status"><strong>Transitional-rate warning:</strong> selecting the previous rules does not establish eligibility. The Revenue Service requires qualifying registration, transport, or shipping documents and applies different deadlines to different transport methods. Confirm eligibility before relying on this result.</div>}
-            {result.registrationRestricted && <div className="notice" role="alert"><strong>Registration eligibility warning:</strong> from 1 April 2026, initial and temporary registration in Georgia is generally restricted for M1 passenger vehicles older than 6 years. Exceptions may apply to electric vehicles, re-export/transit cases, vehicles already registered or imported before the cutoff, and qualifying transport that began before the cutoff. This calculator estimates taxes only and cannot confirm registration eligibility. Check the official rules before buying or shipping.</div>}
+            {!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Age-based excise:</strong> vehicles over 6 years old use a GEL 4.50 per cm³ base excise rate before applicable adjustments. The previously planned age-based ban was replaced by this higher rate. Separate emissions, vehicle-category and registration requirements may still apply, so check them with the relevant authorities before buying or shipping.</div>}
             {(!eligibleYear || !validEngine || !validVehicleType || isElectric) && <div className="notice" role="status">{isElectric ? "Electric-vehicle excise and import-duty rules are included for passenger cars. Verify classification and special cases with the official calculator." : !validVehicleType ? "The classic-car rate is available only when the vehicle is more than 30 years old and qualifies under the legal classification." : "Check the manufacture year and engine capacity before using this estimate."}</div>}
             <div className="notice">
               <strong>Rule used:</strong> {preAprilRegime ? "Previous age-based excise table (transitional cases only)" : "Current rates from 2 April 2026"}. {isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rule: age-based rate × 2,000 for right-hand-drive/converted EVs" : "GEL 3,000 fixed excise for right-hand-drive/converted EVs") : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label} · purchase/shipping country: ${sourceCountry}.` : "Choose a vehicle variant if available, or enter the engine capacity manually."} The catalogue lists common variants only, not every year/market configuration. Transitional cases and vehicle classification need official verification.

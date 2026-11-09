@@ -7,11 +7,14 @@
  * transitional eligibility or whether a vehicle qualifies legally as a
  * classic car.
  *
- * Source material reviewed on 8 November 2026:
- * - Tax Code of Georgia, Articles 188, 197 and 199:
- *   https://matsne.gov.ge/en/document/view/1043717
- * - Revenue Service notice about the April 2026 change:
- *   https://voice.rs.ge/Default.aspx?id=3874
+ * Sources checked on 9 November 2026:
+ * - Tax Code of Georgia, Articles 188 and 197:
+ *   https://www.matsne.gov.ge/en/document/view/1043717
+ * - Revenue Service car-clearance calculator and listed fees:
+ *   https://www.rs.ge/CarClearance-en
+ * - Ministry announcement (12 March 2026) replacing the planned 6-year
+ *   registration ban with a higher excise tariff:
+ *   https://mepa.gov.ge/Ge/News/Details/26330
  *
  * Transitional rules are selected manually by the user. The caller must make
  * clear that choosing the previous regime does not establish eligibility.
@@ -41,8 +44,7 @@ const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1
  *   validVehicleType: boolean,
  *   rate: number,
  *   excise: number,
- *   importDuty: number,
- *   registrationRestricted: boolean
+ *   importDuty: number
  * }}
  */
 export function calculateVehicleTaxes({
@@ -89,7 +91,6 @@ export function calculateVehicleTaxes({
     validVehicleType,
     rate,
     excise,
-    importDuty,
-    registrationRestricted: declarationYear >= 2026 && age > 6 && !isElectric
+    importDuty
   };
 }

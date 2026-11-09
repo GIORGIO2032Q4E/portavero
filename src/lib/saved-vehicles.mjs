@@ -39,7 +39,6 @@ const costKeys = [
  * @property {number} officialFees
  * @property {number} estimatedTotal
  * @property {number} unknownCosts
- * @property {boolean} registrationRestricted
  * @property {string[]} riskReasons
  */
 
@@ -100,7 +99,6 @@ export function isSavedVehicleCandidate(value) {
     isSafeMoney(candidate.officialFees) &&
     isSafeMoney(candidate.estimatedTotal) &&
     Number.isSafeInteger(candidate.unknownCosts) && candidate.unknownCosts >= 0 && candidate.unknownCosts <= costKeys.length &&
-    typeof candidate.registrationRestricted === "boolean" &&
     Array.isArray(candidate.riskReasons) &&
     candidate.riskReasons.length <= 12 &&
     candidate.riskReasons.every((reason) => typeof reason === "string" && reason.length > 0 && reason.length <= 240);
