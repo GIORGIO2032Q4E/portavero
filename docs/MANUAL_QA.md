@@ -57,6 +57,11 @@ Use a test VIN only. A correctly shaped VIN is not proof that a vehicle exists.
 - [ ] Open `/vin-check`. Confirm the form explains the difference between technical data and vehicle history.
 - [ ] Submit an empty value, a short value, a long value and a value containing I, O or Q. Confirm local validation blocks each invalid value.
 - [ ] Submit a known test VIN. Confirm the route returns available technical fields and displays the NHTSA vPIC source link.
+- [ ] Select U.S. market for the known U.S. test VIN. Confirm the local position-nine check-digit result matches; change one character in position nine and confirm it warns but still allows the NHTSA request.
+- [ ] Leave the market as "Not sure / another market" for a non-U.S. VIN. Confirm the U.S. check-digit formula is not applied and the VIN is still submitted for decoding.
+- [ ] Use a provider response with some technical fields but no make/model. Confirm the page shows it as partial data instead of discarding it as a total failure.
+- [ ] Edit the VIN after a result is shown. Confirm the old result and error are cleared. Confirm the VIN input cannot change while a request is in progress.
+- [ ] Test malformed upstream JSON, an empty Results array, a rate-limit response and a timeout. Confirm each produces a distinct, readable error.
 - [ ] Check a VIN with an NHTSA warning, where available. Confirm the warning is visible and the page does not suppress it.
 - [ ] Test a VIN that the provider cannot decode. Confirm the page reports that no usable technical result was returned.
 - [ ] Simulate or test an unavailable provider/network. Confirm a clear error appears and no vehicle-history result is invented.
