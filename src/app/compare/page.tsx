@@ -167,9 +167,21 @@ export default function CompareVehiclesPage() {
                       <strong className="compare-total">{money(candidate.estimatedTotal)}</strong>
                     ))}
                     {row("Additional costs not entered", (candidate) => `${candidate.unknownCosts} of 7 categories`)}
-                    {row("Registration check", (candidate) => candidate.registrationRestricted
-                      ? <span className="compare-risk">Restriction flagged. Check official rules and exceptions.</span>
-                      : "No general age restriction flagged by this calculator. Verify eligibility officially.")}
+                    {row("Age-related tax note", (candidate) => {
+                      const age = candidate.declarationYear - candidate.year;
+                      if (candidate.preAprilRegime) return "Previous tax regime selected. Confirm that this vehicle meets the transitional conditions before relying on the estimate.";
+                      if (candidate.classicCar) return "Classic-car rate selected. Confirm the vehicle’s legal classification with the Revenue Service.";
+                      if (candidate.isElectric) return candidate.steering === "right"
+                        ? "Right-hand-drive electric vehicle: the current estimate uses the fixed GEL 3,000 excise amount."
+                        : "Left-hand-drive electric vehicle: the current estimate uses zero excise and import duty. Confirm vehicle classification and other requirements officially.";
+                      const baseRate = age > 6 ? "GEL 4.50/cm³" : "GEL 1.50/cm³";
+                      const adjustment = candidate.steering === "right"
+                        ? " A right-hand-drive or converted vehicle may have a threefold excise rate."
+                        : candidate.hybrid && age <= 6
+                          ? " An eligible left-hand-drive hybrid may receive the 60% reduction."
+                          : "";
+                      return `${age > 6 ? "Over 6 years" : "0–6 years"}: ${baseRate} base excise rate.${adjustment} The age band is a tax rule, not a general age-based import ban.`;
+                    })}
                     {row("Risks to review", (candidate) => (
                       <ul className="compare-risk-list">
                         {candidate.riskReasons.map((risk, index) => <li key={index}>{risk}</li>)}
