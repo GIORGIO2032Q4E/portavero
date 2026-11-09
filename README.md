@@ -95,6 +95,14 @@ These choices keep the current build understandable, but they also leave work to
 
 ## Calculation notes and source material
 
+### Georgian vehicle-tax estimator
+
+The current passenger-car excise bands in Article 188 are GEL 1.50 per cm³ for vehicles aged 0–6 years inclusive and GEL 4.50 per cm³ for vehicles older than 6 years, before the applicable hybrid, steering and other special rules. Article 197(6) defines the engine-capacity-based import-duty calculation. The age used for excise is based on the customs-declaration year minus the manufacture year (Article 188(18)). The calculator does not determine the vehicle’s tariff classification or confirm registration and emissions eligibility.
+
+The planned April 2026 blanket restriction for vehicles older than six years was replaced by a higher excise tariff in the Ministry’s 12 March 2026 announcement. Portavero therefore treats the six-year threshold as a tax band, not as a general registration ban. Separate vehicle-category, emissions and registration requirements may still apply, so check the current Revenue Service and Service Agency rules before purchase.
+
+Sources: [Georgian Tax Code, Articles 188 and 197](https://www.matsne.gov.ge/en/document/view/1043717), [Revenue Service car-clearance calculator and listed fees](https://www.rs.ge/CarClearance-en), [Ministry announcement, 12 March 2026](https://mepa.gov.ge/Ge/News/Details/26330).
+
 ### General import calculator
 
 The general calculator sums nine cost categories. The duty estimate uses the user's entered duty percentage and the calculator's customs-value inputs. VAT/GST is estimated from the entered customs-value costs, calculated import duty and the user-entered excise/other-tax field. These are arithmetic choices in the application, not a claim that every country's legal tax base uses those components.
