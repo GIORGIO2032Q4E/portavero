@@ -251,7 +251,7 @@ export default function VehicleImportPage() {
           <section className="panel vehicle-panel">
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
             <p className="panel-intro">This estimate uses a limited set of rules for passenger vehicles classified under HS 8703. Check the official calculator if you are unsure about your vehicle.</p>
-            <div className="notice"><strong>Important:</strong> This is an estimate for passenger vehicles under HS 8703. Electric-vehicle rules and the classic-car rate are included, but special classification and transitional cases still need official verification.</div>
+            <div className="notice"><strong>Important:</strong> This is a preliminary estimate for selected passenger vehicles under HS 8703. It does not calculate the separate sports-car excise treatment in Article 188(9), determine tariff classification, or cover every exemption and transitional case. Electric and classic-car rates are included only for the cases represented here. Check the official Revenue Service calculator for special classifications.</div>
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="source-country">Country of purchase</label>
