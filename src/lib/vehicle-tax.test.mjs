@@ -22,11 +22,11 @@ test("current rate is GEL 1.50/cm³ for age 0 through 6", () => {
   }
 });
 
-test("current rate is GEL 4.50/cm³ at age 7 and above", () => {
+test("current rate is GEL 4.50/cm³ at age 7 and above, without treating age as a registration ban", () => {
   const result = calculate({ manufactureYear: 2019 });
   assert.equal(result.rate, 4.5);
   assert.equal(result.excise, 9000);
-  assert.equal(result.registrationRestricted, true);
+  assert.equal(Object.hasOwn(result, "registrationRestricted"), false);
 });
 
 test("left-hand-drive hybrid age 0 through 6 gets a 60% excise reduction", () => {
@@ -68,7 +68,6 @@ test("left-hand-drive electric car has zero excise and import duty", () => {
   const result = calculate({ isElectric: true, engineCc: 0 });
   assert.equal(result.excise, 0);
   assert.equal(result.importDuty, 0);
-  assert.equal(result.registrationRestricted, false);
 });
 
 test("right-hand-drive electric car uses the current fixed GEL 3,000 excise", () => {
@@ -133,6 +132,7 @@ test("electric vehicle excise follows steering and selected regime", () => {
   const rightCurrent = calculate({ isElectric: true, steering: "right", engineCc: 0 });
   const rightPrevious = calculate({ isElectric: true, steering: "right", engineCc: 0, preAprilRegime: true });
   assert.equal(leftCurrent.excise, 0);
+  assert.equal(Object.hasOwn(leftCurrent, "registrationRestricted"), false);
   assert.equal(rightCurrent.excise, 3000);
   assert.equal(rightPrevious.excise, 1600);
 });
