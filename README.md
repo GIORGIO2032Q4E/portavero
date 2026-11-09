@@ -220,7 +220,7 @@ The test suite uses Node's built-in test runner. It covers:
 
 GitHub Actions runs the dependency audit, lint, TypeScript check, unit tests and production build on pushes to `main` and pull requests targeting `main`. The build uses a placeholder site URL because the production URL is not needed to compile the app.
 
-**What the automated checks do not cover:** there is no browser end-to-end test suite at present. CI does not make live calls to NHTSA or Supabase and does not verify real account email delivery, tax determinations, responsive layouts in every browser or the print dialog on every platform. Use the [manual QA checklist](docs/MANUAL_QA.md) for those checks. A checklist item is not evidence that it has been completed; record the date and result when running it.
+**What the automated checks do not cover:** there is no browser end-to-end test suite at present. CI does not make live calls to NHTSA or Supabase and does not verify real account email delivery, tax determinations, responsive layouts in every browser or the print dialog on every platform. Use the [manual QA checklist](docs/MANUAL_QA.md) for those checks. A checklist item is not evidence that it has been completed; record the date and result when running it. The latest completed live checks are recorded in [the 9 November 2026 production QA record](docs/RELEASE_QA_2026-11-09.md).
 
 ## License
 
