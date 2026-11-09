@@ -76,7 +76,7 @@ export default function CompareVehiclesPage() {
   }
 
   return (
-    <>
+    <div className="compare-page">
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle shortlist</span>
@@ -103,7 +103,10 @@ export default function CompareVehiclesPage() {
             <>
               <div className="compare-toolbar">
                 <p>{candidates.length} of 4 vehicles saved in this browser.</p>
-                <button type="button" className="button button-outline button-small" onClick={clearCandidates}>Clear comparison list</button>
+                <div className="compare-toolbar-actions">
+                  <button type="button" className="button button-outline button-small" onClick={() => window.print()}>Print / Save as PDF</button>
+                  <button type="button" className="button button-outline button-small" onClick={clearCandidates}>Clear comparison list</button>
+                </div>
               </div>
 
               {candidates.length === 1 && (
@@ -189,6 +192,6 @@ export default function CompareVehiclesPage() {
           <p>Saved candidates stay in this browser on this device. They are not synced to your Portavero account or another device.</p>
         </div>
       </section>
-    </>
+    </div>
   );
 }
