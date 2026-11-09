@@ -41,13 +41,20 @@ const candidate = (overrides = {}) => ({
   officialFees: 480,
   estimatedTotal: 8355.67,
   unknownCosts: 3,
-  registrationRestricted: false,
   riskReasons: ["History notes are user-entered and not independently verified."],
   ...overrides
 });
 
 test("accepts a complete saved vehicle candidate", () => {
   assert.equal(isSavedVehicleCandidate(candidate()), true);
+});
+
+test("accepts older saved entries that contain the retired age-ban flag", () => {
+  const legacy = candidate({ registrationRestricted: true });
+  assert.equal(isSavedVehicleCandidate(legacy), true);
+  const parsed = parseSavedVehicleCandidates(JSON.stringify([legacy]));
+  assert.equal(parsed.items.length, 1);
+  assert.equal(parsed.skipped, false);
 });
 
 test("rejects candidates with unsupported fractional GEL amounts", () => {
