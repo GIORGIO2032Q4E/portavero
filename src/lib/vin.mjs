@@ -1,6 +1,6 @@
 /**
- * Basic format validation for a standard 17-character VIN.
- * The remote decoder remains responsible for deciding whether it can decode it.
+ * Check the shape of a standard 17-character VIN before sending it to vPIC.
+ * This checks the character format only; it does not prove that the VIN exists.
  * @param {unknown} value
  * @returns {{valid: true, vin: string} | {valid: false, vin: string, message: string}}
  */
@@ -26,6 +26,34 @@ export function validateVin(value) {
   return { valid: true, vin };
 }
 
+const usVinCharacterValues = {
+  A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8,
+  J: 1, K: 2, L: 3, M: 4, N: 5, P: 7, R: 9,
+  S: 2, T: 3, U: 4, V: 5, W: 6, X: 7, Y: 8, Z: 9
+};
+const usVinPositionWeights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
+
+/**
+ * Calculate the position-nine check digit used for U.S.-market VINs.
+ * This is an advisory helper, not a global VIN-validity rule.
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+export function calculateUsVinCheckDigit(value) {
+  const checked = validateVin(value);
+  if (!checked.valid) return null;
+
+  const total = [...checked.vin].reduce((sum, character, index) => {
+    const characterValue = /\d/.test(character)
+      ? Number(character)
+      : usVinCharacterValues[character];
+    return sum + characterValue * usVinPositionWeights[index];
+  }, 0);
+
+  const remainder = total % 11;
+  return remainder === 10 ? "X" : String(remainder);
+}
+
 const nhtsaWarningByCode = {
   "1": "NHTSA reports that the VIN check digit in position 9 does not calculate correctly. Verify the VIN on the vehicle and its documents.",
   "2": "NHTSA reports that it corrected one VIN character while decoding. Verify the original VIN before relying on these details.",
@@ -44,17 +72,103 @@ const nhtsaWarningByCode = {
 };
 
 /**
- * Convert NHTSA's comma-separated ErrorCode field into readable warnings.
+ * Convert NHTSA's ErrorCode value into readable, de-duplicated warnings.
  * @param {unknown} value
  * @returns {string[]}
  */
 export function getVinWarnings(value) {
   if (typeof value !== "string" && typeof value !== "number") return [];
+
   const codes = String(value)
     .split(",")
     .map((part) => part.trim().match(/^\d+/)?.[0])
     .filter((code) => Boolean(code) && code !== "0");
+
   return [...new Set(codes.map((code) =>
     nhtsaWarningByCode[code] || `NHTSA returned VIN decoder code ${code}. Check the source response before relying on this result.`
   ))];
+}
+
+const decodedFields = [
+  ["Make", "Make"],
+  ["Model", "Model"],
+  ["ModelYear", "Model year"],
+  ["Manufacturer", "Manufacturer"],
+  ["VehicleType", "Vehicle type"],
+  ["BodyClass", "Body class"],
+  ["Series", "Series"],
+  ["Trim", "Trim"],
+  ["EngineCylinders", "Engine cylinders"],
+  ["EngineConfiguration", "Engine configuration"],
+  ["EngineModel", "Engine model"],
+  ["DisplacementL", "Engine displacement (L)"],
+  ["FuelTypePrimary", "Primary fuel type"],
+  ["DriveType", "Drive type"],
+  ["TransmissionStyle", "Transmission"],
+  ["PlantCountry", "Manufacturing country"],
+  ["PlantCity", "Manufacturing city"]
+];
+
+const vpicSource = {
+  name: "NHTSA vPIC",
+  url: "https://vpic.nhtsa.dot.gov/api/"
+};
+
+function isRecord(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function readField(row, key) {
+  const value = row[key];
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return "";
+}
+
+/**
+ * Turn the external vPIC response into the small shape used by the page.
+ * Partial technical data is kept instead of being discarded.
+ * @param {unknown} payload
+ * @param {string} vin
+ */
+export function parseNhtsaVinResponse(payload, vin) {
+  if (!isRecord(payload) || !Array.isArray(payload.Results)) {
+    return { kind: "invalid-response" };
+  }
+
+  const row = payload.Results.find(isRecord);
+  if (!row) return { kind: "no-result" };
+
+  const fields = decodedFields
+    .map(([key, label]) => ({ label, value: readField(row, key) }))
+    .filter((field) => field.value.length > 0);
+  const providerWarnings = getVinWarnings(row.ErrorCode);
+  const providerMessage = readField(row, "ErrorText");
+
+  if (fields.length === 0) {
+    return {
+      kind: "no-data",
+      providerWarnings,
+      providerMessage: providerMessage || undefined
+    };
+  }
+
+  const hasMake = Boolean(readField(row, "Make"));
+  const hasModel = Boolean(readField(row, "Model"));
+  const quality = hasMake && hasModel ? "complete" : "partial";
+
+  return {
+    kind: quality,
+    result: {
+      quality,
+      vin,
+      fields,
+      providerWarnings,
+      providerMessage: providerMessage || undefined,
+      source: vpicSource,
+      note: quality === "complete"
+        ? "These are manufacturer-reported technical details available in NHTSA vPIC. Availability and accuracy can vary, especially for vehicles not built for the United States market."
+        : "NHTSA returned some technical fields, but not both make and model. Treat this as a partial result and check the details against the vehicle documents."
+    }
+  };
 }
