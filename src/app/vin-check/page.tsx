@@ -59,7 +59,10 @@ export default function VinCheckPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ vin })
       });
-      const payload = await response.json() as ApiResponse;
+      const rawPayload: unknown = await response.json();
+      const payload: ApiResponse = rawPayload && typeof rawPayload === "object" && !Array.isArray(rawPayload)
+        ? rawPayload as ApiResponse
+        : {};
 
       const providerWarnings = Array.isArray(payload.providerWarnings)
         ? payload.providerWarnings.filter((warning): warning is string => typeof warning === "string")
