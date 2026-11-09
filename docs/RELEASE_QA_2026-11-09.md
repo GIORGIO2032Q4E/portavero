@@ -2,11 +2,15 @@
 
 **Date:** 9 November 2026  
 **Environment:** https://portavero.vercel.app  
-**Production commit tested:** `849b64968966f106bd57970b3cbba1471df3d0d9`  
-**Production deployment:** `dpl_FJWdJWKBcLBNKpufCC7P1UkqAfbJ`  
-**Automated CI run:** [GitHub Actions #42596372846](https://github.com/GIORGIO2032Q4E/portavero/actions/runs/42596372846)
+**Manual browser QA commit:** `849b64968966f106bd57970b3cbba1471df3d0d9`  
+**Manual browser QA deployment:** `dpl_FJWdJWKBcLBNKpufCC7P1UkqAfbJ`  
+**Latest production release:** `ca08a81c08dd7de09c581b48162ce1017240d4ae`  
+**Latest production deployment:** `dpl_Fa9yxcVre3BYum7wEuAVznbVhNaw` (`READY`)  
+**Latest-code CI run:** [GitHub Actions #42624780566](https://github.com/GIORGIO2032Q4E/portavero/actions/runs/42624780566) on the PR head containing the same source tree as the merged release.
 
-This record separates checks completed against the live site from checks that remain unverified. A successful page response is not proof that every interactive feature or account workflow works.
+**Earlier production CI run:** [GitHub Actions #42596372846](https://github.com/GIORGIO2032Q4E/portavero/actions/runs/42596372846)
+
+The route, responsive-layout, browser, VIN, print and Supabase checks below were manually performed against the earlier production deployment listed above. The latest release corrects the six-year vehicle-tax message and comparison label. Its exact source tree passed the latest CI run, including the production build and server smoke tests, and the new deployment is READY. The full manual browser sweep was not repeated after that deployment, so those earlier browser results are not presented as tests of the latest commit.
 
 ## Passed checks
 
