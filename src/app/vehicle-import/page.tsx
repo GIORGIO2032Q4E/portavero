@@ -17,6 +17,7 @@ import {
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = STANDARD_VEHICLE_FEES_GEL;
+type CostFieldKey = "purchase" | "auction" | "inland" | "shipping" | "insurance" | "port" | "delivery";
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -59,6 +60,22 @@ export default function VehicleImportPage() {
   const [historyNotes, setHistoryNotes] = useState("");
   const [savedVehicleCount, setSavedVehicleCount] = useState(0);
   const [candidateMessage, setCandidateMessage] = useState("");
+  const [invalidCostFields, setInvalidCostFields] = useState<Record<CostFieldKey, boolean>>({
+    purchase: false,
+    auction: false,
+    inland: false,
+    shipping: false,
+    insurance: false,
+    port: false,
+    delivery: false
+  });
+
+  function handleCostFieldValidity(field: CostFieldKey, valid: boolean) {
+    setInvalidCostFields((current) => {
+      const invalid = !valid;
+      return current[field] === invalid ? current : { ...current, [field]: invalid };
+    });
+  }
 
   useEffect(() => {
     try {
@@ -84,6 +101,7 @@ export default function VehicleImportPage() {
   const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || vehicleAge > 30;
+  const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
 
   const result = useMemo(() => {
     const taxes = calculateVehicleTaxes({
@@ -109,12 +127,12 @@ export default function VehicleImportPage() {
       unknownCosts: costSummary.unknownCosts.length,
       invalidCosts: costSummary.invalidCosts,
       invalidTaxAmounts: costSummary.invalidTaxAmounts,
-      invalidAmounts: costSummary.invalidAmounts,
+      invalidAmounts: costSummary.invalidAmounts || hasInvalidCostField,
       officialFees: standardStateFees,
-      total: costSummary.total,
+      total: costSummary.invalidAmounts || hasInvalidCostField ? null : costSummary.total,
       rate: taxes.rate,
     };
-  }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery]);
+  }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery, hasInvalidCostField]);
 
   function saveVehicleForComparison() {
     setCandidateMessage("");
@@ -151,6 +169,9 @@ export default function VehicleImportPage() {
       const riskReasons: string[] = [];
       if (result.unknownCosts > 0) {
         riskReasons.push(`${result.unknownCosts} cost categories are still unknown, so this is not a final landed-cost figure.`);
+      }
+      if (declarationYear > currentYear) {
+        riskReasons.push(`The customs declaration is planned for ${declarationYear}. This estimate uses the ${currentYear} rules and fee snapshot; future changes are not predicted.`);
       }
       if (!selectedEngine) {
         riskReasons.push("The engine configuration was entered manually. Confirm it against the vehicle documents.");
@@ -340,6 +361,7 @@ export default function VehicleImportPage() {
               </div>
             </div>
             {preAprilRegime && <div className="notice" role="status"><strong>Transitional-rate warning:</strong> selecting the previous rules does not establish eligibility. The Revenue Service requires qualifying registration, transport, or shipping documents and applies different deadlines to different transport methods. Confirm eligibility before relying on this result.</div>}
+            {declarationYear > currentYear && <div className="notice" role="status"><strong>Future-year projection:</strong> this estimate applies the rules and GEL 480 fee snapshot currently recorded in Portavero to a planned {declarationYear} declaration. Tax rates, fees and requirements may change before then, so do not treat this as a forecast of the final amount.</div>}
             {!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Age-based excise:</strong> vehicles over 6 years old use a GEL 4.50 per cm³ base excise rate before applicable adjustments. The previously planned age-based ban was replaced by this higher rate. Separate emissions, vehicle-category and registration requirements may still apply, so check them with the relevant authorities before buying or shipping.</div>}
             {(!eligibleYear || !validEngine || !validVehicleType || isElectric) && <div className="notice" role="status">{isElectric ? "Electric-vehicle excise and import-duty rules are included for passenger cars. Verify classification and special cases with the official calculator." : !validVehicleType ? "The classic-car rate is available only when the vehicle is more than 30 years old and qualifies under the legal classification." : "Check the manufacture year and engine capacity before using this estimate."}</div>}
             <div className="notice">
@@ -376,13 +398,13 @@ export default function VehicleImportPage() {
           </div>
           <div className="panel">
             <div className="form-grid">
-              <NumberField id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} />
-              <NumberField id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} />
-              <NumberField id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} />
-              <NumberField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} />
-              <NumberField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} />
-              <NumberField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} />
-              <NumberField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} hint="Exclude standard registration and clearance fees already counted above." />
+              <NumberField id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} onValidityChange={(valid) => handleCostFieldValidity("purchase", valid)} />
+              <NumberField id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} onValidityChange={(valid) => handleCostFieldValidity("auction", valid)} />
+              <NumberField id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} onValidityChange={(valid) => handleCostFieldValidity("inland", valid)} />
+              <NumberField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} onValidityChange={(valid) => handleCostFieldValidity("shipping", valid)} />
+              <NumberField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} onValidityChange={(valid) => handleCostFieldValidity("insurance", valid)} />
+              <NumberField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} onValidityChange={(valid) => handleCostFieldValidity("port", valid)} />
+              <NumberField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} onValidityChange={(valid) => handleCostFieldValidity("delivery", valid)} hint="Exclude standard registration and clearance fees already counted above." />
             </div>
           </div>
         </div>
