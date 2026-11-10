@@ -118,7 +118,8 @@ export default function VehicleImportPage() {
       { purchase, auction, inland, shipping, insurance, port, delivery },
       taxes.excise,
       taxes.importDuty,
-      standardStateFees
+      standardStateFees,
+      hasInvalidCostField
     );
     return {
       excise: taxes.excise,
@@ -127,9 +128,9 @@ export default function VehicleImportPage() {
       unknownCosts: costSummary.unknownCosts.length,
       invalidCosts: costSummary.invalidCosts,
       invalidTaxAmounts: costSummary.invalidTaxAmounts,
-      invalidAmounts: costSummary.invalidAmounts || hasInvalidCostField,
+      invalidAmounts: costSummary.invalidAmounts,
       officialFees: standardStateFees,
-      total: costSummary.invalidAmounts || hasInvalidCostField ? null : costSummary.total,
+      total: costSummary.total,
       rate: taxes.rate,
     };
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery, hasInvalidCostField]);

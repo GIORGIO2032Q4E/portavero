@@ -41,8 +41,9 @@ function isSafeExpense(value) {
  * @param {number} excise
  * @param {number} importDuty
  * @param {number} officialFees
+ * @param {boolean} hasInvalidInput True when a field rejected an entry before it reached this function.
  */
-export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = STANDARD_VEHICLE_FEES_GEL) {
+export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = STANDARD_VEHICLE_FEES_GEL, hasInvalidInput = false) {
   const invalidCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => {
     const value = costs[key];
     return value !== null && !isSafeExpense(value);
@@ -60,7 +61,8 @@ export function summarizeVehicleImportCosts(costs, excise, importDuty, officialF
   const invalidAmounts = invalidCosts.length > 0 ||
     invalidTaxAmounts ||
     knownCosts === null ||
-    !isSafeMoney(total);
+    !isSafeMoney(total) ||
+    hasInvalidInput;
 
   return {
     knownCosts,
