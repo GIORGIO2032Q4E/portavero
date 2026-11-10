@@ -13,6 +13,7 @@ type NumberFieldProps = {
   step?: number;
   min?: number;
   max?: number;
+  onValidityChange?: (valid: boolean) => void;
 };
 
 export default function NumberField({
@@ -24,10 +25,13 @@ export default function NumberField({
   inputMode,
   step = 0.01,
   min = 0,
-  max
+  max,
+  onValidityChange
 }: NumberFieldProps) {
   const [error, setError] = useState("");
   const skipValueResetRef = useRef(false);
+  const onValidityChangeRef = useRef(onValidityChange);
+  onValidityChangeRef.current = onValidityChange;
 
   useEffect(() => {
     if (skipValueResetRef.current) {
@@ -35,10 +39,12 @@ export default function NumberField({
       return;
     }
     setError("");
+    onValidityChangeRef.current?.(true);
   }, [value]);
 
   useEffect(() => {
     setError("");
+    onValidityChangeRef.current?.(true);
   }, [step, min, max]);
 
   const decimalPlaces = String(step).includes(".") ? String(step).split(".")[1].length : 0;
@@ -64,6 +70,7 @@ export default function NumberField({
         onChange={(event) => {
           const parsed = parseNonNegativeNumber(event.target.value, { step, min, max });
           setError(parsed.error ?? "");
+          onValidityChangeRef.current?.(!parsed.error);
           skipValueResetRef.current = Boolean(parsed.error) && !Object.is(value, parsed.value);
           onChange(parsed.value);
         }}
