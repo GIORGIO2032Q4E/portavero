@@ -55,6 +55,13 @@ test("decimal GEL expenses are counted without changing the tax inputs", () => {
   assert.equal(result.total, 581.8);
 });
 
+test("a rejected field keeps the total invalid after its value is cleared from calculation", () => {
+  const result = summarizeVehicleImportCosts(blankCosts(), 3000, 130, 480, true);
+  assert.equal(result.unknownCosts.length, 7);
+  assert.equal(result.invalidAmounts, true);
+  assert.equal(result.total, null);
+});
+
 test("invalid tax amounts and overflowing totals are not presented as valid", () => {
   const invalidTax = summarizeVehicleImportCosts(blankCosts(), Infinity, 0, 480);
   assert.equal(invalidTax.invalidTaxAmounts, true);
