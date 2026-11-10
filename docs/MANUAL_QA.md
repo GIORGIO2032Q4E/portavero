@@ -47,6 +47,8 @@ For each case, record **Pass**, **Fail**, **Blocked** or **Not run**, and includ
 - [ ] Check a classic-car selection at 30 and 31 years. Confirm the age threshold and legal-classification warning are visible.
 - [ ] Select the previous regime. Confirm the page explains that transitional eligibility must be independently established from the required documents.
 - [ ] Enter purchase, auction, transport, shipping, insurance, port and delivery costs. Confirm the subtotal adds entered amounts once and identifies blank categories.
+- [ ] Enter an invalid cost (negative, excess decimals or too large). Confirm the field reports the error, the overall total changes to “Check details”, and saving is blocked until the field is corrected or cleared.
+- [ ] Set the customs declaration year after the current year. Confirm the page and saved candidate flag the result as a projection using the current tax rules and fee snapshot.
 - [ ] Confirm the result includes the listed GEL 480 fee snapshot once. Verify the current fee schedule with the Revenue Service before treating it as current.
 - [ ] Save a candidate for comparison. Confirm the saved record contains the selected vehicle and cost information.
 - [ ] Print or save the vehicle estimate as PDF. Check that the selected details, warnings and cost breakdown are readable.
