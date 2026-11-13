@@ -144,8 +144,8 @@ export default function AccountPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">Your Portavero account</span>
-          <h1>{session ? "Your import workspace." : "Keep your import plans together."}</h1>
+          <span className="eyebrow">Account</span>
+          <h1>{session ? "Saved estimates." : "Save estimates to your account."}</h1>
           <p>Sign in to save new general import estimates to your account. Vehicle comparison candidates are kept only in this browser.</p>
         </div>
       </section>
@@ -153,7 +153,7 @@ export default function AccountPage() {
         <div className="container account-layout">
           {!configured ? (
             <section className="panel account-panel">
-              <h2>One setup step first</h2>
+              <h2>Account storage is not configured.</h2>
               <p>Supabase handles account sign-in. To enable this feature, configure the project URL and publishable key.</p>
               <ol>
                 <li>Create a project at <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Supabase</a>.</li>
@@ -162,12 +162,12 @@ export default function AccountPage() {
                 <li>In Supabase Authentication settings, set the site URL and allow your Portavero preview/production URLs.</li>
               </ol>
               <div className="notice">Do not put a Supabase service-role key in browser code or commit secrets to GitHub.</div>
-              <Link href="/how-it-works" className="button button-dark">Back to Portavero</Link>
+              <Link href="/" className="button button-dark">Go to home</Link>
             </section>
           ) : session ? (
             <section className="panel account-panel">
               <div className="account-heading">
-                <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Portavero user"}</h2></div>
+                <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Signed-in account"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
               <p>New general estimates saved while signed in can be opened from another device using the same account. Loading one here creates a browser copy; editing that copy does not update the cloud record.</p>
@@ -190,7 +190,7 @@ export default function AccountPage() {
           ) : (
             <section className="panel account-panel">
               <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to keep your saved import estimates available across devices." : "Sign in to access your Portavero workspace."}</p>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to open your saved general import estimates on another device." : "Sign in to view your saved import estimates."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
                 {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}

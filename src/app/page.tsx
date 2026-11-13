@@ -53,7 +53,7 @@ export default function HomePage() {
           <div className="simple-hero-copy">
             <p className="simple-status">A student project about car imports to Georgia</p>
             <h1>Estimate what it may cost to bring a car to Georgia.</h1>
-            <p className="simple-lede">An auction or listing price is only the start. There may also be buyer fees, transport to the port, shipping, customs and local delivery. I built Portavero to keep those figures together. Enter what you know and leave the rest blank until you have a real amount.</p>
+            <p className="simple-lede">An auction price is not the full cost. Buyer fees, inland transport, shipping, customs and delivery come later. I built Portavero to put those amounts in one estimate. Add a figure when you can confirm it; blank fields stay out of the total.</p>
             <div className="hero-actions">
               <Link href="/vehicle-import" className="button button-dark">Estimate a car import</Link>
               <Link href="/calculator" className="simple-text-link">Importing other goods? <span aria-hidden="true">→</span></Link>
@@ -77,9 +77,9 @@ export default function HomePage() {
       <section className="simple-tools-section">
         <div className="container">
           <div className="simple-section-heading">
-            <p className="editorial-label">WHAT'S IN THE PROJECT</p>
-            <h2>The car tools, and a few extras.</h2>
-            <p>The vehicle planner is the main tool. The other pages help check a VIN, keep a shortlist or work out a separate import cost.</p>
+            <p className="editorial-label">THE CURRENT TOOLS</p>
+            <h2>Vehicle import comes first.</h2>
+            <p>The planner is the main part of Portavero. The other pages let you check technical VIN data, browse common engine variants, compare cars or estimate the cost of importing other goods.</p>
           </div>
           <div className="simple-tool-list">
             {tools.map((tool) => (
@@ -99,8 +99,8 @@ export default function HomePage() {
       <section className="simple-how-section">
         <div className="container simple-how-grid">
           <div>
-            <p className="editorial-label">WHEN USING THE ESTIMATE</p>
-            <h2>Start with the details you can confirm.</h2>
+            <p className="editorial-label">BEFORE YOU USE A RESULT</p>
+            <h2>Three things to check.</h2>
           </div>
           <ol>
             <li><strong>Check the car.</strong><span>Use the engine capacity and year from the vehicle documents where possible.</span></li>
@@ -110,13 +110,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="simple-bottom-cta">
-        <div className="container">
-          <h2>Start with the car and price you have.</h2>
-          <p>You do not need every figure at once. Add the confirmed amounts and update the estimate when you get another quote.</p>
-          <Link href="/vehicle-import" className="button button-dark">Open vehicle planner</Link>
-        </div>
-      </section>
     </>
   );
 }

@@ -12,12 +12,12 @@ export default function TermsPage() {
         <div className="container">
           <span className="eyebrow">Project information</span>
           <h1>Terms of use</h1>
-          <p>These terms describe the intended use and current limitations of the Portavero project prototype.</p>
+          <p>These notes explain what the current Portavero prototype is for and what its estimates do not cover.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <p><strong>Last updated: November 8, 2026</strong></p>
+          <p><strong>Last updated: November 13, 2026</strong></p>
 
           <h2>Purpose</h2>
           <p>Portavero is an independent student project for organising estimated import costs for goods and vehicles brought into Georgia. It includes a general cost calculator, a limited vehicle-tax estimator, a technical VIN lookup, a browser-based vehicle comparison and a manual shipping quote comparison. It is not a customs broker, shipping carrier, vehicle-history provider or government service.</p>
@@ -32,11 +32,8 @@ export default function TermsPage() {
           <h2>Your responsibility</h2>
           <p>Check your inputs, vehicle documents, exact engine capacity, tariff classification, current fees, registration eligibility, carrier quote and import requirements before making a purchase or shipping decision. For a vehicle-specific tax estimate, consult the official <a href="https://www.rs.ge/CarClearance-en" target="_blank" rel="noreferrer">Revenue Service Auto/Moto Levy Calculator</a> or ask the Revenue Service or a qualified customs broker.</p>
 
-          <h2>Availability and changes</h2>
-          <p>The project is provided as-is for demonstration and educational purposes. It may change, become unavailable or contain errors. No service-level commitment, commercial support or guaranteed data availability is offered.</p>
-
-          <h2>Contact</h2>
-          <p>This student-developed project prototype does not currently have a dedicated support email address.</p>
+          <h2>Availability and contact</h2>
+          <p>This is a student project, not a commercial customs or shipping service. Pages and data sources may change, and the site may be unavailable at times. There is currently no dedicated support email.</p>
 
           <div className="notice">These terms describe the current prototype and are not a substitute for legal review before commercial use.</div>
         </div>
