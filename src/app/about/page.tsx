@@ -24,7 +24,7 @@ export default function AboutPage() {
           <p>The site uses Next.js, React and TypeScript. I keep the cost and vehicle-tax calculations in separate JavaScript modules, so the arithmetic and input rules can be tested with Node without opening a page. The VIN form sends a request through a Next.js route to NHTSA vPIC. The car comparison list stays in the current browser. Supabase is used only for general saved estimates when it is configured.</p>
 
           <h2>Choices behind the current version</h2>
-          <p>The catalogue does not guess an engine size when a model has several variants. The VIN page shows technical data returned by NHTSA, not accident or auction history. Freight prices, exchange rates and tariff rates are entered or checked by the user; Portavero does not fetch them. These are deliberate limits in the current code, not features waiting to be switched on.</p>
+          <p>The catalogue does not guess an engine size when a model has several variants. The VIN page shows technical data returned by NHTSA, not accident or auction history. Freight prices, exchange rates and tariff rates are entered or checked by the user; Portavero does not fetch them.</p>
 
           <h2>What still needs checking</h2>
           <p>The catalogue is incomplete, and the vehicle-tax estimator covers selected passenger-car cases rather than every classification or exception. Its fee amount is a stored snapshot. Real customs calculations, vehicle documents and carrier quotes still need to be checked before a purchase or shipment.</p>
