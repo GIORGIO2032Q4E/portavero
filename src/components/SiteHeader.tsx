@@ -63,8 +63,8 @@ export default function SiteHeader() {
           })}
         </nav>
 
-        <Link href="/calculator" className="button button-small button-dark header-cta" onClick={closeMenu}>
-          Calculate cost <span aria-hidden="true">↗</span>
+        <Link href="/vehicle-import" className="button button-small button-dark header-cta" onClick={closeMenu}>
+          Estimate a car <span aria-hidden="true">↗</span>
         </Link>
       </div>
     </header>
