@@ -739,9 +739,6 @@ h2, h3 { font-weight: 650; }
 .simple-how-grid li strong, .simple-how-grid li span { display: block; }
 .simple-how-grid li strong { margin-bottom: 3px; }
 .simple-how-grid li span { color: var(--muted); font-size: .92rem; }
-.simple-bottom-cta { padding: 64px 0 72px; }
-.simple-bottom-cta h2 { margin-bottom: 8px; font-size: clamp(1.9rem, 3.5vw, 2.7rem); }
-.simple-bottom-cta p { margin-bottom: 22px; }
 @media (max-width: 800px) {
   .simple-hero { padding: 52px 0; }
   .simple-hero-grid, .simple-how-grid { grid-template-columns: 1fr; gap: 32px; }
