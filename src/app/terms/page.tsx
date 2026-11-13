@@ -32,11 +32,8 @@ export default function TermsPage() {
           <h2>Your responsibility</h2>
           <p>Check your inputs, vehicle documents, exact engine capacity, tariff classification, current fees, registration eligibility, carrier quote and import requirements before making a purchase or shipping decision. For a vehicle-specific tax estimate, consult the official <a href="https://www.rs.ge/CarClearance-en" target="_blank" rel="noreferrer">Revenue Service Auto/Moto Levy Calculator</a> or ask the Revenue Service or a qualified customs broker.</p>
 
-          <h2>Availability and changes</h2>
-          <p>This is a student project, not a commercial customs or shipping service. Pages and data sources may change, and the site may be unavailable at times. There is no dedicated support email or guaranteed uptime.</p>
-
-          <h2>Contact</h2>
-          <p>This student-developed project prototype does not currently have a dedicated support email address.</p>
+          <h2>Availability and contact</h2>
+          <p>This is a student project, not a commercial customs or shipping service. Pages and data sources may change, and the site may be unavailable at times. There is currently no dedicated support email.</p>
 
           <div className="notice">These terms describe the current prototype and are not a substitute for legal review before commercial use.</div>
         </div>
