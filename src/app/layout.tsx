@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     template: "%s | Portavero"
   },
   description:
-    "A student-built car-import planning project for Georgia. Estimate selected vehicle taxes, organise known costs, compare cars and check available VIN technical data.",
+    "A car-import planning tool for Georgia. Estimate selected vehicle taxes, add the costs you know, compare cars and check the technical details available from a VIN.",
   applicationName: "Portavero",
   icons: { icon: "/favicon.svg" },
   keywords: ["car import Georgia", "vehicle import costs", "Georgia vehicle taxes", "VIN technical data", "vehicle comparison"],
   openGraph: {
     title: "Portavero | Plan a car import to Georgia",
-    description: "Estimate selected vehicle taxes, organise known import costs, compare cars and request available VIN technical data.",
+    description: "Estimate selected vehicle taxes, add known import costs, compare cars and check available VIN technical data.",
     type: "website",
     siteName: "Portavero"
   },
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-mark" aria-hidden="true">P</span>
                 <span>Portavero</span>
               </Link>
-              <p>A student-built project for planning car imports to Georgia.</p>
+              <p>A car-import project built in Georgia. Use it to organise costs and compare cars before you buy.</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>
