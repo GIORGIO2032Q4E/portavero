@@ -57,6 +57,8 @@ export default function VehicleImportPage() {
   const [delivery, setDelivery] = useState<number | null>(null);
   const [candidateName, setCandidateName] = useState("");
   const [vin, setVin] = useState("");
+  const [vinVehicleName, setVinVehicleName] = useState("");
+  const [vinElectric, setVinElectric] = useState(false);
   const [historyNotes, setHistoryNotes] = useState("");
   const [savedVehicleCount, setSavedVehicleCount] = useState(0);
   const [candidateMessage, setCandidateMessage] = useState("");
@@ -78,6 +80,33 @@ export default function VehicleImportPage() {
   }
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const incomingVin = params.get("vin") ?? "";
+
+    if (validateVin(incomingVin).valid) {
+      const make = (params.get("make") ?? "").slice(0, 80);
+      const model = (params.get("model") ?? "").slice(0, 80);
+      const matchingMake = vehicleCatalog.find((item) => item.name.toLowerCase() === make.toLowerCase());
+      const matchingModel = matchingMake?.models.find((item) => item.name.toLowerCase() === model.toLowerCase());
+      const modelYear = Number(params.get("year"));
+      const capacity = Number(params.get("engineCc"));
+      const fuel = (params.get("fuel") ?? "").toLowerCase();
+
+      setVin(incomingVin.toUpperCase());
+      setVinVehicleName([make, model].filter(Boolean).join(" ") || "Vehicle from VIN");
+      if (matchingMake) setMakeName(matchingMake.name);
+      if (matchingModel) setModelName(matchingModel.name);
+      if (Number.isInteger(modelYear) && modelYear >= 1960 && modelYear <= new Date().getFullYear()) {
+        setYear(modelYear);
+      }
+      if (Number.isFinite(capacity) && capacity > 0 && capacity <= 100000) {
+        setEngineCc(capacity);
+      }
+      setHybrid(fuel.includes("hybrid"));
+      setVinElectric(fuel.includes("electric") && !fuel.includes("hybrid"));
+      setSteering("");
+    }
+
     try {
       const saved = parseSavedVehicleCandidates(
         window.localStorage.getItem(SAVED_VEHICLES_STORAGE_KEY)
@@ -94,11 +123,13 @@ export default function VehicleImportPage() {
   const selectedMake = vehicleCatalog.find((make) => make.name === makeName);
   const selectedModel = selectedMake?.models.find((model) => model.name === modelName);
   const selectedEngine = selectedModel?.engines.find((engine) => engine.id === engineId);
-  const isElectric = selectedEngine?.fuel === "Electric";
+  const isElectric = selectedEngine?.fuel === "Electric" || vinElectric;
 
   const currentYear = new Date().getFullYear();
   const vehicleAge = declarationYear - year;
   const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
+  const validSteering = steering === "left" || steering === "right";
+  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering;
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || vehicleAge > 30;
   const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
@@ -243,13 +274,12 @@ export default function VehicleImportPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
-          <h1>Work out a rough budget for importing a car.</h1>
-          <p>Choose the car or enter its engine size, then add the costs you know. Portavero estimates selected Georgian vehicle taxes and puts the amounts together. Check the result with the Revenue Service before you make a decision.</p>
+          <h1>{vin ? "Import estimate for this car" : "Estimate the cost of importing a car."}</h1>
+          <p>{vin ? "Available details from the VIN have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Start with a VIN to fill in the car details, or enter them manually. Then add the costs you know to estimate selected Georgian vehicle taxes and import expenses."}</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/vehicles" className="button button-dark">Browse vehicle catalogue</Link>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
-            <Link href="/compare" className="button button-outline">Compare saved vehicles ({savedVehicleCount})</Link>
             <button type="button" className="button button-dark print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
           </div>
         </div>
@@ -262,7 +292,8 @@ export default function VehicleImportPage() {
             <span>All amounts are shown in Georgian lari (GEL).</span>
           </div>
           <div className="print-vehicle-summary">
-            <div><span>Vehicle</span><strong>{[makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
+            <div><span>Vehicle</span><strong>{vinVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
+            {vin && <div><span>VIN</span><strong>{vin}</strong></div>}
             <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (engineCc === null ? "Not entered" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
             <div><span>Purchase country</span><strong>{sourceCountry}</strong></div>
             <div><span>Manufacture year</span><strong>{year}</strong></div>
@@ -274,6 +305,7 @@ export default function VehicleImportPage() {
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
             <p className="panel-intro">This planner covers selected passenger cars under HS 8703. It does not cover every vehicle or tax exception, so check unusual cases with the Revenue Service.</p>
             <div className="notice"><strong>Important:</strong> This planner only covers selected passenger cars under HS 8703. It does not determine the car's tariff classification, cover every exemption or confirm transitional eligibility. It also does not include the separate sports-car excise treatment in Article 188(9). Electric and classic-car calculations are limited to the cases shown here. Check special cases with the Revenue Service.</div>
+            {vin && <div className="notice" role="status"><strong>Details loaded from VIN for {vinVehicleName}.</strong> {engineCc === null && !isElectric ? "NHTSA did not return an engine size. Enter it from the car's documents. " : "Check the returned engine size and model year against the car's documents. "}Choose the steering side below; it is not confirmed by this VIN lookup.</div>}
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="source-country">Country of purchase</label>
@@ -302,6 +334,7 @@ export default function VehicleImportPage() {
                   const id = event.target.value;
                   const engine = selectedModel?.engines.find((item) => item.id === id);
                   setEngineId(id);
+                  setVinElectric(false);
                   setEngineCc(getEngineCapacityForSelection(engine));
                   setHybrid(engine?.fuel === "Hybrid" || engine?.fuel === "Plug-in hybrid");
                   setClassicCar(false);
@@ -340,6 +373,7 @@ export default function VehicleImportPage() {
               <div className="field">
                 <label htmlFor="steering">Steering configuration</label>
                 <select id="steering" value={steering} onChange={(event) => setSteering(event.target.value)}>
+                  <option value="">Choose steering side</option>
                   <option value="left">Left-hand drive</option>
                   <option value="right">Right-hand drive or converted</option>
                 </select>
@@ -349,6 +383,7 @@ export default function VehicleImportPage() {
                 <select id="hybrid" value={isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
                   const next = getManualVehicleTypeSelection(event.target.value);
                   setEngineId(next.engineId);
+                  setVinElectric(false);
                   setEngineCc(null);
                   setHybrid(next.hybrid);
                   setClassicCar(next.classicCar);
@@ -361,6 +396,7 @@ export default function VehicleImportPage() {
                 <small>The 60% reduction is only for left-hand-drive hybrids aged 0–6 years. Choose the classic-car option only if the car meets the legal classification.</small>
               </div>
             </div>
+            {vin && !validSteering && <div className="notice" role="alert">Choose whether the car is left-hand drive or right-hand drive before using the tax estimate. The VIN lookup does not confirm steering side.</div>}
             {preAprilRegime && <div className="notice" role="status"><strong>Using the previous tax rules?</strong> Selecting this option does not mean the car qualifies. The Revenue Service asks for specific registration and transport documents, and the deadlines depend on how the car was moved. Check your documents with them before relying on this estimate.</div>}
             {declarationYear > currentYear && <div className="notice" role="status"><strong>Planning for {declarationYear}?</strong> This uses the tax rules and GEL 480 fee list currently stored in Portavero. Rates, fees and requirements may change before then, so treat the result as a rough guide, not a forecast.</div>}
             {!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Cars over 6 years old:</strong> the base excise rate is GEL 4.50 per cm³ before any applicable adjustments. The previously proposed age-based registration ban was replaced by this higher rate. Other emissions, vehicle-category and registration rules may still apply, so check the exact car before buying or shipping.</div>}
@@ -372,17 +408,17 @@ export default function VehicleImportPage() {
 
           <aside className="panel result-panel" aria-live="polite">
             <span className="result-label">Estimated excise</span>
-            <div className="result-total">{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
-            <p>{eligibleYear && validEngine && validVehicleType ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${(engineCc ?? 0).toLocaleString("en-US")} cm³`) : "Check the car details and any special rules."}</p>
+            <div className="result-total">{canShowTaxEstimate && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
+            <p>{canShowTaxEstimate ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${(engineCc ?? 0).toLocaleString("en-US")} cm³`) : "Check the car details and any special rules."}</p>
             <div className="result-lines">
               <div className="result-line"><span>Excise rule</span><strong>{isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rate × 2,000" : "GEL 3,000 fixed") : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
               <div className="result-line"><span>Transport and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
-              <div className="result-line"><span>Estimated import duty</span><strong>{eligibleYear && validEngine && validVehicleType && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
+              <div className="result-line"><span>Estimated import duty</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
               <div className="result-line"><span>Standard listed clearance and registration fees</span><strong>{money(result.officialFees)}</strong></div>
               <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
               <div className="result-line"><span>Other costs you entered</span><strong>{result.knownCosts === null ? "Check details" : money(result.knownCosts)}</strong></div>
-              <div className="result-line result-line-total"><span>Known costs, estimated taxes and standard fees</span><strong>{eligibleYear && validEngine && validVehicleType && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
+              <div className="result-line result-line-total"><span>Known costs, estimated taxes and standard fees</span><strong>{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
             </div>
             <div className="disclaimer">{result.invalidAmounts && <><strong>One of the amounts needs checking.</strong> Portavero cannot safely calculate the total until you fix the invalid entry. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "Blank costs are not included, so this is not the final price of the car." : "You've entered an amount for every additional cost."} The total includes GEL 480 in listed standard fees. A broker, storage, special handling, vehicle classification or transitional rules may add costs or change the tax amount.</div>
           </aside>
