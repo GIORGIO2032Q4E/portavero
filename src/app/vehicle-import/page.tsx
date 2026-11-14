@@ -175,7 +175,7 @@ export default function VehicleImportPage() {
       return;
     }
 
-    if (!eligibleYear || !validEngine || !validVehicleType || result.invalidAmounts || result.total === null || result.knownCosts === null) {
+    if (!eligibleYear || !validEngine || !validVehicleType || !validSteering || result.invalidAmounts || result.total === null || result.knownCosts === null) {
       setCandidateMessage("Check the car details and cost fields first. Fix any invalid entries before saving it.");
       return;
     }
@@ -324,7 +324,7 @@ export default function VehicleImportPage() {
               </div>
               <div className="field">
                 <label htmlFor="model">Model</label>
-                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setClassicCar(false); }}>
+                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setClassicCar(false); }}>
                   <option value="">Choose a model</option>
                   {selectedMake?.models.map((model) => <option key={model.name} value={model.name}>{model.name}</option>)}
                 </select>
@@ -362,7 +362,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>The planner uses the declaration year to work out the car's age.</small>
               </div>
-              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} max={100000} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); }} hint={selectedEngine?.cc === 0 && !isElectric ? "This model comes with different engine sizes. Enter the capacity shown in the car's documents. Portavero will not guess it." : "If you chose an engine above, its capacity is filled in here. Check it against the car's documents."} />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} max={100000} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); setVinElectric(false); }} hint={selectedEngine?.cc === 0 && !isElectric ? "This model comes with different engine sizes. Enter the capacity shown in the car's documents. Portavero will not guess it." : "If you chose an engine above, its capacity is filled in here. Check it against the car's documents."} />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
