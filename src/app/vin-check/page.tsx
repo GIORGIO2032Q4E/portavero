@@ -32,6 +32,29 @@ function isDecodedField(value: unknown): value is DecodedField {
     typeof (value as DecodedField).value === "string";
 }
 
+function getImportEstimateHref(result: DecodeResult) {
+  const getValue = (label: string) =>
+    result.fields.find((field) => field.label === label)?.value ?? "";
+  const params = new URLSearchParams({ vin: result.vin });
+  const make = getValue("Make");
+  const model = getValue("Model");
+  const year = Number(getValue("Model year"));
+  const displacement = Number(getValue("Engine displacement (L)"));
+  const fuel = getValue("Primary fuel type");
+
+  if (make) params.set("make", make);
+  if (model) params.set("model", model);
+  if (Number.isInteger(year) && year >= 1960 && year <= new Date().getFullYear()) {
+    params.set("year", String(year));
+  }
+  if (Number.isFinite(displacement) && displacement > 0 && displacement <= 100) {
+    params.set("engineCc", String(Math.round(displacement * 1000)));
+  }
+  if (fuel) params.set("fuel", fuel);
+
+  return `/vehicle-import?${params.toString()}`;
+}
+
 export default function VinCheckPage() {
   const [vin, setVin] = useState("");
   const [market, setMarket] = useState<"unknown" | "us">("unknown");
@@ -118,7 +141,7 @@ export default function VinCheckPage() {
           <h1>See what a VIN can tell you.</h1>
           <p>Enter a 17-character VIN and Portavero will ask the U.S. NHTSA vPIC decoder for the technical details it has. The result can be incomplete, depending on the vehicle.</p>
           <div className="hero-actions">
-            <Link href="/vehicle-import" className="button button-dark">Estimate import costs ↗</Link>
+            <Link href="/vehicle-import" className="button button-dark">Enter car details manually ↗</Link>
             <a href="https://vpic.nhtsa.dot.gov/decoder/" target="_blank" rel="noreferrer" className="button button-outline">Open NHTSA's VIN decoder ↗</a>
           </div>
         </div>
@@ -227,7 +250,7 @@ export default function VinCheckPage() {
                   </div>
                   <p className="source-note">{result.note} Source: <a href={result.source.url} target="_blank" rel="noreferrer">{result.source.name}</a>.</p>
                   <p className="source-note">VIN submitted: <code>{result.vin}</code></p>
-                  <Link href="/vehicle-import" className="button button-outline">Continue to import estimate ↗</Link>
+                  <Link href={getImportEstimateHref(result)} className="button button-dark">Estimate import costs for this car ↗</Link>
                 </div>
               )}
             </section>
