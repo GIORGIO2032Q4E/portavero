@@ -80,8 +80,8 @@ export default function CompareVehiclesPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle shortlist</span>
-          <h1>Compare the cars you are considering.</h1>
-          <p>Review the specifications, notes, estimated import costs and visible risks side by side. Missing information stays marked as unknown.</p>
+          <h1>Put the cars on your shortlist side by side.</h1>
+          <p>Compare the details, costs and notes for each car. Anything you have not entered stays marked as unknown, so an incomplete estimate does not look like a final price.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Add a vehicle to compare ↗</Link>
             <Link href="/vehicles" className="button button-outline">Browse vehicle catalogue</Link>
@@ -95,17 +95,17 @@ export default function CompareVehiclesPage() {
 
           {candidates.length === 0 ? (
             <div className="panel catalog-empty">
-              <h2>Your comparison list is empty.</h2>
-              <p>Open the vehicle import planner, enter a car and its known costs, then choose “Save for comparison”. You can keep up to four candidates in this browser.</p>
+              <h2>You haven't saved any cars yet.</h2>
+              <p>Go to the car-import planner, add a car and the costs you know, then select “Save for comparison”. You can keep up to four cars in this browser.</p>
               <Link href="/vehicle-import" className="button button-dark">Start with a vehicle ↗</Link>
             </div>
           ) : (
             <>
               <div className="compare-toolbar">
-                <p>{candidates.length} of 4 vehicles saved in this browser.</p>
+                <p>{candidates.length} of 4 cars saved in this browser.</p>
                 <div className="compare-toolbar-actions">
-                  <button type="button" className="button button-outline button-small" onClick={() => window.print()}>Print / Save as PDF</button>
-                  <button type="button" className="button button-outline button-small" onClick={clearCandidates}>Clear comparison list</button>
+                  <button type="button" className="button button-outline button-small" onClick={() => window.print()}>Print or save as PDF</button>
+                  <button type="button" className="button button-outline button-small" onClick={clearCandidates}>Remove all saved cars</button>
                 </div>
               </div>
 
@@ -191,7 +191,7 @@ export default function CompareVehiclesPage() {
                 </table>
               </div>
 
-              <p className="compare-footnote">The estimate includes the amounts entered, the calculator’s preliminary tax estimates and GEL 480 in listed standard fees. Blank cost categories are excluded, so this is not a guaranteed final landed cost. VIN format and user-entered history notes are not proof of vehicle condition or legal status.</p>
+              <p className="compare-footnote">The estimate adds the amounts entered, the planner's tax estimates and GEL 480 in listed fees. Blank costs are not included, so the total may still be too low. A VIN format check and notes you type yourself do not prove the car's condition or legal status.</p>
             </>
           )}
         </div>
@@ -199,9 +199,9 @@ export default function CompareVehiclesPage() {
 
       <section className="section section-tint">
         <div className="container content-narrow prose">
-          <h2>What “history” means here</h2>
-          <p>Portavero currently does not connect to accident, title, odometer, service or auction-history databases. The comparison shows notes you entered yourself and labels them as unverified. A VIN can be recorded, but this page does not run the NHTSA decoder automatically or turn missing records into a clean-history claim.</p>
-          <p>Saved candidates stay in this browser on this device. They are not synced to your Portavero account or another device.</p>
+          <h2>About the history notes</h2>
+          <p>Portavero does not check accident, title, mileage, service or auction records. It only shows the notes you add, and those notes are not verified. You can save a VIN here, but this page does not decode it or treat missing records as proof of a clean history.</p>
+          <p>Your saved cars stay in this browser on this device. They are not synced to your account or copied to another device.</p>
         </div>
       </section>
     </div>
