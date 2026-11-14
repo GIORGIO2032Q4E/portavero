@@ -37,7 +37,7 @@ export function calculateVehicleTaxes({
   const manqanaSworia = !klasikuria || asaki > 30;
   const asakiTarifistvis = Math.max(0, asaki);
 
-  let tarifi = 0;
+  let tarifi;
 
   if (dzveliRegimi) {
     const tarifikisIndexi = Math.min(asakiTarifistvis, dzveliAccizisTarifebi.length - 1);
