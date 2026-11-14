@@ -1,47 +1,19 @@
 import Link from "next/link";
 
-const tools = [
+const steps = [
   {
     number: "01",
-    title: "Vehicle import estimate",
-    description: "Add the car's year and engine size, then enter the purchase, auction and transport costs you know. The tax estimate covers selected cases only.",
-    href: "/vehicle-import",
-    link: "Estimate car costs"
-  },
-  {
-    number: "02",
-    title: "VIN check",
-    description: "Enter a VIN to see the technical details NHTSA vPIC has for that car. It does not check accident or auction history.",
+    title: "Check the car's VIN",
+    description: "Enter the 17-character VIN. Portavero asks NHTSA for the make, model, year and engine details it can find.",
     href: "/vin-check",
     link: "Check a VIN"
   },
   {
-    number: "03",
-    title: "Compare vehicles",
-    description: "Save up to four cars in this browser and compare their details, costs and the notes you've added.",
-    href: "/compare",
-    link: "Compare cars"
-  },
-  {
-    number: "04",
-    title: "Vehicle catalogue",
-    description: "Look through common makes, models and engine options. Check the exact engine in the car's documents.",
-    href: "/vehicles",
-    link: "Browse the catalogue"
-  },
-  {
-    number: "05",
-    title: "Shipping checklist",
-    description: "Put the shipping quotes you've received side by side and check what's included. No live prices are shown here.",
-    href: "/shipping",
-    link: "Review shipping offers"
-  },
-  {
-    number: "06",
-    title: "General import calculator",
-    description: "For other goods, add the costs and tax rates you've checked. The calculator won't look up rates for you.",
-    href: "/calculator",
-    link: "Calculate other imports"
+    number: "02",
+    title: "Estimate the import cost",
+    description: "Use the details returned for that car, then add its purchase price, auction fees, shipping and other costs you know.",
+    href: "/vehicle-import",
+    link: "Estimate car costs"
   }
 ];
 
@@ -52,13 +24,13 @@ export default function HomePage() {
         <div className="container simple-hero-grid">
           <div className="simple-hero-copy">
             <p className="simple-status">A car-import project built in Georgia</p>
-            <h1>Thinking about importing a car to Georgia? Start with the costs.</h1>
-            <p className="simple-lede">The auction price is only the start. You may also need to pay buyer fees, transport to the port, shipping, customs and delivery. I built Portavero to put the costs you know in one place. Add each amount when you have it. Anything left blank stays out of the total.</p>
+            <h1>Check a car's VIN. Then work out what it may cost to import.</h1>
+            <p className="simple-lede">Start with the VIN to bring in the car's available technical details. Use those details in an import estimate, add the costs from the auction and shipping quotes, and see what the total may look like in Georgia.</p>
             <div className="hero-actions">
-              <Link href="/vehicle-import" className="button button-dark">Estimate a car import</Link>
-              <Link href="/calculator" className="simple-text-link">Importing other goods? <span aria-hidden="true">→</span></Link>
+              <Link href="/vin-check" className="button button-dark">Start with a VIN</Link>
+              <Link href="/vehicle-import" className="simple-text-link">Enter the car details manually <span aria-hidden="true">→</span></Link>
             </div>
-            <p className="simple-note">No live freight prices, exchange rates or automatic tax-rate lookup.</p>
+            <p className="simple-note">VIN data can be incomplete. Tax and fee estimates cover selected cases and must be checked with the Revenue Service.</p>
           </div>
           <aside className="simple-example">
             <div className="simple-example-heading">
@@ -67,9 +39,9 @@ export default function HomePage() {
             </div>
             <div className="simple-example-row"><span>Car price</span><strong>Enter amount</strong></div>
             <div className="simple-example-row"><span>Auction fees</span><strong>Add if known</strong></div>
-            <div className="simple-example-row"><span>Shipping</span><strong>Quote needed</strong></div>
+            <div className="simple-example-row"><span>Shipping</span><strong>Add your quote</strong></div>
             <div className="simple-example-row"><span>Customs charges</span><strong>Check with Revenue Service</strong></div>
-            <p className="simple-example-foot">Just an example of the costs to enter, not a quote.</p>
+            <p className="simple-example-foot">These are the costs used in an estimate, not a quote.</p>
           </aside>
         </div>
       </section>
@@ -77,19 +49,19 @@ export default function HomePage() {
       <section className="simple-tools-section">
         <div className="container">
           <div className="simple-section-heading">
-            <p className="editorial-label">WHAT YOU CAN DO HERE</p>
-            <h2>The car-import planner is the main tool.</h2>
-            <p>Start with the car planner. The other pages help you check available VIN details, look up common engine options, compare cars or work out the cost of importing other goods.</p>
+            <p className="editorial-label">HOW TO USE PORTAVERO</p>
+            <h2>One car, two steps.</h2>
+            <p>The VIN gives the estimate a starting point. You can correct the details and fill in anything the decoder does not return.</p>
           </div>
           <div className="simple-tool-list">
-            {tools.map((tool) => (
-              <article className="simple-tool-row" key={tool.number}>
-                <span className="simple-tool-number">{tool.number}</span>
+            {steps.map((step) => (
+              <article className="simple-tool-row" key={step.number}>
+                <span className="simple-tool-number">{step.number}</span>
                 <div>
-                  <h3>{tool.title}</h3>
-                  <p>{tool.description}</p>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
                 </div>
-                <Link href={tool.href}>{tool.link} <span aria-hidden="true">→</span></Link>
+                <Link href={step.href}>{step.link} <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>
@@ -100,16 +72,15 @@ export default function HomePage() {
         <div className="container simple-how-grid">
           <div>
             <p className="editorial-label">BEFORE YOU RELY ON THE NUMBER</p>
-            <h2>A few things worth checking first.</h2>
+            <h2>Check these details first.</h2>
           </div>
           <ol>
-            <li><strong>Check the car.</strong><span>Check the engine size and year against the car's documents.</span></li>
-            <li><strong>Add the costs you have.</strong><span>Add shipping, port and broker charges when you have real figures. Until then, leave them blank.</span></li>
-            <li><strong>Verify the tax result.</strong><span>The planner covers selected cases, not every vehicle or exception. Check the exact car with the Revenue Service before you buy or ship it.</span></li>
+            <li><strong>Match the car.</strong><span>Compare the VIN result with the car and its documents. NHTSA may not return every field.</span></li>
+            <li><strong>Confirm the tax details.</strong><span>Check the engine size and steering side. The VIN decoder does not reliably confirm every detail used in the tax estimate.</span></li>
+            <li><strong>Add real costs.</strong><span>Use the purchase price and actual auction, shipping, port and delivery quotes. Leave unknown costs blank.</span></li>
           </ol>
         </div>
       </section>
-
     </>
   );
 }
