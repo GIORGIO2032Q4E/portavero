@@ -17,10 +17,12 @@ const server = spawn(
 );
 
 const pages = [
-  "/", "/about", "/how-it-works", "/calculator", "/vehicle-import",
-  "/vehicles", "/vin-check", "/compare", "/shipping", "/account",
+  "/", "/about", "/how-it-works", "/vehicle-import",
+  "/vehicles", "/vin-check", "/shipping", "/account",
   "/privacy-policy", "/terms"
 ];
+
+const redirects = ["/calculator", "/compare"];
 
 function request(path, options = {}) {
   return new Promise((resolve, reject) => {
@@ -81,6 +83,13 @@ try {
     output.log(`PASS ${path}`);
   }
 
+  for (const path of redirects) {
+    const response = await request(path);
+    assert.equal(response.status, 307, `${path} should redirect to the car-import planner`);
+    assert.equal(response.headers.location, "/vehicle-import", `${path} should point to /vehicle-import`);
+    output.log(`PASS ${path} redirects to /vehicle-import`);
+  }
+
   for (const [path, expectedType] of [["/robots.txt", /text\/plain/i], ["/sitemap.xml", /xml/i]]) {
     const response = await request(path);
     assert.equal(response.status, 200, `${path} should return HTTP 200`);
@@ -112,7 +121,7 @@ try {
   assert.equal(typeof invalidVinBody.error, "string", "Invalid VIN response should contain a readable error");
   output.log("PASS VIN API rejects invalid input locally");
 
-  output.log(`Production smoke tests passed for ${pages.length} pages, 2 metadata routes, security headers and VIN input validation.`);
+  output.log(`Production smoke tests passed for ${pages.length} pages, ${redirects.length} redirects, 2 metadata routes, security headers and VIN input validation.`);
 } finally {
   if (server.exitCode === null) {
     server.kill("SIGTERM");
