@@ -115,11 +115,11 @@ export default function VinCheckPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">VIN check · Technical data</span>
-          <h1>Decode a vehicle identification number.</h1>
-          <p>Enter a 17-character VIN to request vehicle details from the U.S. National Highway Traffic Safety Administration&apos;s vPIC decoder.</p>
+          <h1>See what a VIN can tell you.</h1>
+          <p>Enter a 17-character VIN and Portavero will ask the U.S. NHTSA vPIC decoder for the technical details it has. The result can be incomplete, depending on the vehicle.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Estimate import costs ↗</Link>
-            <a href="https://vpic.nhtsa.dot.gov/decoder/" target="_blank" rel="noreferrer" className="button button-outline">Open NHTSA decoder ↗</a>
+            <a href="https://vpic.nhtsa.dot.gov/decoder/" target="_blank" rel="noreferrer" className="button button-outline">Open NHTSA's VIN decoder ↗</a>
           </div>
         </div>
       </section>
@@ -132,10 +132,10 @@ export default function VinCheckPage() {
                 <span className="step-chip">01</span>
                 <div>
                   <span className="eyebrow">Enter the VIN</span>
-                  <h2>Look up technical details</h2>
+                  <h2>Check the VIN</h2>
                 </div>
               </div>
-              <p className="panel-intro">Portavero checks the VIN format, then asks NHTSA vPIC to decode it. Format checks catch typing mistakes; only the source can return manufacturer data.</p>
+              <p className="panel-intro">First, Portavero checks the VIN format for typing mistakes. Then it sends the number to NHTSA vPIC and shows whatever manufacturer data comes back.</p>
               <form onSubmit={decodeVin}>
                 <div className="field">
                   <label htmlFor="vin">Vehicle identification number (VIN)</label>
@@ -158,7 +158,7 @@ export default function VinCheckPage() {
                     aria-describedby="vin-help"
                     required
                   />
-                  <small id="vin-help">17 characters. The letters I, O and Q are not used in standard VINs. Spaces and punctuation are not accepted.</small>
+                  <small id="vin-help">Enter all 17 characters. Standard VINs do not use the letters I, O or Q. Do not add spaces or punctuation.</small>
                 </div>
 
                 <div className="field">
@@ -171,7 +171,7 @@ export default function VinCheckPage() {
                     <option value="unknown">Not sure / another market</option>
                     <option value="us">Built for the U.S. market</option>
                   </select>
-                  <small>The position-nine check digit is tested only when you select U.S. market. Other markets may use different rules.</small>
+                  <small>The ninth character is checked only when you choose U.S. market. VIN rules can differ in other markets.</small>
                 </div>
 
                 {expectedUsCheckDigit !== null && (
@@ -208,8 +208,8 @@ export default function VinCheckPage() {
                 <div className="vin-result" aria-live="polite">
                   <div className="notice" role="status">
                     {result.quality === "complete"
-                      ? <><strong>Vehicle details returned.</strong> Compare the available fields with the car's documents before relying on them.</>
-                      : <><strong>Partial technical data returned.</strong> NHTSA did not provide both make and model. Treat the fields below as incomplete and verify them against the vehicle documents.</>}
+                      ? <><strong>NHTSA returned vehicle details.</strong> Compare the available fields with the car's documents before relying on them.</>
+                      : <><strong>NHTSA returned only part of the information.</strong> It did not provide both the make and model, so check the details below against the car's documents.</>}
                   </div>
                   {result.providerWarnings.length > 0 && (
                     <div className="notice" role="alert">
@@ -234,11 +234,11 @@ export default function VinCheckPage() {
 
             <aside className="panel result-panel">
               <span className="eyebrow">Know what you are seeing</span>
-              <h2>Technical data is not vehicle history.</h2>
+              <h2>A VIN decode is not a vehicle-history report.</h2>
               <div className="result-lines">
                 <div className="result-line">
                   <span>VIN decoding</span>
-                  <strong>Available via NHTSA vPIC</strong>
+                  <strong>Available from NHTSA vPIC</strong>
                 </div>
                 <div className="result-line">
                   <span>Accident, title and ownership records</span>
@@ -263,10 +263,10 @@ export default function VinCheckPage() {
 
       <section className="section section-tint">
         <div className="container content-narrow prose">
-          <h2>What the decoder can and cannot tell you</h2>
-          <p>NHTSA vPIC decodes manufacturer-submitted vehicle specification data. Depending on the VIN, available fields can include make, model, model year, body class, engine information, fuel type, drive type and manufacturing location.</p>
-          <p>It is not an accident, ownership, title, mileage, service or auction-history database. This version of Portavero does not query those records and does not display auction photos. Missing information is simply unavailable, not evidence that the vehicle is accident-free.</p>
-          <p>NHTSA says its data is intended mainly for vehicles manufactured for sale or importation into the United States. A vehicle from another market can decode partially or not at all. Verify the VIN on the vehicle and documents, and confirm specifications with the manufacturer or seller.</p>
+          <h2>What you can get from a VIN</h2>
+          <p>NHTSA vPIC reads vehicle information submitted by manufacturers. Depending on the VIN, it may return the make, model, model year, body type, engine, fuel type, drive type and place of manufacture.</p>
+          <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. No result does not mean the car is accident-free.</p>
+          <p>NHTSA's database is mainly intended for vehicles made for sale or import into the United States. A car from another market may return only a few details, or none at all. Check the VIN on the car and its documents, and confirm the specifications with the seller or manufacturer.</p>
           <p>Source: <a href="https://vpic.nhtsa.dot.gov/api/" target="_blank" rel="noreferrer">NHTSA vPIC API documentation</a> and the <a href="https://vpic.nhtsa.dot.gov/" target="_blank" rel="noreferrer">vPIC website</a>.</p>
         </div>
       </section>

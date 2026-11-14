@@ -41,8 +41,8 @@ export default function VehicleCatalogPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle catalogue</span>
-          <h1>Find your car before estimating its import costs.</h1>
-          <p>Browse the makes, models and common engine variants currently included in Portavero. Exact engines vary by year and market, so confirm the details from the vehicle documents.</p>
+          <h1>Check the common engine options for your car.</h1>
+          <p>This list covers some of the makes, models and engine options included in Portavero. The same model can have different engines depending on its year and market, so check the car's documents before using a number in your estimate.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Estimate import costs ↗</Link>
             <Link href="/compare" className="button button-outline">Compare saved vehicles ({savedVehicleCount})</Link>
@@ -54,7 +54,7 @@ export default function VehicleCatalogPage() {
         <div className="container">
           <div className="catalog-toolbar">
             <label className="field catalog-search">
-              <span>Search make, model, engine or fuel type</span>
+              <span>Search by make, model, engine or fuel</span>
               <input
                 type="search"
                 value={search}
@@ -68,7 +68,7 @@ export default function VehicleCatalogPage() {
           {makes.length === 0 ? (
             <div className="panel catalog-empty">
               <h2>No matching vehicles</h2>
-              <p>Try a different spelling or search by make, model or engine type.</p>
+              <p>Try another spelling, or search for just the make, model or engine.</p>
               <button className="button button-outline" type="button" onClick={() => setSearch("")}>Clear search</button>
             </div>
           ) : (
@@ -108,7 +108,7 @@ export default function VehicleCatalogPage() {
             </div>
           )}
 
-          <p className="catalog-disclaimer">This is a curated starter catalogue, not a complete global vehicle database or VIN decoder. If your exact trim or engine is missing, you can enter the engine capacity manually in the vehicle import estimator.</p>
+          <p className="catalog-disclaimer">This list is not complete, and it does not identify the exact engine fitted to a car. Can't find your trim? You can enter the engine size yourself in the car-import planner.</p>
         </div>
       </section>
     </>

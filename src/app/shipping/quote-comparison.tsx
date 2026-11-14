@@ -28,9 +28,9 @@ export default function QuoteComparison() {
     <section className="section section-tint" id="quote-comparison">
       <div className="container">
         <div className="section-heading">
-          <span className="eyebrow">Manual quote comparison</span>
-          <h2>Compare quotes you already have.</h2>
-          <p>Enter offers received from shipping providers. Portavero does not fetch live prices, contact providers, or verify these offers. Compare only prices in the same currency.</p>
+          <span className="eyebrow">Compare your shipping quotes</span>
+          <h2>Put the quotes you've received side by side.</h2>
+          <p>Add the prices and details from the offers you have received. Portavero does not contact shipping companies or check whether a quote is genuine. Compare prices in the same currency.</p>
         </div>
         <div className="panel">
           <div className="form-grid">
@@ -38,11 +38,11 @@ export default function QuoteComparison() {
               <section key={index} className="quote-entry">
                 <h3>Quote {index + 1}</h3>
                 <div className="field">
-                  <label htmlFor={`quote-provider-${index}`}>Provider name</label>
+                  <label htmlFor={`quote-provider-${index}`}>e.g. Company or agent</label>
                   <input id={`quote-provider-${index}`} value={quote.provider} maxLength={80} onChange={(event) => updateQuote(index, { provider: event.target.value })} placeholder="Company or agent" />
                 </div>
                 <div className="field">
-                  <label htmlFor={`quote-price-${index}`}>Quoted price</label>
+                  <label htmlFor={`quote-price-${index}`}>Price in the quote</label>
                   <input id={`quote-price-${index}`} type="number" min="0" step="0.01" value={quote.price} onChange={(event) => updateQuote(index, { price: event.target.value })} placeholder="Enter amount" />
                 </div>
                 <div className="field">
@@ -52,7 +52,7 @@ export default function QuoteComparison() {
                   </select>
                 </div>
                 <div className="field">
-                  <label htmlFor={`quote-days-${index}`}>Estimated transit days (optional)</label>
+                  <label htmlFor={`quote-days-${index}`}>Estimated travel time in days (optional)</label>
                   <input
                     id={`quote-days-${index}`}
                     type="number"
@@ -79,11 +79,11 @@ export default function QuoteComparison() {
           </div>
           <div className="quote-comparison-results">
             <h3>Comparison</h3>
-            {validQuotes.length === 0 ? <p>Enter a provider name and a price to compare a quote.</p> : (
+            {validQuotes.length === 0 ? <p>Add a company name and price to see the quote here.</p> : (
               <div className="result-lines">
                 {validQuotes.map((quote) => (
                   <div className="result-line" key={quote.index}>
-                    <span><strong>{quote.provider.trim()}</strong><br /><small>{quote.days.trim() && hasValidTransitDays(quote.days) ? `About ${Number(quote.days)} transit days` : "Transit time not entered"} · {quote.insurance ? "Insurance marked as included" : "Insurance not marked as included"}</small></span>
+                    <span><strong>{quote.provider.trim()}</strong><br /><small>{quote.days.trim() && hasValidTransitDays(quote.days) ? `About ${Number(quote.days)} transit days` : "Travel time not entered"} · {quote.insurance ? "Insurance listed as included" : "Insurance not listed as included"}</small></span>
                     <strong>{new Intl.NumberFormat("en-US", { style: "currency", currency: quote.currency, maximumFractionDigits: 2 }).format(quote.amount)}</strong>
                   </div>
                 ))}
@@ -91,9 +91,9 @@ export default function QuoteComparison() {
             )}
             {(["USD", "EUR", "GEL"] as const).map((currency) => {
               const best = bestByCurrency(currency);
-              return best ? <p key={currency} className="quote-best-price">Lowest entered {currency} quote: <strong>{best.provider}</strong> ({new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(best.amount)}).</p> : null;
+              return best ? <p key={currency} className="quote-best-price">Lowest {currency} price you entered: <strong>{best.provider}</strong> ({new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(best.amount)}).</p> : null;
             })}
-            <p className="disclaimer quote-disclaimer">The lowest price is not always the best offer. Check what is included, quote expiry, cargo limits, insurance terms, destination charges and delivery before choosing a provider. This comparison stays in the current page and is not saved.</p>
+            <p className="disclaimer quote-disclaimer">The cheapest quote is not always the best deal. Check what it covers, when it expires, cargo limits, insurance, destination charges and final delivery. These entries stay on this page and are cleared when you leave.</p>
           </div>
         </div>
       </div>

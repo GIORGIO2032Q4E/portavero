@@ -14,11 +14,11 @@ type SavedEstimate = { id: number; name: string; savedAt: string; currency: Curr
 
 const costFields: { key: CostKey; label: string; hint: string }[] = [
   { key: "purchase", label: "Purchase price", hint: "Price paid to the seller." },
-  { key: "supplier", label: "Supplier or auction fees", hint: "Enter the fee shown by the seller or auction." },
+  { key: "supplier", label: "Supplier or auction fees", hint: "Use the fee shown by the seller or auction house." },
   { key: "inland", label: "Origin inland transport", hint: "Transport to the export port or warehouse." },
-  { key: "freight", label: "International freight", hint: "Use a carrier quote where possible." },
+  { key: "freight", label: "International freight", hint: "Use the price from your carrier's quote." },
   { key: "insurance", label: "Cargo insurance", hint: "Leave blank until confirmed if you do not know it." },
-  { key: "customs", label: "Excise and other taxes (excluding duty/VAT)", hint: "Enter verified excise or other taxes here. Do not include the import duty or VAT calculated below." },
+  { key: "customs", label: "Excise and other taxes (excluding duty/VAT)", hint: "Add any confirmed excise or other taxes here. Do not include the import duty or VAT/GST calculated below." },
   { key: "port", label: "Port and clearance charges", hint: "Destination handling, broker and documentation fees." },
   { key: "delivery", label: "Final delivery", hint: "Transport from the port to the final destination." },
   { key: "other", label: "Storage and other costs", hint: "Any additional known expense." }
@@ -112,14 +112,14 @@ export default function CalculatorPage() {
 
       const parsed: unknown = JSON.parse(stored);
       if (!Array.isArray(parsed)) {
-        setSaveMessage("Saved estimates could not be read in this browser.");
+        setSaveMessage("I couldn't read the saved estimates in this browser.");
         return;
       }
 
       const validEstimates = parsed.filter(isSavedEstimate);
       setSavedEstimates(validEstimates.slice(0, 10));
       if (validEstimates.length !== parsed.length) {
-        setSaveMessage("Some saved estimates were skipped because their data was incomplete.");
+        setSaveMessage("Some saved estimates could not be loaded because information was missing.");
       }
     } catch {
       setSaveMessage("Saved estimates could not be read in this browser.");
@@ -133,7 +133,7 @@ export default function CalculatorPage() {
       setSaveMessage("");
       return true;
     } catch {
-      setSaveMessage("Could not save in this browser. Check available storage.");
+      setSaveMessage("Couldn't save this estimate. Check whether browser storage is available.");
       return false;
     }
   }
@@ -141,7 +141,7 @@ export default function CalculatorPage() {
   async function saveEstimate() {
     const name = estimateName.trim();
     if (!name) {
-      setSaveMessage("Enter a name for this estimate first.");
+      setSaveMessage("Give this estimate a name first.");
       return;
     }
     const isUpdating = editingEstimateId !== null;
@@ -166,7 +166,7 @@ export default function CalculatorPage() {
           ? "Estimate saved to your account and this browser."
           : "Estimate saved to your account. Browser storage was unavailable.");
       } else if (!savedLocally) {
-        setSaveMessage("Could not save in this browser. Sign in to save the estimate to your account.");
+        setSaveMessage("Couldn't save a browser copy. Sign in to save the estimate to your account.");
       }
     } catch {
       setSaveMessage(savedLocally
@@ -199,14 +199,14 @@ export default function CalculatorPage() {
     if (editingEstimateId === id) {
       setEditingEstimateId(null);
       setEstimateName("");
-      setSaveMessage("The selected estimate was deleted.");
+      setSaveMessage("Estimate deleted.");
     }
   }
 
   function cancelEstimateEdit() {
     setEditingEstimateId(null);
     setEstimateName("");
-    setSaveMessage("Editing cancelled. Changes have not been saved.");
+    setSaveMessage("Edit cancelled. Your changes were not saved.");
   }
 
   const result = useMemo(
@@ -234,7 +234,7 @@ export default function CalculatorPage() {
     setVatRate(null);
     setEditingEstimateId(null);
     setEstimateName("");
-    setSaveMessage("Calculator reset. Saved estimates were not changed.");
+    setSaveMessage("The calculator has been reset. Your saved estimates are still there.");
   }
 
   function changeCurrency(nextCurrency: Currency) {
@@ -248,15 +248,15 @@ export default function CalculatorPage() {
       <section className="page-hero calculator-hero">
         <div className="container">
           <span className="eyebrow">Import cost calculator</span>
-          <h1>Estimate your import costs.</h1>
-          <p>Enter the amounts you know to get a subtotal. Leave anything unknown blank and add it later when you have a quote.</p>
+          <h1>Add up the costs of an import.</h1>
+          <p>Add the costs you know to see a running total. Leave unknown amounts blank and fill them in when you get a quote.</p>
         </div>
       </section>
       <section className="section calculator-page">
         <div className="container tool-layout">
           <section className="panel">
             <h2>Shipment details</h2>
-            <p className="panel-intro">Use the same currency for every amount. Currency conversion and live shipping prices are not connected.</p>
+            <p className="panel-intro">Use one currency for every amount. Portavero does not convert currencies or fetch live shipping prices.</p>
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="category">What are you importing?</label>
@@ -278,7 +278,7 @@ export default function CalculatorPage() {
                   <option value="GEL">GEL · Georgian lari</option>
                   <option value="JPY">JPY · Japanese yen</option>
                 </select>
-                <small>Changing currency clears amounts so they are not accidentally relabelled.</small>
+                <small>Changing the currency clears the amounts already entered, so they are not mistaken for a different currency.</small>
               </div>
               <div className="field">
                 <label htmlFor="origin">Origin country or location</label>
@@ -287,17 +287,17 @@ export default function CalculatorPage() {
               <div className="field">
                 <label htmlFor="country-of-origin">Country of origin (where goods were made)</label>
                 <input id="country-of-origin" value={countryOfOrigin} onChange={(event) => setCountryOfOrigin(event.target.value)} maxLength={100} />
-                <small>Origin can differ from the country you buy or ship the goods from and may affect preferential duty.</small>
+                <small>The country where the goods were made can be different from the country you bought or shipped them from. It may affect the duty rate.</small>
               </div>
               <div className="field">
                 <label htmlFor="hs-code">HS / tariff code</label>
                 <input id="hs-code" value={hsCode} onChange={(event) => setHsCode(event.target.value)} maxLength={20} placeholder="e.g. 8703.23" />
-                <small>Use the destination customs authority’s exact code before selecting a rate.</small>
+                <small>Check the exact code with the destination customs authority before entering a tax rate.</small>
               </div>
               <div className="field">
                 <label htmlFor="import-date">Expected import / declaration date</label>
                 <input id="import-date" type="date" value={importDate} onChange={(event) => setImportDate(event.target.value)} />
-                <small>Rates and exemptions can change over time. This date is recorded for your reference; it does not fetch historical rates.</small>
+                <small>This date is saved with the estimate. It does not look up old rates, and tax rules can change.</small>
               </div>
               <div className="field">
                 <label htmlFor="destination">Destination country</label>
@@ -321,16 +321,16 @@ export default function CalculatorPage() {
                   <option>Not decided</option>
                 </select>
               </div>
-              <NumberField inputMode="numeric" id="quantity" label="Number of items" value={quantity} step={1} min={1} onChange={(value) => setQuantity(value ?? 1)} hint="Use a whole number of items. This also calculates the average cost per item." />
+              <NumberField inputMode="numeric" id="quantity" label="Number of items" value={quantity} step={1} min={1} onChange={(value) => setQuantity(value ?? 1)} hint="Enter a whole number. Portavero will also show the average cost per item." />
             </div>
-            <h2 className="calculator-subheading">Verified tax rates</h2>
-            <p className="panel-intro">Enter rates confirmed for the destination country and product classification. Rates are not fetched automatically. The estimates use the costs entered above, so missing purchase, freight, insurance or excise/other-tax amounts can make the result too low.</p>
+            <h2 className="calculator-subheading">Tax rates you've checked</h2>
+            <p className="panel-intro">First, check the rates for the product code, country of origin and destination. Then enter them here. Portavero does not look up or verify tax rates. Missing purchase, freight, insurance or other-tax costs can also make the estimate too low.</p>
             <div className="form-grid">
-              <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} min={0} max={100} onChange={setDutyRate} hint="Enter a percentage from 0 to 100 for the exact HS / tariff code and origin rules." />
-              <NumberField inputMode="decimal" id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} min={0} max={100} onChange={setVatRate} hint="Enter a percentage from 0 to 100. Use 0 only if the import is confirmed exempt or zero-rated." />
+              <NumberField inputMode="decimal" id="duty-rate" label="Import duty rate (%)" value={dutyRate} min={0} max={100} onChange={setDutyRate} hint="Enter the rate for this exact product code and country of origin. Use a value from 0 to 100." />
+              <NumberField inputMode="decimal" id="vat-rate" label="Import VAT / GST rate (%)" value={vatRate} min={0} max={100} onChange={setVatRate} hint="Enter a value from 0 to 100. Use 0 only when you've confirmed that the import is exempt or zero-rated." />
             </div>
             <div className="notice">
-              <strong>Check the official tariff before entering rates.</strong>{" "}
+              <strong>Check the official tariff before you enter a rate.</strong>{" "}
               {destination.trim().toLowerCase() === "georgia" ? (
                 <a href="https://www.rs.ge/CommodityCodes-en" target="_blank" rel="noreferrer">Georgia Revenue Service tariff and commodity codes ↗</a>
               ) : /^(eu|european union|germany|france|italy|spain|netherlands|poland|ireland|belgium|austria|portugal|greece|finland|sweden|denmark|czechia|czech republic|romania|bulgaria|croatia|slovakia|slovenia|hungary|lithuania|latvia|estonia|luxembourg|cyprus|malta)$/i.test(destination.trim()) ? (
@@ -343,8 +343,8 @@ export default function CalculatorPage() {
                 <a href="https://www.wcoomd.org/en/topics/nomenclature/resources/national-and-international-customs-tariff/national-tariff" target="_blank" rel="noreferrer">WCO directory of national customs tariffs ↗</a>
               )}. Check rates for destination: {destination.trim() || "not specified"}; tariff code: {hsCode.trim() || "not entered"}; origin: {countryOfOrigin.trim() || "not specified"}; import date: {importDate || "not entered"}. This tool does not fetch tariff rates automatically. EU TARIC does not include national VAT rates, and special taxes or exemptions may require separate checks.
             </div>
-            <h2 className="calculator-subheading">Known costs</h2>
-            <p className="panel-intro">Leave a field blank if you do not know the amount yet. Enter 0 only when you have confirmed that the cost is zero or does not apply.</p>
+            <h2 className="calculator-subheading">Costs you know</h2>
+            <p className="panel-intro">Don't know an amount yet? Leave it blank. Enter 0 only when you've checked that the cost really is zero or does not apply.</p>
             <div className="form-grid">
               {costFields.map((field) => (
                 <NumberField inputMode="decimal"
@@ -359,12 +359,12 @@ export default function CalculatorPage() {
               ))}
             </div>
             <div className="calculator-actions print-hide">
-              <button type="button" className="button button-outline" onClick={resetCalculator}>Reset calculator</button>
-              <button type="button" className="button button-dark" onClick={() => window.print()}>Print / Save as PDF</button>
+              <button type="button" className="button button-outline" onClick={resetCalculator}>Reset</button>
+              <button type="button" className="button button-dark" onClick={() => window.print()}>Print or save as PDF</button>
             </div>
             <section className="saved-estimates print-hide">
               <h2>Save this estimate</h2>
-              <p className="panel-intro">Saved estimates stay in this browser on this device when you are signed out. <Link href="/account" className="text-link">Sign in or create an account</Link> to save new estimates to your account. Loading a cloud estimate makes a browser copy; later edits to that copy do not update the cloud record.</p>
+              <p className="panel-intro">When you're signed out, saved estimates stay in this browser on this device. <Link href="/account" className="text-link">Sign in or create an account</Link> to save new estimates to your account. Loading an account estimate makes a copy in this browser. Changes to that copy do not update the saved account version.</p>
               <div className="estimate-save-controls">
                 <input className="estimate-name-input" aria-label="Estimate name" placeholder="e.g. Car parts from Italy" value={estimateName} onChange={(event) => setEstimateName(event.target.value)} maxLength={60} />
                 <button type="button" className="button button-dark" onClick={saveEstimate}>{editingEstimateId === null ? "Save estimate" : "Save changes"}</button>
@@ -385,9 +385,9 @@ export default function CalculatorPage() {
           </section>
 
           <aside className="panel result-panel" aria-live="polite">
-            <span className="result-label">{dutyRate !== null && vatRate !== null ? "Estimated total using entered rates" : dutyRate !== null ? "Subtotal including entered duty estimate" : "Known-cost subtotal"}</span>
+            <span className="result-label">{dutyRate !== null && vatRate !== null ? "Estimated total with the rates you entered" : dutyRate !== null ? "Subtotal with your duty estimate" : "Subtotal of costs entered"}</span>
             <div className="result-total">{result.estimatedTotal === null ? "Check amounts" : money(result.estimatedTotal, currency)}</div>
-            <p>{result.totalUnavailable ? "One or more amounts or combined totals cannot be calculated safely. Correct invalid fields or reduce unusually large values to see the total." : dutyRate !== null && vatRate !== null ? "Includes estimated duty and VAT/GST using the rates you entered. Confirm the tax base and any country-specific rules before relying on it." : dutyRate !== null ? "Includes the duty estimate from your entered rate, but excludes VAT/GST until both rates are available. Confirm the tax base and country-specific rules." : vatRate !== null ? "VAT/GST cannot be estimated yet because the duty rate needed for its tax base is missing. The displayed amount is only your entered costs." : "Enter verified duty and VAT/GST rates below to add a preliminary tax estimate. Until then, this is only the sum of entered costs."}</p>
+            <p>{result.totalUnavailable ? "Something in the amounts is outside the calculator's safe range. Check the fields and reduce any unusually large values." : dutyRate !== null && vatRate !== null ? "This includes duty and VAT/GST calculated with the rates you entered. Check the tax base and local rules before using the figure." : dutyRate !== null ? "This includes your duty estimate, but not VAT/GST. Add both rates before using a combined tax estimate, and check the local tax rules." : vatRate !== null ? "VAT/GST needs the duty rate to calculate its tax base. Until you enter that rate, this is only the total of the costs you've entered." : "Add the duty and VAT/GST rates you've checked below to include a tax estimate. Until then, this is just the total of the costs you've entered."}</p>
             <div className="result-lines">
               {costFields.map(({ key, label }) => (
                 <div className="result-line" key={key}>
@@ -395,23 +395,23 @@ export default function CalculatorPage() {
                   <strong>{costs[key] === null ? "Not entered" : money(costs[key] ?? 0, currency)}</strong>
                 </div>
               ))}
-              <div className="result-line"><span>Customs-value costs entered</span><strong>{result.customsValue === null ? "Check amounts" : money(result.customsValue, currency)}</strong></div>
-              <div className="result-line"><span>Import duty {dutyRate === null ? "(rate missing)" : `(${dutyRate}%)`}</span><strong>{result.importDuty === null ? (dutyRate === null ? "Enter verified rate" : "Check amounts") : money(result.importDuty, currency)}</strong></div>
-              <div className="result-line"><span>Import VAT / GST {vatRate === null ? "(rate missing)" : `(${vatRate}%)`}</span><strong>{result.importVat === null ? (dutyRate === null || vatRate === null ? "Enter both duty and VAT/GST rates" : "Check amounts") : money(result.importVat, currency)}</strong></div>
+              <div className="result-line"><span>Costs used for customs value</span><strong>{result.customsValue === null ? "Check amounts" : money(result.customsValue, currency)}</strong></div>
+              <div className="result-line"><span>Import duty {dutyRate === null ? "(rate missing)" : `(${dutyRate}%)`}</span><strong>{result.importDuty === null ? (dutyRate === null ? "Add a checked rate" : "Check amounts") : money(result.importDuty, currency)}</strong></div>
+              <div className="result-line"><span>Import VAT / GST {vatRate === null ? "(rate missing)" : `(${vatRate}%)`}</span><strong>{result.importVat === null ? (dutyRate === null || vatRate === null ? "Add both tax rates" : "Check amounts") : money(result.importVat, currency)}</strong></div>
               <div className="result-line result-line-total">
-                <span>Average per item</span>
+                <span>Average cost per item</span>
                 <strong>{result.perItem === null ? "Check amounts" : money(result.perItem, currency)}</strong>
               </div>
             </div>
             <div className="disclaimer">
-              <strong>{result.unknownCosts.length} of {costFields.length} cost categories still unknown.</strong>
+              <strong>{result.unknownCosts.length} of {costFields.length} cost categories still need an amount.</strong>
               {result.unknownCosts.length > 0
-                ? ` Add or verify: ${result.unknownCosts.map((key) => costFields.find((field) => field.key === key)?.label.toLowerCase() ?? key).join(", ")}.`
-                : " All listed cost categories have an entered amount."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value inputs are blank, so the tax base may be understated.` : ""} {dutyRate !== null && vatRate !== null && costs.customs === null ? " The VAT/GST estimate treats the blank excise/other-tax field as 0, so it may be too low until you confirm the amount or enter a verified zero." : ""} {dutyRate === null || vatRate === null ? "Duty and VAT/GST are not fully calculated until both verified rates are entered." : "These are indicative calculations. Local law may use a different tax base, exemptions, thresholds, minimum charges or special duties."}
-            {result.totalUnavailable && <p className="calculator-footer-note">One or more amounts, tax inputs or combined totals are outside the calculator’s safe range. Check the fields and use confirmed values before relying on the estimate.</p>}
+                ? ` Still to add or check: ${result.unknownCosts.map((key) => costFields.find((field) => field.key === key)?.label.toLowerCase() ?? key).join(", ")}.`
+                : " You have entered an amount for every cost category."} {result.missingCustomsValue > 0 ? `${result.missingCustomsValue} customs-value amounts are blank, so the tax estimate may be too low.` : ""} {dutyRate !== null && vatRate !== null && costs.customs === null ? " The VAT/GST estimate treats the blank excise/other-tax field as 0. It may be too low until you add the amount or confirm that it is zero." : ""} {dutyRate === null || vatRate === null ? "The full duty and VAT/GST estimate needs both rates." : "This is only an estimate. The destination country may use a different tax base, exemptions, thresholds, minimum charges or extra duties."}
+            {result.totalUnavailable && <p className="calculator-footer-note">One or more amounts or rates are too large or invalid to calculate safely. Check the entries before relying on the estimate.</p>}
             </div>
             <p className="calculator-footer-note">
-              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. Goods origin: {countryOfOrigin.trim() || "not specified"} · HS code: {hsCode.trim() || "not entered"} · import date: {importDate || "not entered"}. No live freight rates, currency conversion or automatic tariff lookup is connected. This calculator applies the rates you enter and does not replace the destination country’s official customs calculation.
+              Route: {origin.trim() || "Origin not specified"} → {destination.trim() || "Destination not specified"} · {destinationPort} · {shippingMethod}. Goods origin: {countryOfOrigin.trim() || "not specified"} · HS code: {hsCode.trim() || "not entered"} · import date: {importDate || "not entered"}. This calculator does not fetch shipping prices, convert currencies or look up tariffs. It uses the rates you enter, so check the final tax calculation with the destination country's customs authority.
             </p>
           </aside>
         </div>
