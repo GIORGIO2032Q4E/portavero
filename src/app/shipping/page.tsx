@@ -14,7 +14,7 @@ export default function ShippingPage() {
         <div className="container">
           <span className="eyebrow">Shipping guide</span>
           <h1>What to check before you book shipping.</h1>
-          <p>The price depends on the route, cargo size and weight, timing and provider. This page helps you check a quote; it does not show live shipping prices.</p>
+          <p>The price of shipping a car depends on the route, vehicle size, timing and provider. This page helps you check a quote; it does not show live shipping prices.</p>
         </div>
       </section>
       <section className="section">
@@ -26,9 +26,9 @@ export default function ShippingPage() {
           </div>
           <div className="card-grid">
             {[
-              ["Pickup, route and delivery", "Check where the car or cargo will be collected, which ports it will pass through and where the journey ends."],
+              ["Pickup, route and delivery", "Check where the car will be collected, which ports it will pass through and where it will be delivered."],
               ["Extra charges", "Ask about fuel surcharges, port handling, paperwork, insurance and fees due at the destination."],
-              ["Timing and cargo limits", "Ask how long the trip may take, when the price expires, and whether there are size or cargo restrictions."]
+              ["Timing and cargo limits", "Ask how long the trip may take, when the price expires, and whether the vehicle meets the carrier's requirements."]
             ].map(([title, description], index) => (
               <article className="feature-card" key={title}>
                 <span className="feature-icon">0{index + 1}</span>
