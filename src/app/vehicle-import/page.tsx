@@ -96,7 +96,7 @@ export default function VehicleImportPage() {
       setVinVehicleName([make, model].filter(Boolean).join(" ") || "Vehicle from VIN");
       if (matchingMake) setMakeName(matchingMake.name);
       if (matchingModel) setModelName(matchingModel.name);
-      if (Number.isInteger(modelYear) && modelYear >= 1960 && modelYear <= new Date().getFullYear()) {
+      if (Number.isInteger(modelYear) && modelYear >= 1960 && modelYear <= new Date().getFullYear() + 2) {
         setYear(modelYear);
       }
       if (Number.isFinite(capacity) && capacity > 0 && capacity <= 100000) {
@@ -128,10 +128,10 @@ export default function VehicleImportPage() {
   const currentYear = new Date().getFullYear();
   const vehicleAge = declarationYear - year;
   const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
-  const validSteering = steering === "left" || steering === "right";
-  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering;
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || vehicleAge > 30;
+  const validSteering = steering === "left" || steering === "right";
+  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering;
   const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
 
   const result = useMemo(() => {
@@ -298,7 +298,7 @@ export default function VehicleImportPage() {
             <div><span>Purchase country</span><strong>{sourceCountry}</strong></div>
             <div><span>Manufacture year</span><strong>{year}</strong></div>
             <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge} year(s)</strong></div>
-            <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : "Left-hand drive"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
+            <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : steering === "left" ? "Left-hand drive" : "Steering not confirmed"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
           </div>
           <div className="tool-layout">
           <section className="panel vehicle-panel">
@@ -316,7 +316,7 @@ export default function VehicleImportPage() {
               </div>
               <div className="field">
                 <label htmlFor="make">Make</label>
-                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setClassicCar(false); }}>
+                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setClassicCar(false); }}>
                   <option value="">Choose a make</option>
                   {vehicleCatalog.map((make) => <option key={make.name} value={make.name}>{make.name}</option>)}
                 </select>
@@ -347,7 +347,7 @@ export default function VehicleImportPage() {
               <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
                 <select id="manufacture-year" value={year} onChange={(event) => { setYear(Number(event.target.value)); setClassicCar(false); }}>
-                  {Array.from({ length: currentYear - 1960 + 1 }, (_, index) => currentYear - index).map((value) => (
+                  {Array.from({ length: currentYear - 1960 + 3 }, (_, index) => currentYear + 2 - index).map((value) => (
                     <option key={value} value={value}>{value}</option>
                   ))}
                 </select>
