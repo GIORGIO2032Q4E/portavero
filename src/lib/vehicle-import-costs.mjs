@@ -10,20 +10,21 @@ export const VEHICLE_IMPORT_COST_KEYS = [
 
 export const STANDARD_VEHICLE_FEES_GEL = 480;
 
-const maxSafeMoney = Number.MAX_SAFE_INTEGER / 100;
+const maqsimumi = Number.MAX_SAFE_INTEGER / 100;
 
-function isSafeMoney(value) {
-  return typeof value === "number" &&
-    Number.isFinite(value) &&
-    value >= 0 &&
-    value <= maxSafeMoney;
+function fasiSworia(ricxvi) {
+  return typeof ricxvi === "number" &&
+    Number.isFinite(ricxvi) &&
+    ricxvi >= 0 &&
+    ricxvi <= maqsimumi;
 }
 
-function isSafeExpense(value) {
-  if (!isSafeMoney(value)) return false;
-  const scaled = value * 100;
-  return Number.isFinite(scaled) &&
-    Math.abs(scaled - Math.round(scaled)) <= 1e-7;
+function tetriSworia(fasi) {
+  if (!fasiSworia(fasi)) return false;
+
+  const tetrebi = fasi * 100;
+  return Number.isFinite(tetrebi) &&
+    Math.abs(tetrebi - Math.round(tetrebi)) <= 1e-7;
 }
 
 /**
@@ -34,32 +35,44 @@ function isSafeExpense(value) {
  * @param {boolean} hasInvalidInput
  */
 export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = STANDARD_VEHICLE_FEES_GEL, hasInvalidInput = false) {
-  const invalidCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => {
-    const value = costs[key];
-    return value !== null && !isSafeExpense(value);
-  });
-  const unknownCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => costs[key] === null);
-  const knownCostsRaw = VEHICLE_IMPORT_COST_KEYS.reduce((jami, key) => {
+  const arasworiFasebi = [];
+  const ucnobiFasebi = [];
+  let jami = 0;
+
+  for (const key of VEHICLE_IMPORT_COST_KEYS) {
     const fasi = costs[key];
-    return jami + (isSafeExpense(fasi) ? fasi : 0);
-  }, 0);
-  const knownCosts = isSafeMoney(knownCostsRaw) ? knownCostsRaw : null;
-  const invalidTaxAmounts = !isSafeMoney(excise) ||
-    !isSafeMoney(importDuty) ||
-    !isSafeMoney(officialFees);
-  const total = (knownCosts ?? 0) + excise + importDuty + officialFees;
-  const invalidAmounts = invalidCosts.length > 0 ||
+
+    if (fasi === null) {
+      ucnobiFasebi.push(key);
+      continue;
+    }
+
+    if (!tetriSworia(fasi)) {
+      arasworiFasebi.push(key);
+      continue;
+    }
+
+    jami += fasi;
+  }
+
+  const jamiSworia = fasiSworia(jami);
+  const knownCosts = jamiSworia ? jami : null;
+  const invalidTaxAmounts = !fasiSworia(excise) ||
+    !fasiSworia(importDuty) ||
+    !fasiSworia(officialFees);
+  const sulJami = (knownCosts ?? 0) + excise + importDuty + officialFees;
+  const invalidAmounts = arasworiFasebi.length > 0 ||
     invalidTaxAmounts ||
     knownCosts === null ||
-    !isSafeMoney(total) ||
+    !fasiSworia(sulJami) ||
     hasInvalidInput;
 
   return {
     knownCosts,
-    unknownCosts,
-    invalidCosts,
+    unknownCosts: ucnobiFasebi,
+    invalidCosts: arasworiFasebi,
     invalidTaxAmounts,
     invalidAmounts,
-    total: invalidAmounts ? null : total
+    total: invalidAmounts ? null : sulJami
   };
 }
