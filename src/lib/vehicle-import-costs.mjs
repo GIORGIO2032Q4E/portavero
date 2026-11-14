@@ -8,68 +8,71 @@ export const VEHICLE_IMPORT_COST_KEYS = [
   "delivery"
 ];
 
-/**
- * Snapshot of the seven standard vehicle-clearance and registration fees
- * listed by the Georgian Revenue Service, reviewed on 8 November 2026.
- * This is not a live lookup; verify the current fee schedule before use.
- *
- * Source: https://www.rs.ge/CarClearance-en
- */
 export const STANDARD_VEHICLE_FEES_GEL = 480;
 
-const maxSafeMoney = Number.MAX_SAFE_INTEGER / 100;
+const maqsimumi = Number.MAX_SAFE_INTEGER / 100;
 
-function isSafeMoney(value) {
-  return typeof value === "number" &&
-    Number.isFinite(value) &&
-    value >= 0 &&
-    value <= maxSafeMoney;
+function fasiSworia(ricxvi) {
+  return typeof ricxvi === "number" &&
+    Number.isFinite(ricxvi) &&
+    ricxvi >= 0 &&
+    ricxvi <= maqsimumi;
 }
 
-function isSafeExpense(value) {
-  if (!isSafeMoney(value)) return false;
-  const scaled = value * 100;
-  return Number.isFinite(scaled) &&
-    Math.abs(scaled - Math.round(scaled)) <= 1e-7;
+function tetriSworia(fasi) {
+  if (!fasiSworia(fasi)) return false;
+
+  const tetrebi = fasi * 100;
+  return Number.isFinite(tetrebi) &&
+    Math.abs(tetrebi - Math.round(tetrebi)) <= 1e-7;
 }
 
 /**
- * Sum only entered vehicle-import expenses. Tax calculations are supplied by
- * the existing vehicle-tax module and are deliberately not changed here.
- *
  * @param {{purchase: number|null, auction: number|null, inland: number|null, shipping: number|null, insurance: number|null, port: number|null, delivery: number|null}} costs
  * @param {number} excise
  * @param {number} importDuty
  * @param {number} officialFees
- * @param {boolean} hasInvalidInput True when a field rejected an entry before it reached this function.
+ * @param {boolean} hasInvalidInput
  */
 export function summarizeVehicleImportCosts(costs, excise, importDuty, officialFees = STANDARD_VEHICLE_FEES_GEL, hasInvalidInput = false) {
-  const invalidCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => {
-    const value = costs[key];
-    return value !== null && !isSafeExpense(value);
-  });
-  const unknownCosts = VEHICLE_IMPORT_COST_KEYS.filter((key) => costs[key] === null);
-  const knownCostsRaw = VEHICLE_IMPORT_COST_KEYS.reduce((sum, key) => {
-    const value = costs[key];
-    return sum + (isSafeExpense(value) ? value : 0);
-  }, 0);
-  const knownCosts = isSafeMoney(knownCostsRaw) ? knownCostsRaw : null;
-  const invalidTaxAmounts = !isSafeMoney(excise) ||
-    !isSafeMoney(importDuty) ||
-    !isSafeMoney(officialFees);
-  const total = (knownCosts ?? 0) + excise + importDuty + officialFees;
-  const invalidAmounts = invalidCosts.length > 0 ||
-    invalidTaxAmounts ||
-    knownCosts === null ||
-    !isSafeMoney(total) ||
+  const arasworiFasebi = [];
+  const ucnobiFasebi = [];
+  let jami = 0;
+
+  for (const velisSaxeli of VEHICLE_IMPORT_COST_KEYS) {
+    const fasi = costs[velisSaxeli];
+
+    if (fasi === null) {
+      ucnobiFasebi.push(velisSaxeli);
+      continue;
+    }
+
+    if (!tetriSworia(fasi)) {
+      arasworiFasebi.push(velisSaxeli);
+      continue;
+    }
+
+    jami += fasi;
+  }
+
+  const jamiSworia = fasiSworia(jami);
+  const natsnobiFasebi = jamiSworia ? jami : null;
+  const taxisShecdoma = !fasiSworia(excise) ||
+    !fasiSworia(importDuty) ||
+    !fasiSworia(officialFees);
+  const sulJami = (natsnobiFasebi ?? 0) + excise + importDuty + officialFees;
+  const jamiArasworia = arasworiFasebi.length > 0 ||
+    taxisShecdoma ||
+    natsnobiFasebi === null ||
+    !fasiSworia(sulJami) ||
     hasInvalidInput;
 
   return {
-    knownCosts,
-    unknownCosts,
-    invalidCosts,
-    invalidTaxAmounts,
-    invalidAmounts,
-    total: invalidAmounts ? null : total
+    knownCosts: natsnobiFasebi,
+    unknownCosts: ucnobiFasebi,
+    invalidCosts: arasworiFasebi,
+    invalidTaxAmounts: taxisShecdoma,
+    invalidAmounts: jamiArasworia,
+    total: jamiArasworia ? null : sulJami
   };
 }

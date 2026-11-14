@@ -1,32 +1,6 @@
-/**
- * Preliminary vehicle-tax rules currently implemented by Portavero.
- *
- * Scope: selected passenger vehicles classified under HS 8703. This function
- * calculates from the supplied year, engine capacity and configuration. It
- * does not determine tariff classification, registration eligibility,
- * transitional eligibility or whether a vehicle qualifies legally as a
- * classic car.
- *
- * Sources checked on 9 November 2026:
- * - Tax Code of Georgia, Articles 188 and 197:
- *   https://www.matsne.gov.ge/en/document/view/1043717
- * - Revenue Service car-clearance calculator and listed fees:
- *   https://www.rs.ge/CarClearance-en
- * - Ministry announcement (12 March 2026) replacing the planned 6-year
- *   registration ban with a higher excise tariff:
- *   https://mepa.gov.ge/Ge/News/Details/26330
- *
- * Transitional rules are selected manually by the user. The caller must make
- * clear that choosing the previous regime does not establish eligibility.
- */
-
-// Historical age-based excise table used only when the user selects the
-// previous regime for a case they believe meets the transitional conditions.
-const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
+const dzveliAccizisTarifebi = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
 
 /**
- * Calculate the project's preliminary vehicle-tax figures.
- *
  * @param {{
  *   manufactureYear: number,
  *   declarationYear: number,
@@ -48,49 +22,71 @@ const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1
  * }}
  */
 export function calculateVehicleTaxes({
-  manufactureYear,
-  declarationYear,
-  engineCc,
-  steering,
-  hybrid,
-  classicCar,
-  isElectric,
-  preAprilRegime
+  manufactureYear: gamoSvebisWeli,
+  declarationYear: deklaraciisWeli,
+  engineCc: dzravisCc,
+  steering: sachisMdebareoba,
+  hybrid: hibridia,
+  classicCar: klasikuria,
+  isElectric: eleqtrulia,
+  preAprilRegime: dzveliRegimi
 }) {
-  const age = declarationYear - manufactureYear;
-  const eligibleYear = age >= 0;
-  const validEngine = isElectric || (Number.isFinite(engineCc) && engineCc > 0);
-  const validVehicleType = !classicCar || age > 30;
-  const rateAge = Math.max(0, age);
+  const asaki = deklaraciisWeli - gamoSvebisWeli;
+  const weliSworia = asaki >= 0;
+  const dzraviSworia = eleqtrulia || (Number.isFinite(dzravisCc) && dzravisCc > 0);
+  const manqanaSworia = !klasikuria || asaki > 30;
+  const asakiTarifistvis = Math.max(0, asaki);
 
-  let rate = preAprilRegime
-    ? previousExciseRates[Math.min(rateAge, previousExciseRates.length - 1)]
-    : rateAge <= 6 ? 1.5 : 4.5;
+  let tarifi;
 
-  if (classicCar && rateAge > 30) rate = 1;
-
-  if (!isElectric && !classicCar) {
-    if (steering === "right") rate *= 3;
-    else if (hybrid && rateAge <= 6) rate *= 0.4;
+  if (dzveliRegimi) {
+    const tarifikisIndexi = Math.min(asakiTarifistvis, dzveliAccizisTarifebi.length - 1);
+    tarifi = dzveliAccizisTarifebi[tarifikisIndexi];
+  } else if (asakiTarifistvis <= 6) {
+    tarifi = 1.5;
+  } else {
+    tarifi = 4.5;
   }
 
-  const excise = eligibleYear && validEngine && validVehicleType
-    ? isElectric
-      ? steering === "right" ? (preAprilRegime ? rate * 2000 : 3000) : 0
-      : classicCar && rateAge > 30 ? engineCc : engineCc * rate
-    : 0;
+  if (klasikuria && asakiTarifistvis > 30) {
+    tarifi = 1;
+  }
 
-  const importDuty = eligibleYear && validEngine && validVehicleType && !isElectric
-    ? engineCc * 0.05 * (1 + rateAge * 0.05)
-    : 0;
+  if (!eleqtrulia && !klasikuria) {
+    if (sachisMdebareoba === "right") {
+      tarifi *= 3;
+    } else if (hibridia && asakiTarifistvis <= 6) {
+      tarifi *= 0.4;
+    }
+  }
+
+  let accizi = 0;
+
+  if (weliSworia && dzraviSworia && manqanaSworia) {
+    if (eleqtrulia) {
+      if (sachisMdebareoba === "right") {
+        accizi = dzveliRegimi ? tarifi * 2000 : 3000;
+      }
+    } else if (klasikuria && asakiTarifistvis > 30) {
+      accizi = dzravisCc;
+    } else {
+      accizi = dzravisCc * tarifi;
+    }
+  }
+
+  let importisGadasaxadi = 0;
+
+  if (weliSworia && dzraviSworia && manqanaSworia && !eleqtrulia) {
+    importisGadasaxadi = dzravisCc * 0.05 * (1 + asakiTarifistvis * 0.05);
+  }
 
   return {
-    age,
-    eligibleYear,
-    validEngine,
-    validVehicleType,
-    rate,
-    excise,
-    importDuty
+    age: asaki,
+    eligibleYear: weliSworia,
+    validEngine: dzraviSworia,
+    validVehicleType: manqanaSworia,
+    rate: tarifi,
+    excise: accizi,
+    importDuty: importisGadasaxadi
   };
 }

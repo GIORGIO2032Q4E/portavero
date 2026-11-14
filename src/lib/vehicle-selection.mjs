@@ -1,36 +1,25 @@
 /**
- * Resolve the manual vehicle-type option.
- *
- * Choosing a manual type invalidates a catalogue engine selection. The form
- * clears the capacity too, so the user must confirm it from the documents.
- *
- * @param {unknown} value
+ * @param {unknown} tipi
  * @returns {{ engineId: string, hybrid: boolean, classicCar: boolean }}
  */
-export function getManualVehicleTypeSelection(value) {
+export function getManualVehicleTypeSelection(tipi) {
   return {
     engineId: "",
-    hybrid: value === "hybrid",
-    classicCar: value === "classic"
+    hybrid: tipi === "hybrid",
+    classicCar: tipi === "classic"
   };
 }
 
 /**
- * Return a safe capacity for a catalogue selection.
- *
- * A zero-capacity electric variant is valid. A zero-capacity petrol, diesel
- * or hybrid entry means the catalogue does not know the exact displacement.
- *
- * @param {{ cc?: unknown, fuel?: unknown } | null | undefined} engine
+ * @param {{ cc?: unknown, fuel?: unknown } | null | undefined} dzravi
  * @returns {number | null}
  */
-export function getEngineCapacityForSelection(engine) {
-  if (!engine || typeof engine !== "object") return null;
-  if (engine.fuel === "Electric") return 0;
+export function getEngineCapacityForSelection(dzravi) {
+  if (!dzravi || typeof dzravi !== "object") return null;
+  if (dzravi.fuel === "Electric") return 0;
 
-  return typeof engine.cc === "number" &&
-    Number.isFinite(engine.cc) &&
-    engine.cc > 0
-    ? engine.cc
-    : null;
+  const dzravisCc = dzravi.cc;
+  if (typeof dzravisCc !== "number" || !Number.isFinite(dzravisCc) || dzravisCc <= 0) return null;
+
+  return dzravisCc;
 }

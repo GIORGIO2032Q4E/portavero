@@ -1,60 +1,61 @@
 /**
- * Parse a non-negative number entered into a calculator field.
- * The default step is one cent; step=1 is used for whole-number fields.
- *
- * @param {string} raw
- * @param {{step?: number, min?: number, max?: number}} options
+ * @param {string} sheyvanili
+ * @param {{step?: number, min?: number, max?: number}} wesebi
  * @returns {{value: number | null, error: string | null}}
  */
-export function parseNonNegativeNumber(raw, options = {}) {
-  const step = options.step ?? 0.01;
-  const decimals = String(step).includes(".") ? String(step).split(".")[1].length : 0;
-  const scale = 10 ** decimals;
-  const safeMax = Number.MAX_SAFE_INTEGER / scale;
-  const max = options.max ?? safeMax;
+export function parseNonNegativeNumber(sheyvanili, wesebi = {}) {
+  const nabiji = wesebi.step ?? 0.01;
+  const atwiladebi = String(nabiji).includes(".") ? String(nabiji).split(".")[1].length : 0;
+  const gamravlebeli = 10 ** atwiladebi;
+  const maqsimumi = wesebi.max ?? Number.MAX_SAFE_INTEGER / gamravlebeli;
+  const minimumi = wesebi.min ?? 0;
 
-  if (raw === "") return { value: null, error: null };
+  if (sheyvanili === "") return { value: null, error: null };
 
-  const value = Number(raw);
-  if (!Number.isFinite(value)) {
+  const ricxvi = Number(sheyvanili);
+
+  if (!Number.isFinite(ricxvi)) {
     return { value: null, error: "Enter a valid number." };
   }
-  const min = options.min ?? 0;
-  if (value < min) {
-    return {
-      value: null,
-      error: min === 0 ? "Amount cannot be negative." : `Enter a value of at least ${min}.`
-    };
-  }
-  if (!Number.isFinite(step) || step <= 0) {
-    return { value: null, error: "This field has an invalid step setting." };
-  }
-  if (value > max) {
-    return {
-      value: null,
-      error: options.max === undefined
-        ? "This amount is too large to calculate safely."
-        : `Enter a value no greater than ${max}.`
-    };
+
+  if (ricxvi < minimumi) {
+    const shetyobineba = minimumi === 0
+      ? "Amount cannot be negative."
+      : `Enter a value of at least ${minimumi}.`;
+
+    return { value: null, error: shetyobineba };
   }
 
-  const scaled = value * scale;
-  if (!Number.isFinite(scaled) || scaled > Number.MAX_SAFE_INTEGER) {
+  if (!Number.isFinite(nabiji) || nabiji <= 0) {
+    return { value: null, error: "This field has an invalid step setting." };
+  }
+
+  if (ricxvi > maqsimumi) {
+    const shetyobineba = wesebi.max === undefined
+      ? "This amount is too large to calculate safely."
+      : `Enter a value no greater than ${maqsimumi}.`;
+
+    return { value: null, error: shetyobineba };
+  }
+
+  const gamotvlili = ricxvi * gamravlebeli;
+
+  if (!Number.isFinite(gamotvlili) || gamotvlili > Number.MAX_SAFE_INTEGER) {
     return { value: null, error: "This amount is too large to calculate safely." };
   }
 
-  const rounded = Math.round(scaled);
-  if (Math.abs(scaled - rounded) > 1e-7) {
-    return {
-      value: null,
-      error: decimals === 0
-        ? "Enter a whole number."
-        : `Use no more than ${decimals} decimal places.`
-    };
+  const damrgvalebuli = Math.round(gamotvlili);
+
+  if (Math.abs(gamotvlili - damrgvalebuli) > 1e-7) {
+    const shetyobineba = atwiladebi === 0
+      ? "Enter a whole number."
+      : `Use no more than ${atwiladebi} decimal places.`;
+
+    return { value: null, error: shetyobineba };
   }
 
   return {
-    value: rounded / scale,
+    value: damrgvalebuli / gamravlebeli,
     error: null
   };
 }
