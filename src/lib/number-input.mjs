@@ -1,7 +1,4 @@
 /**
- * Parse a non-negative number entered into a calculator field.
- * The default step is one cent; step=1 is used for whole-number fields.
- *
  * @param {string} raw
  * @param {{step?: number, min?: number, max?: number}} options
  * @returns {{value: number | null, error: string | null}}
