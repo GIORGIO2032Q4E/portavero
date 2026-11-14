@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Portavero",
-  description: "Why I started the car-import project, how it is built and where its estimates stop."
+  description: "Why I built Portavero, how the main tools work and what they do not cover."
 };
 
 export default function AboutPage() {
