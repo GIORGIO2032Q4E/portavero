@@ -1,26 +1,25 @@
 /**
- * @param {unknown} value
+ * @param {unknown} tipi
  * @returns {{ engineId: string, hybrid: boolean, classicCar: boolean }}
  */
-export function getManualVehicleTypeSelection(value) {
+export function getManualVehicleTypeSelection(tipi) {
   return {
     engineId: "",
-    hybrid: value === "hybrid",
-    classicCar: value === "classic"
+    hybrid: tipi === "hybrid",
+    classicCar: tipi === "classic"
   };
 }
 
 /**
- * @param {{ cc?: unknown, fuel?: unknown } | null | undefined} engine
+ * @param {{ cc?: unknown, fuel?: unknown } | null | undefined} dzravi
  * @returns {number | null}
  */
-export function getEngineCapacityForSelection(engine) {
-  if (!engine || typeof engine !== "object") return null;
-  if (engine.fuel === "Electric") return 0;
+export function getEngineCapacityForSelection(dzravi) {
+  if (!dzravi || typeof dzravi !== "object") return null;
+  if (dzravi.fuel === "Electric") return 0;
 
-  return typeof engine.cc === "number" &&
-    Number.isFinite(engine.cc) &&
-    engine.cc > 0
-    ? engine.cc
-    : null;
+  const cc = dzravi.cc;
+  if (typeof cc !== "number" || !Number.isFinite(cc) || cc <= 0) return null;
+
+  return cc;
 }
