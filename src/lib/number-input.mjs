@@ -5,12 +5,7 @@
  */
 export function parseNonNegativeNumber(sheyvanili, wesebi = {}) {
   const nabiji = wesebi.step ?? 0.01;
-
-  if (!Number.isFinite(nabiji) || nabiji <= 0) {
-    return { value: null, error: "This field has an invalid step setting." };
-  }
-
-  const atwiladebi = String(nabiji).split(".")[1]?.length ?? 0;
+  const atwiladebi = String(nabiji).includes(".") ? String(nabiji).split(".")[1].length : 0;
   const gamravlebeli = 10 ** atwiladebi;
   const maqsimumi = wesebi.max ?? Number.MAX_SAFE_INTEGER / gamravlebeli;
   const minimumi = wesebi.min ?? 0;
@@ -29,6 +24,10 @@ export function parseNonNegativeNumber(sheyvanili, wesebi = {}) {
       : `Enter a value of at least ${minimumi}.`;
 
     return { value: null, error: shetyobineba };
+  }
+
+  if (!Number.isFinite(nabiji) || nabiji <= 0) {
+    return { value: null, error: "This field has an invalid step setting." };
   }
 
   if (ricxvi > maqsimumi) {
