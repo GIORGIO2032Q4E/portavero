@@ -1189,7 +1189,6 @@ p,
 }
 
 
-/* Shipping quote comparison */
 .quote-entry {
   display: flex;
   flex-direction: column;
@@ -1233,7 +1232,6 @@ p,
 }
 
 
-/* Import calculator controls */
 .calculator-subheading {
   margin-top: 34px;
 }
@@ -1566,7 +1564,6 @@ p,
 }
 
 
-/* Print styles for the import cost calculator */
 @media print {
   body {
     min-width: 0 !important;
@@ -1717,7 +1714,6 @@ p,
 }
 
 
-/* Saved vehicle comparison */
 .field textarea {
   width: 100%;
   min-height: 110px;
@@ -1869,7 +1865,6 @@ p,
 }
 
 
-/* Printable vehicle comparison */
 @page compare-report {
   size: A4 landscape;
   margin: 10mm;
