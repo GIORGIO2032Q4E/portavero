@@ -51,14 +51,14 @@ export default function HomePage() {
       <section className="simple-hero">
         <div className="container simple-hero-grid">
           <div className="simple-hero-copy">
-            <p className="simple-status">A student project about car imports to Georgia</p>
-            <h1>Estimate what it may cost to bring a car to Georgia.</h1>
-            <p className="simple-lede">An auction price is not the full cost. Buyer fees, inland transport, shipping, customs and delivery come later. I built Portavero to put those amounts in one estimate. Add a figure when you can confirm it; blank fields stay out of the total.</p>
+            <p className="simple-status">A car-import project built in Georgia</p>
+            <h1>Thinking about importing a car to Georgia? Start with the costs.</h1>
+            <p className="simple-lede">The auction price is only the start. You may also need to pay buyer fees, transport to the port, shipping, customs and delivery. I built Portavero to put the costs you know in one place. Add each amount when you have it. Anything left blank stays out of the total.</p>
             <div className="hero-actions">
               <Link href="/vehicle-import" className="button button-dark">Estimate a car import</Link>
               <Link href="/calculator" className="simple-text-link">Importing other goods? <span aria-hidden="true">→</span></Link>
             </div>
-            <p className="simple-note">No live shipping quotes, exchange rates or automatic customs-rate lookup.</p>
+            <p className="simple-note">No live freight prices, exchange rates or automatic tax-rate lookup.</p>
           </div>
           <aside className="simple-example">
             <div className="simple-example-heading">
@@ -69,7 +69,7 @@ export default function HomePage() {
             <div className="simple-example-row"><span>Auction fees</span><strong>Add if known</strong></div>
             <div className="simple-example-row"><span>Shipping</span><strong>Quote needed</strong></div>
             <div className="simple-example-row"><span>Customs charges</span><strong>Check with RS</strong></div>
-            <p className="simple-example-foot">Example fields only. This is not a quote.</p>
+            <p className="simple-example-foot">Just an example of the costs to enter, not a quote.</p>
           </aside>
         </div>
       </section>
@@ -77,9 +77,9 @@ export default function HomePage() {
       <section className="simple-tools-section">
         <div className="container">
           <div className="simple-section-heading">
-            <p className="editorial-label">THE CURRENT TOOLS</p>
-            <h2>Vehicle import comes first.</h2>
-            <p>The planner is the main part of Portavero. The other pages let you check technical VIN data, browse common engine variants, compare cars or estimate the cost of importing other goods.</p>
+            <p className="editorial-label">WHAT YOU CAN DO HERE</p>
+            <h2>The car-import planner is the main tool.</h2>
+            <p>Start with the car planner. The other pages help you check available VIN details, look up common engine options, compare cars or work out the cost of importing other goods.</p>
           </div>
           <div className="simple-tool-list">
             {tools.map((tool) => (
@@ -99,13 +99,13 @@ export default function HomePage() {
       <section className="simple-how-section">
         <div className="container simple-how-grid">
           <div>
-            <p className="editorial-label">BEFORE YOU USE A RESULT</p>
-            <h2>Three things to check.</h2>
+            <p className="editorial-label">BEFORE YOU RELY ON THE NUMBER</p>
+            <h2>A few things worth checking first.</h2>
           </div>
           <ol>
-            <li><strong>Check the car.</strong><span>Use the engine capacity and year from the vehicle documents where possible.</span></li>
-            <li><strong>Add the costs you have.</strong><span>Leave shipping, port or broker charges blank until you have a quote.</span></li>
-            <li><strong>Verify the tax result.</strong><span>The planner covers selected cases. Check the vehicle with the Georgian Revenue Service before buying or shipping.</span></li>
+            <li><strong>Check the car.</strong><span>Check the engine size and year against the car's documents.</span></li>
+            <li><strong>Add the costs you have.</strong><span>Add shipping, port and broker charges when you have real figures. Until then, leave them blank.</span></li>
+            <li><strong>Verify the tax result.</strong><span>The planner covers selected cases, not every vehicle or exception. Check the exact car with the Revenue Service before you buy or ship it.</span></li>
           </ol>
         </div>
       </section>
