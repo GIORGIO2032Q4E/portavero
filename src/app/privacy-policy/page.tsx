@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy policy",
-  description: "What the Portavero prototype stores in your browser and which external services are used."
+  description: "A plain-language guide to what Portavero saves, what leaves your browser and which outside services are involved."
 };
 
 export default function PrivacyPolicyPage() {
@@ -12,40 +12,40 @@ export default function PrivacyPolicyPage() {
         <div className="container">
           <span className="eyebrow">Project information</span>
           <h1>Privacy policy</h1>
-          <p>This page describes how the current Portavero prototype handles calculator entries, saved comparisons, VIN lookups and optional account data.</p>
+          <p>Here is what happens to the information you enter in Portavero, what stays in your browser and what is sent to another service.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
           <p><strong>Last updated: November 8, 2026</strong></p>
 
-          <h2>Information entered into calculators</h2>
-          <p>The general import calculator and vehicle import planner perform their calculations in your browser. The figures you enter are not sent to Portavero's server merely to calculate a result. Avoid entering sensitive personal or financial information.</p>
+          <h2>The details you enter</h2>
+          <p>The general import calculator and car-import planner do their calculations in your browser. The amounts you enter are not sent to Portavero just to work out a total. Please do not enter sensitive personal or financial information.</p>
 
-          <h2>Browser storage</h2>
-          <p>The general import calculator can save up to ten estimates in your browser's local storage. Vehicle comparison can save up to four candidates in the same browser. A comparison candidate may contain vehicle details, a VIN, cost figures and notes that you entered about the vehicle's condition or history. Anyone with access to the same browser profile may be able to access this locally stored information. Clearing the site's browser data can remove it.</p>
-          <p>The shipping quote comparison is held in the current page state and is not saved after you leave the page. It is not sent to a shipping provider.</p>
+          <h2>What stays in your browser</h2>
+          <p>You can save up to ten general estimates and four car comparisons in your browser. A saved car may include its details, VIN, costs and any condition or history notes you add. Someone else using the same browser profile may be able to see that information. Clearing the site's browser data can delete these saved items.</p>
+          <p>Shipping quotes are kept only while that page is open. They are not saved after you leave, and they are not sent to a shipping company.</p>
 
-          <h2>VIN lookup and NHTSA</h2>
-          <p>When you submit a VIN on the VIN Check page, the browser sends it to the Portavero VIN API route. That route sends the VIN to the U.S. National Highway Traffic Safety Administration's vPIC decoder and returns available technical fields and provider warnings. The VIN is therefore shared with NHTSA for the lookup. Portavero does not use this request to search accident, title, ownership, odometer, service or auction records.</p>
+          <h2>When you check a VIN</h2>
+          <p>When you submit a VIN, your browser sends it to Portavero's VIN API route. That route passes it to the U.S. National Highway Traffic Safety Administration's vPIC decoder and returns the technical details and warnings that are available. This means your VIN is shared with NHTSA for the lookup. The request does not search accident, title, ownership, mileage, service or auction records.</p>
           <p>See the <a href="https://vpic.nhtsa.dot.gov/api/" target="_blank" rel="noreferrer">NHTSA vPIC API information</a> for details about that service.</p>
 
-          <h2>Account information and Supabase</h2>
-          <p>Account features are optional and require a configured Supabase project. Supabase Authentication handles sign-up, sign-in and password reset. Portavero does not store your password in its own database. When you choose to save a general estimate to your account, the estimate is stored in the Supabase project's <code>saved_estimates</code> table. The SQL setup enables row-level security and defines policies that restrict records to the signed-in user who owns them.</p>
-          <p>The current prototype stores the Supabase session in browser local storage. It does not use an HttpOnly session cookie. This is a known security limitation. Avoid signing in on shared or untrusted devices, and do not store sensitive information in estimates.</p>
-          <p>Cloud estimates can be listed, loaded into the current browser and deleted from the account page. Loading creates a local browser copy. Editing a local copy does not automatically update the original cloud record.</p>
+          <h2>When you use an account</h2>
+          <p>You do not need an account to use the calculators. Sign-up, sign-in and password resets are handled by Supabase when the project is configured. Portavero does not store your password in its own database. When you save a general estimate to your account, it is stored in the Supabase project's <code>saved_estimates</code> table. The database rules are set up so a signed-in user can access only their own saved estimates.</p>
+          <p>There is an important limitation: the current version keeps the Supabase session in browser storage rather than an HttpOnly cookie. Avoid signing in on shared or untrusted devices, and do not put sensitive information in saved estimates.</p>
+          <p>You can view and delete account estimates from the account page. Loading one creates a copy in your browser. Editing that copy does not change the original saved estimate in your account.</p>
 
-          <h2>Hosting and technical information</h2>
-          <p>The site is hosted by Vercel. Hosting and security services may process technical information such as IP addresses, request details, timestamps and security logs to deliver and protect the website. The exact information and retention periods depend on the provider's configuration and current terms. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">Vercel's privacy policy</a>.</p>
+          <h2>Website hosting</h2>
+          <p>Portavero is hosted by Vercel. Like most hosting services, Vercel may process technical details such as IP addresses, request information, timestamps and security logs to keep the site running and protect it. What is collected and how long it is kept depends on Vercel's settings and current terms. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">Vercel's privacy policy</a>.</p>
 
-          <h2>Analytics, advertising and external resources</h2>
-          <p>The current project does not intentionally include advertising or analytics trackers. It uses system fonts and does not request fonts from an external font service. The VIN decoder is the feature that makes a deliberate external data request to NHTSA. Links to official government and provider websites open those services under their own policies.</p>
+          <h2>Analytics and outside services</h2>
+          <p>The current version does not intentionally use advertising or analytics trackers. It uses the fonts already available on your device. The VIN checker is the feature that sends data to an outside service, NHTSA. Other external links take you to government or provider websites, which have their own privacy policies.</p>
 
-          <h2>Your choices</h2>
-          <p>You can remove browser-saved estimates and comparison candidates through the site where those controls are provided, or clear the site's local storage in your browser. You can sign out of your Portavero account and delete cloud estimates from the account page. The account and browser copies are separate, so deleting one does not necessarily delete the other.</p>
+          <h2>Your options</h2>
+          <p>You can delete saved estimates and comparisons using the controls on the site, or clear Portavero's browser data. You can also sign out and delete estimates saved to your account. Browser copies and account copies are separate, so deleting one does not automatically delete the other.</p>
 
-          <h2>Contact and scope</h2>
-          <p>This is a student-developed project prototype and does not currently have a dedicated support email address. This page describes the data handling implemented in the current version; future integrations or changes to the hosting and database configuration may change it.</p>
+          <h2>A note about this policy</h2>
+          <p>Portavero is a student project and does not have a dedicated support email yet. This page describes how the current version works. That may change if new services are added or the hosting and database setup changes.</p>
           <div className="notice">Portavero is not designed for sensitive personal information and this page is not a claim of legal compliance for a commercial service. Review the deployed configuration, third-party provider terms and applicable privacy requirements before using the project commercially.</div>
         </div>
       </section>
