@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
           <p>The car-import planner does its calculations in your browser. The amounts you enter are not sent to Portavero just to work out a total. Please do not enter sensitive personal or financial information.</p>
 
           <h2>What stays in your browser</h2>
-          <p>The car comparison feature can save up to four cars in your browser. A saved car may include its details, VIN, costs and any condition or history notes you add. Someone else using the same browser profile may be able to see that information. Clearing the site's browser data can delete these saved items.</p>
+          <p>The current version no longer offers a car comparison list. Saved comparison details from an earlier version may still remain in your browser storage. Anyone with access to the same browser profile may be able to see that information. Clearing the site's browser data can remove it.</p>
           <p>Shipping quotes are kept only while that page is open. They are not saved after you leave, and they are not sent to a shipping company.</p>
 
           <h2>When you check a VIN</h2>
@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
           <p>The current version does not intentionally use advertising or analytics trackers. It uses the fonts already available on your device. The VIN checker is the feature that sends data to an outside service, NHTSA. Other external links take you to government or provider websites, which have their own privacy policies.</p>
 
           <h2>Your options</h2>
-          <p>You can delete saved car comparisons using the controls on the site, or clear Portavero's browser data. You can also sign out and delete estimates saved to your account. Browser copies and account copies are separate, so deleting one does not automatically delete the other.</p>
+          <p>You can clear Portavero's browser data to remove information left by earlier versions. You can also sign out and delete estimates saved to your account. Browser data and account data are separate, so deleting one does not automatically delete the other.</p>
 
           <h2>A note about this policy</h2>
           <p>Portavero is a student project and does not have a dedicated support email yet. This page describes how the current version works. That may change if new services are added or the hosting and database setup changes.</p>
