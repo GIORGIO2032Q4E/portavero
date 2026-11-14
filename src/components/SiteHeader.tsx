@@ -10,7 +10,6 @@ const navigation = [
   { href: "/vehicles", label: "Vehicle catalogue" },
   { href: "/shipping", label: "Shipping" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/account", label: "Account" }
 ];
 
 export default function SiteHeader() {
