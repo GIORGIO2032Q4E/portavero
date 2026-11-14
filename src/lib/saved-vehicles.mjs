@@ -57,7 +57,6 @@ function isSafeMoney(value) {
 }
 
 /**
- * Reject malformed local data before it is shown or reused.
  * @param {unknown} value
  * @returns {value is SavedVehicleCandidate}
  */
@@ -105,7 +104,6 @@ export function isSavedVehicleCandidate(value) {
 }
 
 /**
- * Read saved comparison candidates without trusting localStorage contents.
  * @param {string|null} raw
  * @returns {{items: SavedVehicleCandidate[], skipped: boolean}}
  */
