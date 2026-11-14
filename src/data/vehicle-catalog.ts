@@ -10,8 +10,6 @@ type EngineVariant = {
 type VehicleModel = { name: string; engines: EngineVariant[] };
 type VehicleMake = { name: string; models: VehicleModel[] };
 
-// Common variants found across popular used-car import markets.
-// Engine choices vary by model year, trim and market. This is not a complete VIN-level catalogue.
 const e = (id: string, label: string, cc: number, fuel: EngineVariant["fuel"], years: string, note?: string): EngineVariant =>
   ({ id, label, cc, fuel, years, note });
 
