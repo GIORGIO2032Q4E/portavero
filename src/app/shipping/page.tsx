@@ -26,9 +26,9 @@ export default function ShippingPage() {
           </div>
           <div className="card-grid">
             {[
-              ["Route and handoffs", "Confirm pickup location, destination port, transshipment points and final delivery."],
-              ["What is included", "Check fuel surcharges, terminal handling, documentation, insurance and destination charges."],
-              ["Timing and limits", "Ask about transit-time ranges, quote expiry, cargo dimensions and restricted goods."]
+              ["Pickup, route and delivery", "Check where the car or cargo will be collected, which ports it will pass through and where the journey ends."],
+              ["Extra charges", "Ask about fuel surcharges, port handling, paperwork, insurance and fees due at the destination."],
+              ["Timing and cargo limits", "Ask how long the trip may take, when the price expires, and whether there are size or cargo restrictions."]
             ].map(([title, description], index) => (
               <article className="feature-card" key={title}>
                 <span className="feature-icon">0{index + 1}</span>
