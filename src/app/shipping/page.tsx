@@ -39,7 +39,7 @@ export default function ShippingPage() {
           </div>
           <div style={{ marginTop: 34 }} className="callout">
             <div><h2>Got a shipping quote?</h2><p>Add it to your estimate alongside the other costs you know.</p></div>
-            <Link href="/calculator" className="button button-dark">Add shipping cost <span aria-hidden="true">↗</span></Link>
+            <Link href="/vehicle-import" className="button button-dark">Add shipping cost <span aria-hidden="true">↗</span></Link>
           </div>
         </div>
       </section>
