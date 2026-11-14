@@ -47,10 +47,6 @@ function isValidRate(value) {
 }
 
 /**
- * Summarize entered costs and optional user-supplied duty/VAT rates.
- * This preserves the existing arithmetic; it does not determine a country's
- * legal tax base or select tax rates.
- *
  * @param {{purchase: number|null, supplier: number|null, inland: number|null, freight: number|null, insurance: number|null, customs: number|null, port: number|null, delivery: number|null, other: number|null}} costs
  * @param {number} quantity
  * @param {number | null} dutyRate
