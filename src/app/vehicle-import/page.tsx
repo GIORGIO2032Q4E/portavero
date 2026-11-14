@@ -98,7 +98,7 @@ export default function VehicleImportPage() {
 
   const currentYear = new Date().getFullYear();
   const vehicleAge = declarationYear - year;
-  const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
+  const eligibleYear = year <= declarationYear;
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || vehicleAge > 30;
   const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
