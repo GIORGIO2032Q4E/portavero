@@ -20,7 +20,7 @@ export default function AboutPage() {
           <h2>Where it started</h2>
           <p>I started with a simple cost list for an auction car. The idea was to enter the amounts I had and leave the rest empty until I got a proper quote. An unknown cost is not a free cost, and I did not want an incomplete subtotal to look like the final price of the car.</p>
 
-          <h2>How it works behind the page</h2>
+          <h2>How I built it</h2>
           <p>Portavero is built with Next.js, React and TypeScript. The tax and cost calculations live in separate JavaScript files, which makes them easier to test without opening the website. The VIN page sends a request to NHTSA vPIC through a Next.js API route. Car comparisons stay in the browser, while Supabase can store general import estimates when account settings are configured.</p>
 
           <h2>A few decisions I made</h2>
