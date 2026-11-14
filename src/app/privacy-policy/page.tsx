@@ -20,10 +20,10 @@ export default function PrivacyPolicyPage() {
           <p><strong>Last updated: November 8, 2026</strong></p>
 
           <h2>The details you enter</h2>
-          <p>The general import calculator and car-import planner do their calculations in your browser. The amounts you enter are not sent to Portavero just to work out a total. Please do not enter sensitive personal or financial information.</p>
+          <p>The car-import planner does its calculations in your browser. The amounts you enter are not sent to Portavero just to work out a total. Please do not enter sensitive personal or financial information.</p>
 
           <h2>What stays in your browser</h2>
-          <p>You can save up to ten general estimates and four car comparisons in your browser. A saved car may include its details, VIN, costs and any condition or history notes you add. Someone else using the same browser profile may be able to see that information. Clearing the site's browser data can delete these saved items.</p>
+          <p>The current version no longer offers a car comparison list. Saved comparison details from an earlier version may still remain in your browser storage. Anyone with access to the same browser profile may be able to see that information. Clearing the site's browser data can remove it.</p>
           <p>Shipping quotes are kept only while that page is open. They are not saved after you leave, and they are not sent to a shipping company.</p>
 
           <h2>When you check a VIN</h2>
@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
           <p>See the <a href="https://vpic.nhtsa.dot.gov/api/" target="_blank" rel="noreferrer">NHTSA vPIC API information</a> for details about that service.</p>
 
           <h2>When you use an account</h2>
-          <p>You do not need an account to use the calculators. Sign-up, sign-in and password resets are handled by Supabase when the project is configured. Portavero does not store your password in its own database. When you save a general estimate to your account, it is stored in the Supabase project's <code>saved_estimates</code> table. The database rules are set up so a signed-in user can access only their own saved estimates.</p>
+          <p>You do not need an account to check a VIN or estimate a car import. Sign-up, sign-in and password resets are handled by Supabase when the project is configured. Portavero does not store your password in its own database. Estimates saved through the account feature are stored in the Supabase project's <code>saved_estimates</code> table. The database rules are set up so a signed-in user can access only their own saved estimates.</p>
           <p>There is an important limitation: the current version keeps the Supabase session in browser storage rather than an HttpOnly cookie. Avoid signing in on shared or untrusted devices, and do not put sensitive information in saved estimates.</p>
           <p>You can view and delete account estimates from the account page. Loading one creates a copy in your browser. Editing that copy does not change the original saved estimate in your account.</p>
 
@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
           <p>The current version does not intentionally use advertising or analytics trackers. It uses the fonts already available on your device. The VIN checker is the feature that sends data to an outside service, NHTSA. Other external links take you to government or provider websites, which have their own privacy policies.</p>
 
           <h2>Your options</h2>
-          <p>You can delete saved estimates and comparisons using the controls on the site, or clear Portavero's browser data. You can also sign out and delete estimates saved to your account. Browser copies and account copies are separate, so deleting one does not automatically delete the other.</p>
+          <p>You can clear Portavero's browser data to remove information left by earlier versions. You can also sign out and delete estimates saved to your account. Browser data and account data are separate, so deleting one does not automatically delete the other.</p>
 
           <h2>A note about this policy</h2>
           <p>Portavero is a student project and does not have a dedicated support email yet. This page describes how the current version works. That may change if new services are added or the hosting and database setup changes.</p>

@@ -5,14 +5,11 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const navigation = [
-  { href: "/calculator", label: "Import costs" },
-  { href: "/vehicle-import", label: "Car import" },
   { href: "/vin-check", label: "VIN check" },
+  { href: "/vehicle-import", label: "Car import" },
   { href: "/vehicles", label: "Vehicle catalogue" },
-  { href: "/compare", label: "Compare cars" },
   { href: "/shipping", label: "Shipping" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/account", label: "Account" }
 ];
 
 export default function SiteHeader() {
@@ -39,16 +36,16 @@ export default function SiteHeader() {
           aria-controls="primary-navigation"
           onClick={() => setMenuOpen((open) => !open)}
         >
-          <span className={`menu-glyph${menuOpen ? " is-open" : ""}`} aria-hidden="true"><span /><span /></span>
+          <span className={"menu-glyph" + (menuOpen ? " is-open" : "")} aria-hidden="true"><span /><span /></span>
         </button>
 
         <nav
           id="primary-navigation"
-          className={`main-nav${menuOpen ? " is-open" : ""}`}
+          className={"main-nav" + (menuOpen ? " is-open" : "")}
           aria-label="Main navigation"
         >
           {navigation.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const active = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 href={item.href}
@@ -63,8 +60,8 @@ export default function SiteHeader() {
           })}
         </nav>
 
-        <Link href="/vehicle-import" className="button button-small button-dark header-cta" onClick={closeMenu}>
-          Estimate car costs <span aria-hidden="true">↗</span>
+        <Link href="/vin-check" className="button button-small button-dark header-cta" onClick={closeMenu}>
+          Start with VIN <span aria-hidden="true">↗</span>
         </Link>
       </div>
     </header>

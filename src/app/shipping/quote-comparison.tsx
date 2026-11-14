@@ -30,7 +30,7 @@ export default function QuoteComparison() {
         <div className="section-heading">
           <span className="eyebrow">Compare your shipping quotes</span>
           <h2>Put the quotes you've received side by side.</h2>
-          <p>Add the prices and details from the offers you have received. Portavero does not contact shipping companies or check whether a quote is genuine. Compare prices in the same currency.</p>
+          <p>Add the prices and details from the offers you have received. Portavero does not contact shipping companies or check whether a quote is genuine. Compare car-shipping prices in the same currency.</p>
         </div>
         <div className="panel">
           <div className="form-grid">
@@ -93,7 +93,7 @@ export default function QuoteComparison() {
               const best = bestByCurrency(currency);
               return best ? <p key={currency} className="quote-best-price">Lowest {currency} price you entered: <strong>{best.provider}</strong> ({new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 2 }).format(best.amount)}).</p> : null;
             })}
-            <p className="disclaimer quote-disclaimer">The cheapest quote is not always the best deal. Check what it covers, when it expires, cargo limits, insurance, destination charges and final delivery. These entries stay on this page and are cleared when you leave.</p>
+            <p className="disclaimer quote-disclaimer">The cheapest quote is not always the best deal. Check what it covers, when it expires, vehicle requirements, insurance, destination charges and final delivery. These entries stay on this page and are cleared when you leave.</p>
           </div>
         </div>
       </div>

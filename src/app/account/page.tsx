@@ -146,7 +146,7 @@ export default function AccountPage() {
         <div className="container">
           <span className="eyebrow">Account</span>
           <h1>{session ? "Your saved estimates." : "Save your estimates to your account."}</h1>
-          <p>Sign in to save general import estimates to your account. Cars saved for comparison stay in this browser only.</p>
+          <p>This page shows import estimates saved to your account in an earlier version of Portavero. The current car-import planner does not yet save its results to your account.</p>
         </div>
       </section>
       <section className="section">
@@ -172,7 +172,7 @@ export default function AccountPage() {
               </div>
               <p>Estimates you save while signed in are available on another device when you use the same account. Loading one makes a copy in this browser. Changes to that copy do not change the saved account version.</p>
               <h3>Saved estimates ({estimates.length})</h3>
-              {estimates.length === 0 ? <p className="empty-state">You haven't saved an estimate to your account yet. Open the import calculator and save one while signed in.</p> : (
+              {estimates.length === 0 ? <p className="empty-state">There are no estimates saved to this account yet.</p> : (
                 <div className="account-estimate-list">
                   {estimates.map((item) => (
                     <div className="account-estimate" key={item.id}>
@@ -190,7 +190,7 @@ export default function AccountPage() {
           ) : (
             <section className="panel account-panel">
               <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to access your saved general import estimates on another device." : "Sign in to see the import estimates saved to your account."}</p>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to access estimates already saved to your Portavero account." : "Sign in to see the import estimates saved to your account."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
                 {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
