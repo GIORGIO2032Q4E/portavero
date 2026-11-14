@@ -4,42 +4,42 @@ const tools = [
   {
     number: "01",
     title: "Vehicle import estimate",
-    description: "Enter the car's year, engine capacity and configuration, then add the purchase, auction and transport costs you know. The tax rules cover selected cases only.",
+    description: "Add the car's year and engine size, then enter the purchase, auction and transport costs you know. The tax estimate covers selected cases only.",
     href: "/vehicle-import",
     link: "Estimate car costs"
   },
   {
     number: "02",
     title: "VIN check",
-    description: "Request available technical details from NHTSA vPIC. It can return specifications, but it does not provide accident or auction history.",
+    description: "Enter a VIN to see the technical details NHTSA vPIC has for that car. It does not check accident or auction history.",
     href: "/vin-check",
     link: "Check a VIN"
   },
   {
     number: "03",
     title: "Compare vehicles",
-    description: "Save up to four cars in this browser and compare their specifications, entered costs and your own notes.",
+    description: "Save up to four cars in this browser and compare their details, costs and the notes you've added.",
     href: "/compare",
     link: "Compare cars"
   },
   {
     number: "04",
     title: "Vehicle catalogue",
-    description: "Browse a short list of common makes, models and engine options. Confirm the exact engine from the car's documents.",
+    description: "Look through common makes, models and engine options. Check the exact engine in the car's documents.",
     href: "/vehicles",
     link: "Browse the catalogue"
   },
   {
     number: "05",
     title: "Shipping checklist",
-    description: "Compare freight offers you have received and check what each one includes. No live carrier prices are connected.",
+    description: "Put the shipping quotes you've received side by side and check what's included. No live prices are shown here.",
     href: "/shipping",
     link: "Review shipping offers"
   },
   {
     number: "06",
     title: "General import calculator",
-    description: "For other goods, add the costs and tax rates you have checked. The calculator does not look up tariff rates for you.",
+    description: "For other goods, add the costs and tax rates you've checked. The calculator won't look up rates for you.",
     href: "/calculator",
     link: "Calculate other imports"
   }
@@ -68,7 +68,7 @@ export default function HomePage() {
             <div className="simple-example-row"><span>Car price</span><strong>Enter amount</strong></div>
             <div className="simple-example-row"><span>Auction fees</span><strong>Add if known</strong></div>
             <div className="simple-example-row"><span>Shipping</span><strong>Quote needed</strong></div>
-            <div className="simple-example-row"><span>Customs charges</span><strong>Check with RS</strong></div>
+            <div className="simple-example-row"><span>Customs charges</span><strong>Check with Revenue Service</strong></div>
             <p className="simple-example-foot">Just an example of the costs to enter, not a quote.</p>
           </aside>
         </div>
