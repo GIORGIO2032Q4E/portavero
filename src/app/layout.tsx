@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     template: "%s | Portavero"
   },
   description:
-    "A car-import planning tool for Georgia. Estimate selected vehicle taxes, add the costs you know, compare cars and check the technical details available from a VIN.",
+    "A car-import tool for Georgia. Check a VIN, review the available vehicle details and estimate selected taxes and import costs.",
   applicationName: "Portavero",
   icons: { icon: "/favicon.svg" },
-  keywords: ["car import Georgia", "vehicle import costs", "Georgia vehicle taxes", "VIN technical data", "vehicle comparison"],
+  keywords: ["car import Georgia", "vehicle import costs", "Georgia vehicle taxes", "VIN decoder"],
   openGraph: {
     title: "Portavero | Plan a car import to Georgia",
-    description: "Estimate selected vehicle taxes, add known import costs, compare cars and check available VIN technical data.",
+    description: "Check a VIN, review available vehicle details and estimate selected Georgian vehicle taxes and import costs.",
     type: "website",
     siteName: "Portavero"
   },
@@ -44,14 +44,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-mark" aria-hidden="true">P</span>
                 <span>Portavero</span>
               </Link>
-              <p>A car-import project built in Georgia. Use it to organise costs and compare cars before you buy.</p>
+              <p>A car-import project built in Georgia. Check a car's VIN and estimate its import costs before you buy.</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>
               <Link href="/how-it-works">How it works</Link>
               <Link href="/vin-check">VIN check</Link>
               <Link href="/vehicles">Vehicle catalogue</Link>
-              <Link href="/compare">Compare cars</Link>
               <Link href="/privacy-policy">Privacy</Link>
               <Link href="/terms">Terms</Link>
               <Link href="/account">Account</Link>
