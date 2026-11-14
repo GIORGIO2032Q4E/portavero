@@ -53,7 +53,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/vehicles">Vehicle catalogue</Link>
               <Link href="/privacy-policy">Privacy</Link>
               <Link href="/terms">Terms</Link>
-              <Link href="/account">Account</Link>
             </div>
           </div>
           <div className="footer-bottom">
