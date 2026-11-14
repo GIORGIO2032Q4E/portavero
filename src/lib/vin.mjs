@@ -1,6 +1,4 @@
 /**
- * Check the shape of a standard 17-character VIN before sending it to vPIC.
- * This checks the character format only; it does not prove that the VIN exists.
  * @param {unknown} value
  * @returns {{valid: true, vin: string} | {valid: false, vin: string, message: string}}
  */
@@ -34,8 +32,6 @@ const usVinCharacterValues = {
 const usVinPositionWeights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
 
 /**
- * Calculate the position-nine check digit used for U.S.-market VINs.
- * This is an advisory helper, not a global VIN-validity rule.
  * @param {unknown} value
  * @returns {string | null}
  */
@@ -72,7 +68,6 @@ const nhtsaWarningByCode = {
 };
 
 /**
- * Convert NHTSA's ErrorCode value into readable, de-duplicated warnings.
  * @param {unknown} value
  * @returns {string[]}
  */
@@ -126,8 +121,6 @@ function readField(row, key) {
 }
 
 /**
- * Turn the external vPIC response into the small shape used by the page.
- * Partial technical data is kept instead of being discarded.
  * @param {unknown} payload
  * @param {string} vin
  */
