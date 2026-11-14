@@ -209,7 +209,7 @@ export default function VinCheckPage() {
                   <div className="notice" role="status">
                     {result.quality === "complete"
                       ? <><strong>NHTSA returned vehicle details.</strong> Compare the available fields with the car's documents before relying on them.</>
-                      : <><strong>NHTSA returned some details, but not enough to identify both the make and model. Check the information against the car's documents.</strong> NHTSA did not provide both make and model. Treat the fields below as incomplete and verify them against the vehicle documents.</>}
+                      : <><strong>NHTSA returned only part of the information.</strong> It did not provide both the make and model, so check the details below against the car's documents.</>}
                   </div>
                   {result.providerWarnings.length > 0 && (
                     <div className="notice" role="alert">
