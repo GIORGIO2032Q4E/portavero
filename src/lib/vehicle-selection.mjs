@@ -18,8 +18,8 @@ export function getEngineCapacityForSelection(dzravi) {
   if (!dzravi || typeof dzravi !== "object") return null;
   if (dzravi.fuel === "Electric") return 0;
 
-  const cc = dzravi.cc;
-  if (typeof cc !== "number" || !Number.isFinite(cc) || cc <= 0) return null;
+  const dzravisCc = dzravi.cc;
+  if (typeof dzravisCc !== "number" || !Number.isFinite(dzravisCc) || dzravisCc <= 0) return null;
 
-  return cc;
+  return dzravisCc;
 }
