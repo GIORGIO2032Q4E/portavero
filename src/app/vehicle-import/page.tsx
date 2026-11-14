@@ -425,7 +425,7 @@ export default function VehicleImportPage() {
               <div className="field">
                 <label htmlFor="candidate-vin">VIN (optional)</label>
                 <input id="candidate-vin" value={vin} onChange={(event) => setVin(event.target.value.toUpperCase())} maxLength={17} autoComplete="off" spellCheck={false} placeholder="Enter a 17-character VIN" />
-                <small>The VIN is saved for reference only. To check available technical details, use <Link href="/vin-check" className="text-link">VIN Check</Link> separately for available technical decoding.</small>
+                <small>The VIN is saved here for reference. To see the technical details NHTSA can return, open <Link href="/vin-check" className="text-link">VIN Check</Link>.</small>
               </div>
               <label className="field compare-notes-field" htmlFor="history-notes">
                 <span>Condition or history notes (optional)</span>
