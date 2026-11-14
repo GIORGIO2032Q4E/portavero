@@ -1,4 +1,4 @@
-const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
+const dzveliAccizisTarifebi = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
 
 /**
  * @param {{
@@ -22,49 +22,71 @@ const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1
  * }}
  */
 export function calculateVehicleTaxes({
-  manufactureYear,
-  declarationYear,
-  engineCc,
-  steering,
-  hybrid,
-  classicCar,
-  isElectric,
-  preAprilRegime
+  manufactureYear: gamoSvebisWeli,
+  declarationYear: deklaraciisWeli,
+  engineCc: dzravisCc,
+  steering: sachisMdebareoba,
+  hybrid: hibridia,
+  classicCar: klasikuria,
+  isElectric: eleqtrulia,
+  preAprilRegime: dzveliRegimi
 }) {
-  const asaki = declarationYear - manufactureYear;
-  const eligibleYear = asaki >= 0;
-  const validEngine = isElectric || (Number.isFinite(engineCc) && engineCc > 0);
-  const validVehicleType = !classicCar || asaki > 30;
-  const rateAge = Math.max(0, asaki);
+  const asaki = deklaraciisWeli - gamoSvebisWeli;
+  const weliSworia = asaki >= 0;
+  const dzraviSworia = eleqtrulia || (Number.isFinite(dzravisCc) && dzravisCc > 0);
+  const manqanaSworia = !klasikuria || asaki > 30;
+  const asakiTarifistvis = Math.max(0, asaki);
 
-  let rate = preAprilRegime
-    ? previousExciseRates[Math.min(rateAge, previousExciseRates.length - 1)]
-    : rateAge <= 6 ? 1.5 : 4.5;
+  let tarifi = 0;
 
-  if (classicCar && rateAge > 30) rate = 1;
-
-  if (!isElectric && !classicCar) {
-    if (steering === "right") rate *= 3;
-    else if (hybrid && rateAge <= 6) rate *= 0.4;
+  if (dzveliRegimi) {
+    const tarifikisIndexi = Math.min(asakiTarifistvis, dzveliAccizisTarifebi.length - 1);
+    tarifi = dzveliAccizisTarifebi[tarifikisIndexi];
+  } else if (asakiTarifistvis <= 6) {
+    tarifi = 1.5;
+  } else {
+    tarifi = 4.5;
   }
 
-  const excise = eligibleYear && validEngine && validVehicleType
-    ? isElectric
-      ? steering === "right" ? (preAprilRegime ? rate * 2000 : 3000) : 0
-      : classicCar && rateAge > 30 ? engineCc : engineCc * rate
-    : 0;
+  if (klasikuria && asakiTarifistvis > 30) {
+    tarifi = 1;
+  }
 
-  const importDuty = eligibleYear && validEngine && validVehicleType && !isElectric
-    ? engineCc * 0.05 * (1 + rateAge * 0.05)
-    : 0;
+  if (!eleqtrulia && !klasikuria) {
+    if (sachisMdebareoba === "right") {
+      tarifi *= 3;
+    } else if (hibridia && asakiTarifistvis <= 6) {
+      tarifi *= 0.4;
+    }
+  }
+
+  let accizi = 0;
+
+  if (weliSworia && dzraviSworia && manqanaSworia) {
+    if (eleqtrulia) {
+      if (sachisMdebareoba === "right") {
+        accizi = dzveliRegimi ? tarifi * 2000 : 3000;
+      }
+    } else if (klasikuria && asakiTarifistvis > 30) {
+      accizi = dzravisCc;
+    } else {
+      accizi = dzravisCc * tarifi;
+    }
+  }
+
+  let importisGadasaxadi = 0;
+
+  if (weliSworia && dzraviSworia && manqanaSworia && !eleqtrulia) {
+    importisGadasaxadi = dzravisCc * 0.05 * (1 + asakiTarifistvis * 0.05);
+  }
 
   return {
     age: asaki,
-    eligibleYear,
-    validEngine,
-    validVehicleType,
-    rate,
-    excise,
-    importDuty
+    eligibleYear: weliSworia,
+    validEngine: dzraviSworia,
+    validVehicleType: manqanaSworia,
+    rate: tarifi,
+    excise: accizi,
+    importDuty: importisGadasaxadi
   };
 }
