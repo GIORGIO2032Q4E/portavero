@@ -265,7 +265,7 @@ export default function VinCheckPage() {
         <div className="container content-narrow prose">
           <h2>What you can get from a VIN</h2>
           <p>NHTSA vPIC reads vehicle information submitted by manufacturers. Depending on the VIN, it may return the make, model, model year, body type, engine, fuel type, drive type and place of manufacture.</p>
-          <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. A blank result does not mean the car has never been damaged.</p>
+          <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. No result does not mean the car is accident-free.</p>
           <p>NHTSA's database is mainly intended for vehicles made for sale or import into the United States. A car from another market may return only a few details, or none at all. Check the VIN on the car and its documents, and confirm the specifications with the seller or manufacturer.</p>
           <p>Source: <a href="https://vpic.nhtsa.dot.gov/api/" target="_blank" rel="noreferrer">NHTSA vPIC API documentation</a> and the <a href="https://vpic.nhtsa.dot.gov/" target="_blank" rel="noreferrer">vPIC website</a>.</p>
         </div>
