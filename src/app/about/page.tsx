@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Portavero",
-  description: "Why I built Portavero, how the main tools work and what they do not cover."
+  description: "Why I built Portavero as a car-import estimator for Georgia."
 };
 
 export default function AboutPage() {
@@ -12,22 +12,20 @@ export default function AboutPage() {
         <div className="container">
           <span className="eyebrow">About</span>
           <h1>Why I built Portavero.</h1>
-          <p>An auction price tells you only part of the story. There may also be buyer fees, transport to the port, sea freight, customs and local delivery, each listed in a different place. I wanted a way to put the costs I knew together and see what was still missing.</p>
+          <p>When looking at an auction car, the sale price is only one part of the cost. There are also buyer fees, transport, shipping, customs and delivery. I wanted one place to put those numbers together.</p>
         </div>
       </section>
       <section className="section">
         <div className="container content-narrow prose">
-          <h2>Where it started</h2>
-          <p>I started with a simple cost list for an auction car. The idea was to enter the amounts I had and leave the rest empty until I got a proper quote. An unknown cost is not a free cost, and I did not want an incomplete subtotal to look like the final price of the car.</p>
+          <h2>How the idea works</h2>
+          <p>The main flow starts with a VIN. Portavero asks NHTSA vPIC for the technical details it can return, then carries available information into the car-import estimate. You can check or correct those details and enter the costs from the auction and shipping quotes.</p>
 
           <h2>How I built it</h2>
-          <p>Portavero is built with Next.js, React and TypeScript. The tax and cost calculations live in separate JavaScript files, which makes them easier to test without opening the website. The VIN page sends a request to NHTSA vPIC through a Next.js API route. Car comparisons stay in the browser, while Supabase can store general import estimates when account settings are configured.</p>
+          <p>Portavero is built with Next.js, React and TypeScript. The vehicle-tax and import-cost calculations live in separate JavaScript files, so I can test the arithmetic without opening the website. The VIN lookup runs through a Next.js API route before requesting data from NHTSA vPIC.</p>
 
-          <h2>A few decisions I made</h2>
-          <p>I chose not to guess an engine size when a model has several versions. The VIN page shows the technical details NHTSA can return; it does not check accident or auction history. Shipping prices, exchange rates and tax rates still have to come from the user. The site does not fetch them.</p>
-
-          <h2>What is not finished</h2>
-          <p>The catalogue is still incomplete. The tax estimate covers only selected passenger-car cases, and the GEL 480 fee amount is a saved snapshot rather than a live lookup. You still need to check the car's documents, current customs rules and the shipping quote before making a decision.</p>
+          <h2>What it does not check</h2>
+          <p>The VIN decoder does not provide accident, title, ownership, mileage, service or auction history. It may also return incomplete technical details for cars made outside the United States. The vehicle-tax estimate covers selected passenger-car cases, and the GEL 480 standard-fee amount is a saved snapshot rather than a live lookup.</p>
+          <p>Shipping prices and other costs must come from quotes or documents you have checked. Before buying or shipping a car, verify its details and tax treatment with the Georgian Revenue Service.</p>
           <p>The source code, tests and manual QA checklist are in the <a href="https://github.com/GIORGIO2032Q4E/portavero" target="_blank" rel="noreferrer">Portavero repository</a>.</p>
         </div>
       </section>
