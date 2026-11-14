@@ -39,16 +39,16 @@ export function summarizeVehicleImportCosts(costs, excise, importDuty, officialF
   const ucnobiFasebi = [];
   let jami = 0;
 
-  for (const key of VEHICLE_IMPORT_COST_KEYS) {
-    const fasi = costs[key];
+  for (const velisSaxeli of VEHICLE_IMPORT_COST_KEYS) {
+    const fasi = costs[velisSaxeli];
 
     if (fasi === null) {
-      ucnobiFasebi.push(key);
+      ucnobiFasebi.push(velisSaxeli);
       continue;
     }
 
     if (!tetriSworia(fasi)) {
-      arasworiFasebi.push(key);
+      arasworiFasebi.push(velisSaxeli);
       continue;
     }
 
@@ -56,23 +56,23 @@ export function summarizeVehicleImportCosts(costs, excise, importDuty, officialF
   }
 
   const jamiSworia = fasiSworia(jami);
-  const knownCosts = jamiSworia ? jami : null;
-  const invalidTaxAmounts = !fasiSworia(excise) ||
+  const natsnobiFasebi = jamiSworia ? jami : null;
+  const taxisShecdoma = !fasiSworia(excise) ||
     !fasiSworia(importDuty) ||
     !fasiSworia(officialFees);
-  const sulJami = (knownCosts ?? 0) + excise + importDuty + officialFees;
-  const invalidAmounts = arasworiFasebi.length > 0 ||
-    invalidTaxAmounts ||
-    knownCosts === null ||
+  const sulJami = (natsnobiFasebi ?? 0) + excise + importDuty + officialFees;
+  const jamiArasworia = arasworiFasebi.length > 0 ||
+    taxisShecdoma ||
+    natsnobiFasebi === null ||
     !fasiSworia(sulJami) ||
     hasInvalidInput;
 
   return {
-    knownCosts,
+    knownCosts: natsnobiFasebi,
     unknownCosts: ucnobiFasebi,
     invalidCosts: arasworiFasebi,
-    invalidTaxAmounts,
-    invalidAmounts,
-    total: invalidAmounts ? null : sulJami
+    invalidTaxAmounts: taxisShecdoma,
+    invalidAmounts: jamiArasworia,
+    total: jamiArasworia ? null : sulJami
   };
 }
