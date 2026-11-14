@@ -1,32 +1,8 @@
-/**
- * Preliminary vehicle-tax rules currently implemented by Portavero.
- *
- * Scope: selected passenger vehicles classified under HS 8703. This function
- * calculates from the supplied year, engine capacity and configuration. It
- * does not determine tariff classification, registration eligibility,
- * transitional eligibility or whether a vehicle qualifies legally as a
- * classic car.
- *
- * Sources checked on 9 November 2026:
- * - Tax Code of Georgia, Articles 188 and 197:
- *   https://www.matsne.gov.ge/en/document/view/1043717
- * - Revenue Service car-clearance calculator and listed fees:
- *   https://www.rs.ge/CarClearance-en
- * - Ministry announcement (12 March 2026) replacing the planned 6-year
- *   registration ban with a higher excise tariff:
- *   https://mepa.gov.ge/Ge/News/Details/26330
- *
- * Transitional rules are selected manually by the user. The caller must make
- * clear that choosing the previous regime does not establish eligibility.
- */
 
-// Historical age-based excise table used only when the user selects the
-// previous regime for a case they believe meets the transitional conditions.
+
 const previousExciseRates = [1.5, 1.5, 1.5, 1.4, 1.2, 1.0, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.5, 1.8, 2.1, 2.4];
 
 /**
- * Calculate the project's preliminary vehicle-tax figures.
- *
  * @param {{
  *   manufactureYear: number,
  *   declarationYear: number,
@@ -57,11 +33,11 @@ export function calculateVehicleTaxes({
   isElectric,
   preAprilRegime
 }) {
-  const age = declarationYear - manufactureYear;
-  const eligibleYear = age >= 0;
+  const asaki = declarationYear - manufactureYear;
+  const eligibleYear = asaki >= 0;
   const validEngine = isElectric || (Number.isFinite(engineCc) && engineCc > 0);
-  const validVehicleType = !classicCar || age > 30;
-  const rateAge = Math.max(0, age);
+  const validVehicleType = !classicCar || asaki > 30;
+  const rateAge = Math.max(0, asaki);
 
   let rate = preAprilRegime
     ? previousExciseRates[Math.min(rateAge, previousExciseRates.length - 1)]
@@ -85,7 +61,7 @@ export function calculateVehicleTaxes({
     : 0;
 
   return {
-    age,
+    age: asaki,
     eligibleYear,
     validEngine,
     validVehicleType,
