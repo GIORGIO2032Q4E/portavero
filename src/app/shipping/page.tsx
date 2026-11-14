@@ -4,7 +4,7 @@ import QuoteComparison from "./quote-comparison";
 
 export const metadata: Metadata = {
   title: "Shipping cost planning",
-  description: "Review the charges, route details, and transit assumptions to confirm with a freight provider before booking."
+  description: "A checklist for reviewing a shipping quote before you book."
 };
 
 export default function ShippingPage() {
@@ -13,16 +13,16 @@ export default function ShippingPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Shipping guide</span>
-          <h1>Questions to ask before shipping.</h1>
-          <p>Shipping prices depend on the route, size and weight of the cargo, timing and provider. This page is a checklist, not a live price comparison.</p>
+          <h1>What to check before you book shipping.</h1>
+          <p>The price depends on the route, cargo size and weight, timing and provider. This page helps you check a quote; it does not show live shipping prices.</p>
         </div>
       </section>
       <section className="section">
         <div className="container">
           <div className="section-heading">
             <span className="eyebrow">Ask before you book</span>
-            <h2>Make sure the quote covers the whole trip.</h2>
-            <p>Ask providers which charges are included, what could be billed separately, and how long the quote remains valid.</p>
+            <h2>Check what the price actually includes.</h2>
+            <p>Ask what is included, what you may be charged extra for, and when the quote expires.</p>
           </div>
           <div className="card-grid">
             {[
@@ -38,7 +38,7 @@ export default function ShippingPage() {
             ))}
           </div>
           <div style={{ marginTop: 34 }} className="callout">
-            <div><h2>Have a freight quote?</h2><p>Enter it in your cost estimate and compare it with the other known charges.</p></div>
+            <div><h2>Got a shipping quote?</h2><p>Add it to your estimate alongside the other costs you know.</p></div>
             <Link href="/calculator" className="button button-dark">Add shipping cost <span aria-hidden="true">↗</span></Link>
           </div>
         </div>
