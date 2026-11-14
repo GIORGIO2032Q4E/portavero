@@ -145,16 +145,16 @@ export default function AccountPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Account</span>
-          <h1>{session ? "Saved estimates." : "Save estimates to your account."}</h1>
-          <p>Sign in to save new general import estimates to your account. Vehicle comparison candidates are kept only in this browser.</p>
+          <h1>{session ? "Your saved estimates." : "Save your estimates to your account."}</h1>
+          <p>Sign in to save general import estimates to your account. Cars saved for comparison stay in this browser only.</p>
         </div>
       </section>
       <section className="section">
         <div className="container account-layout">
           {!configured ? (
             <section className="panel account-panel">
-              <h2>Account storage is not configured.</h2>
-              <p>Supabase handles account sign-in. To enable this feature, configure the project URL and publishable key.</p>
+              <h2>Account saving is not set up yet.</h2>
+              <p>Account sign-in uses Supabase. To turn it on, the project URL and publishable key need to be added to the site settings.</p>
               <ol>
                 <li>Create a project at <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Supabase</a>.</li>
                 <li>Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to your local environment and Vercel project.</li>
@@ -170,9 +170,9 @@ export default function AccountPage() {
                 <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Signed-in account"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
-              <p>New general estimates saved while signed in can be opened from another device using the same account. Loading one here creates a browser copy; editing that copy does not update the cloud record.</p>
+              <p>Estimates you save while signed in are available on another device when you use the same account. Loading one makes a copy in this browser. Changes to that copy do not change the saved account version.</p>
               <h3>Saved estimates ({estimates.length})</h3>
-              {estimates.length === 0 ? <p className="empty-state">No cloud estimates yet. Open the import calculator and save an estimate while signed in.</p> : (
+              {estimates.length === 0 ? <p className="empty-state">You haven't saved an estimate to your account yet. Open the import calculator and save one while signed in.</p> : (
                 <div className="account-estimate-list">
                   {estimates.map((item) => (
                     <div className="account-estimate" key={item.id}>
@@ -190,7 +190,7 @@ export default function AccountPage() {
           ) : (
             <section className="panel account-panel">
               <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to open your saved general import estimates on another device." : "Sign in to view your saved import estimates."}</p>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to access your saved general import estimates on another device." : "Sign in to see the import estimates saved to your account."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
                 {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
