@@ -36,7 +36,7 @@ export default function HowItWorksPage() {
           <p>Enter a 17-character VIN and the checker asks NHTSA vPIC for the technical details it has. Some results may be incomplete, especially for cars made for markets outside the United States. It does not search accident, title, mileage, ownership, service or auction records.</p>
           <p>You can save up to four cars in the browser you are using and compare their details, costs and your notes. Those notes are not checked, and the list does not sync to another device.</p>
 
-          <p><Link href="/vehicle-import" className="text-link">Open the vehicle import planner <span aria-hidden="true">↗</span></Link></p>
+          <p><Link href="/vehicle-import" className="text-link">Try the car-import planner <span aria-hidden="true">↗</span></Link></p>
         </div>
       </section>
     </>
