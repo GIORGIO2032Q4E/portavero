@@ -140,8 +140,8 @@ export default function VehicleImportPage() {
         ? matchingEngine.fuel === "Hybrid" || matchingEngine.fuel === "Plug-in hybrid"
         : powertrain.isHybrid;
 
-      setVin(incomingVin.toUpperCase());
-      setVinVehicleName([make, model].filter(Boolean).join(" ") || "Vehicle from VIN");
+      setVehicleIdentifier(incomingIdentifier);
+      setIdentifiedVehicleName([make, model].filter(Boolean).join(" ") || "Vehicle from lookup");
       setMakeName(matchingMake?.name ?? make);
       setModelName(matchingModel?.name ?? model);
       if (Number.isInteger(modelYear) && modelYear >= 1960 && modelYear <= new Date().getFullYear() + 2) {
@@ -211,8 +211,8 @@ export default function VehicleImportPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
-          <h1>{vin ? "Import estimate for this car" : "Estimate the cost of importing a car."}</h1>
-          <p>{vin ? "Available details from the VIN have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Enter a VIN first. Available details for that specific car will be added below. Check them against the car’s documents, fill in any missing technical details, then add its purchase, auction, shipping and local delivery costs."}</p>
+          <h1>{vehicleIdentifier ? "Import estimate for this car" : "Estimate the cost of importing a car."}</h1>
+          <p>{vehicleIdentifier ? "Available details from the vehicle lookup have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Start with a VIN check or enter the vehicle details manually. Check specifications against the car’s documents, fill in anything missing, then add its purchase, auction, shipping and local delivery costs."}</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
@@ -228,8 +228,8 @@ export default function VehicleImportPage() {
             <span>All amounts are shown in Georgian lari (GEL).</span>
           </div>
           <div className="print-vehicle-summary">
-            <div><span>Vehicle</span><strong>{vinVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
-            {vin && <div><span>VIN</span><strong>{vin}</strong></div>}
+            <div><span>Vehicle</span><strong>{identifiedVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
+            {vehicleIdentifier && <div><span>Vehicle identifier</span><strong>{vehicleIdentifier}</strong></div>}
             <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (engineCc === null ? "Not entered" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
             <div><span>Manufacture year</span><strong>{year ?? "Not entered"}</strong></div>
             <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge === null ? "age not available" : `${vehicleAge} year(s)`}</strong></div>
