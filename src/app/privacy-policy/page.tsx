@@ -27,8 +27,8 @@ export default function PrivacyPolicyPage() {
           <p>Shipping quotes are kept only while that page is open. They are not saved after you leave, and they are not sent to a shipping company.</p>
 
           <h2>When you check a VIN</h2>
-          <p>When you submit a VIN, your browser sends it to Portavero's VIN API route. That route passes it to the U.S. National Highway Traffic Safety Administration's vPIC decoder and returns the technical details and warnings that are available. This means your VIN is shared with NHTSA for the lookup. The request does not search accident, title, ownership, mileage, service or auction records.</p>
-          <p>See the <a href="https://vpic.nhtsa.dot.gov/api/" target="_blank" rel="noreferrer">NHTSA vPIC API information</a> for details about that service.</p>
+          <p>When you submit a VIN, your browser sends it to Portavero's VIN API route. That route sends it to the U.S. National Highway Traffic Safety Administration (NHTSA), which provides available vehicle specifications. Your VIN is shared with NHTSA for this lookup. The request does not search accident, title, ownership, mileage, service or auction records. The request does not search accident, title, ownership, mileage, service or auction records.</p>
+          <p>Read the <a href="https://vpic.nhtsa.dot.gov/" target="_blank" rel="noreferrer">NHTSA vehicle information service details</a> for more about the lookup.</p>
 
           <h2>When you use an account</h2>
           <p>You do not need an account to check a VIN or estimate a car import. Sign-up, sign-in and password resets are handled by Supabase when the project is configured. Portavero does not store your password in its own database. Estimates saved through the account feature are stored in the Supabase project's <code>saved_estimates</code> table. The database rules are set up so a signed-in user can access only their own saved estimates.</p>
@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
           <p>Portavero is hosted by Vercel. Like most hosting services, Vercel may process technical details such as IP addresses, request information, timestamps and security logs to keep the site running and protect it. What is collected and how long it is kept depends on Vercel's settings and current terms. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">Vercel's privacy policy</a>.</p>
 
           <h2>Analytics and outside services</h2>
-          <p>The current version does not intentionally use advertising or analytics trackers. It uses the fonts already available on your device. The VIN checker is the feature that sends data to an outside service, NHTSA. Other external links take you to government or provider websites, which have their own privacy policies.</p>
+          <p>The current version does not intentionally use advertising or analytics trackers. It uses the fonts already available on your device. The VIN checker is the feature that shares the VIN with NHTSA for a vehicle-details lookup. Other external links take you to government or provider websites, which have their own privacy policies.</p>
 
           <h2>Your options</h2>
           <p>You can clear Portavero's browser data to remove information left by earlier versions. You can also sign out and delete estimates saved to your account. Browser data and account data are separate, so deleting one does not automatically delete the other.</p>
