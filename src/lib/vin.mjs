@@ -102,7 +102,11 @@ const decodedFields = [
   ["EngineConfiguration", "Engine configuration"],
   ["EngineModel", "Engine model"],
   ["DisplacementL", "Engine displacement (L)"],
+  ["DisplacementCC", "Engine displacement (cm³)"],
   ["FuelTypePrimary", "Primary fuel type"],
+  ["FuelTypeSecondary", "Secondary fuel type"],
+  ["ElectrificationLevel", "Electrification level"],
+  ["SteeringLocation", "Steering location"],
   ["DriveType", "Drive type"],
   ["TransmissionStyle", "Transmission"],
   ["PlantCountry", "Manufacturing country"],
@@ -123,6 +127,58 @@ function readField(row, key) {
   if (typeof value === "string") return value.trim();
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
   return "";
+}
+
+function readPositiveNumber(row, ...keys) {
+  for (const key of keys) {
+    const value = Number(readField(row, key));
+    if (Number.isFinite(value) && value > 0 && value <= 100000) return value;
+  }
+  return null;
+}
+
+function getVehicleFromVpic(row) {
+  const make = readField(row, "Make");
+  const model = readField(row, "Model");
+  const modelYearValue = Number(readField(row, "ModelYear"));
+  const modelYear = Number.isInteger(modelYearValue) && modelYearValue >= 1886 && modelYearValue <= 2100
+    ? modelYearValue
+    : null;
+  const displacementL = readPositiveNumber(row, "DisplacementL");
+  const engineCc = readPositiveNumber(row, "DisplacementCC") ??
+    (displacementL !== null ? Math.round(displacementL * 1000) : null);
+  const primaryFuelType = readField(row, "FuelTypePrimary");
+  const secondaryFuelType = readField(row, "FuelTypeSecondary");
+  const electrificationLevel = readField(row, "ElectrificationLevel");
+  const steeringLocation = readField(row, "SteeringLocation");
+  const allFuelText = [primaryFuelType, secondaryFuelType, electrificationLevel].join(" ").toLowerCase();
+  const hasElectric = /electric|battery|bev/.test(allFuelText);
+  const hasCombustion = /gasoline|petrol|diesel|ethanol|lpg|propane|cng|natural gas|hydrogen/.test(allFuelText);
+  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test(electrificationLevel.toLowerCase());
+  const pureElectricLevel = /battery electric|bev|pure electric|all electric/.test(electrificationLevel.toLowerCase());
+  const isElectric = pureElectricLevel || (hasElectric && !hasCombustion && !hybridLevel);
+  const isHybrid = !isElectric && (hybridLevel || (hasElectric && hasCombustion));
+
+  return {
+    make,
+    model,
+    modelYear,
+    engineCc: isElectric ? null : engineCc,
+    primaryFuelType,
+    secondaryFuelType,
+    electrificationLevel,
+    steeringLocation,
+    steering: /right/i.test(steeringLocation)
+      ? "right"
+      : /left/i.test(steeringLocation)
+        ? "left"
+        : "",
+    isElectric,
+    isHybrid,
+    isPlugInHybrid: /plug.?in|phev/i.test(electrificationLevel),
+    series: readField(row, "Series") || readField(row, "Series2"),
+    trim: readField(row, "Trim") || readField(row, "Trim2")
+  };
 }
 
 /**
@@ -162,6 +218,7 @@ export function parseNhtsaVinResponse(payload, vin) {
     result: {
       quality,
       vin,
+      vehicle: getVehicleFromVpic(row),
       fields,
       providerWarnings,
       providerMessage: providerMessage || undefined,
