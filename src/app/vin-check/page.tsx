@@ -5,9 +5,26 @@ import { useState, type FormEvent } from "react";
 import { calculateUsVinCheckDigit, validateVin } from "@/lib/vin.mjs";
 
 type DecodedField = { label: string; value: string };
+type DecodedVehicle = {
+  make: string;
+  model: string;
+  modelYear: number | null;
+  engineCc: number | null;
+  primaryFuelType: string;
+  secondaryFuelType: string;
+  electrificationLevel: string;
+  steeringLocation: string;
+  steering: "" | "left" | "right";
+  isElectric: boolean;
+  isHybrid: boolean;
+  isPlugInHybrid: boolean;
+  series: string;
+  trim: string;
+};
 type DecodeResult = {
   quality: "complete" | "partial";
   vin: string;
+  vehicle: DecodedVehicle;
   fields: DecodedField[];
   source: { name: string; url: string };
   note: string;
@@ -18,6 +35,7 @@ type ApiResponse = {
   error?: string;
   vin?: string;
   quality?: "complete" | "partial";
+  vehicle?: unknown;
   fields?: unknown;
   source?: { name: string; url: string };
   note?: string;
@@ -33,24 +51,19 @@ function isDecodedField(value: unknown): value is DecodedField {
 }
 
 function getImportEstimateHref(result: DecodeResult) {
-  const getValue = (label: string) =>
-    result.fields.find((field) => field.label === label)?.value ?? "";
+  const vehicle = result.vehicle;
   const params = new URLSearchParams({ vin: result.vin });
-  const make = getValue("Make");
-  const model = getValue("Model");
-  const year = Number(getValue("Model year"));
-  const displacement = Number(getValue("Engine displacement (L)"));
-  const fuel = getValue("Primary fuel type");
 
-  if (make) params.set("make", make);
-  if (model) params.set("model", model);
-  if (Number.isInteger(year) && year >= 1960 && year <= new Date().getFullYear()) {
-    params.set("year", String(year));
-  }
-  if (Number.isFinite(displacement) && displacement > 0 && displacement <= 100) {
-    params.set("engineCc", String(Math.round(displacement * 1000)));
-  }
-  if (fuel) params.set("fuel", fuel);
+  if (vehicle.make) params.set("make", vehicle.make);
+  if (vehicle.model) params.set("model", vehicle.model);
+  if (vehicle.modelYear) params.set("year", String(vehicle.modelYear));
+  if (vehicle.engineCc !== null) params.set("engineCc", String(vehicle.engineCc));
+  if (vehicle.primaryFuelType) params.set("fuelPrimary", vehicle.primaryFuelType);
+  if (vehicle.secondaryFuelType) params.set("fuelSecondary", vehicle.secondaryFuelType);
+  if (vehicle.electrificationLevel) params.set("electrification", vehicle.electrificationLevel);
+  if (vehicle.steering) params.set("steering", vehicle.steering);
+  if (vehicle.series) params.set("series", vehicle.series);
+  if (vehicle.trim) params.set("trim", vehicle.trim);
 
   return `/vehicle-import?${params.toString()}`;
 }
@@ -97,6 +110,9 @@ export default function VinCheckPage() {
       if (
         !response.ok ||
         typeof payload.vin !== "string" ||
+        !payload.vehicle ||
+        typeof payload.vehicle !== "object" ||
+        Array.isArray(payload.vehicle) ||
         !payload.source ||
         typeof payload.source.name !== "string" ||
         typeof payload.source.url !== "string" ||
@@ -120,6 +136,7 @@ export default function VinCheckPage() {
       setResult({
         quality: payload.quality === "partial" ? "partial" : "complete",
         vin: payload.vin,
+        vehicle: payload.vehicle as DecodedVehicle,
         fields,
         source: payload.source,
         note: typeof payload.note === "string" ? payload.note : "Technical data returned by the source.",
@@ -138,8 +155,8 @@ export default function VinCheckPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">VIN check · Technical data</span>
-          <h1>See what a VIN can tell you.</h1>
-          <p>Enter a 17-character VIN and Portavero will ask the U.S. NHTSA vPIC decoder for the technical details it has. The result can be incomplete, depending on the vehicle.</p>
+          <h1>Check a VIN. Start the car import estimate.</h1>
+          <p>Portavero asks the NHTSA vPIC decoder for manufacturer-reported vehicle details, then carries the available specifications into the Georgian import calculator. Results can be incomplete, depending on the vehicle.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Enter car details manually ↗</Link>
             <a href="https://vpic.nhtsa.dot.gov/decoder/" target="_blank" rel="noreferrer" className="button button-outline">Open NHTSA's VIN decoder ↗</a>
@@ -250,7 +267,8 @@ export default function VinCheckPage() {
                   </div>
                   <p className="source-note">{result.note} Source: <a href={result.source.url} target="_blank" rel="noreferrer">{result.source.name}</a>.</p>
                   <p className="source-note">VIN submitted: <code>{result.vin}</code></p>
-                  <Link href={getImportEstimateHref(result)} className="button button-dark">Estimate import costs for this car ↗</Link>
+                  <p className="source-note">The calculator will carry over the decoded make, model, year, engine size, fuel system and steering location when NHTSA provides them. You only need to confirm details the decoder could not identify.</p>
+                  <Link href={getImportEstimateHref(result)} className="button button-dark">Continue to this car’s import estimate ↗</Link>
                 </div>
               )}
             </section>
