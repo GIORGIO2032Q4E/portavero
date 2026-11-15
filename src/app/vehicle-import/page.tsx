@@ -7,6 +7,7 @@ import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 import { validateVin } from "@/lib/vin.mjs";
+import { getVehicleAge, hasValidManufactureYear } from "@/lib/vehicle-import-inputs.mjs";
 import { getEngineCapacityForSelection, getManualVehicleTypeSelection, getVinPowertrain, normalizeVinSteering } from "@/lib/vehicle-selection.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
@@ -155,8 +156,8 @@ export default function VehicleImportPage() {
   const isElectric = selectedEngine?.fuel === "Electric" || vinElectric;
 
   const currentYear = new Date().getFullYear();
-  const vehicleAge = year === null ? null : declarationYear - year;
-  const eligibleYear = year !== null && Number.isInteger(year) && vehicleAge !== null && vehicleAge >= 0 && year <= declarationYear;
+  const vehicleAge = getVehicleAge(year, declarationYear);
+  const eligibleYear = hasValidManufactureYear(year, declarationYear);
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || (vehicleAge !== null && vehicleAge > 30);
   const validSteering = steering === "left" || steering === "right";
