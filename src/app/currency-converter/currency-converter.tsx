@@ -20,10 +20,8 @@ function isExchangeRate(value: unknown): value is ExchangeRate {
     typeof data.source === "string";
 }
 
-function formatCurrency(value: number, currency: "USD" | "GEL") {
+function formatAmount(value: number) {
   return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(value);
@@ -153,7 +151,7 @@ export default function CurrencyConverter() {
                   ? "Loading…"
                   : converted === null
                     ? "—"
-                    : formatCurrency(converted, toCurrency)}
+                    : formatAmount(converted)}
               </strong>
             </div>
           </div>
