@@ -66,7 +66,9 @@ export async function GET() {
   const quantity = Number(usd.quantity);
   const rateDate = typeof payload[0].date === "string" ? payload[0].date.slice(0, 10) : "";
 
-  if (!Number.isFinite(rate) || rate <= 0 || !Number.isFinite(quantity) || quantity <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(rateDate)) {
+  const unitRate = getUnitRate(rate, quantity);
+
+  if (unitRate === null || !/^\\d{4}-\\d{2}-\\d{2}$/.test(rateDate)) {
     return NextResponse.json(
       { error: "The USD exchange rate could not be read." },
       { status: 502 }
