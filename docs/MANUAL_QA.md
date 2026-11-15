@@ -1,141 +1,169 @@
-# Manual QA checklist
+# Manual QA plan
 
-This document is a repeatable checklist for checking Portavero in a browser. It is a test plan, not a claim that every scenario has already been run. Record the browser, device, date and result when performing a check.
+This is a repeatable test plan for the current Portavero car-import workflow. It is not a record of completed tests. Mark each case **Pass**, **Fail**, **Blocked** or **Not run**, and record evidence for any result claimed as passed.
+
+Do not use real passwords, payment information, identity documents or private vehicle records during testing.
 
 ## Test record
 
 | Field | Value |
 | --- | --- |
-| Date |  |
-| Tester |  |
-| Browser and version |  |
-| Operating system / device |  |
-| Commit tested |  |
-| Environment (local / preview / production) |  |
+| Date and time | |
+| Tester | |
+| Commit SHA | |
+| Environment (local / preview / production) | |
+| Browser and version | |
+| Operating system and device | |
+| Viewport size(s) | |
 
-For each case, record **Pass**, **Fail**, **Blocked** or **Not run**, and include a short note or screenshot reference. Do not enter real passwords, personal documents or payment details while testing.
+## 1. Home page and navigation
 
-## 1. General import calculator
+- [ ] Open `/`. Confirm the page explains the VIN-to-import-estimate workflow without promising vehicle-history data or live shipping prices.
+- [ ] Follow the primary action. Confirm it opens `/vin-check`.
+- [ ] Open the mobile navigation. Confirm the menu opens and closes, including with Escape.
+- [ ] Use the keyboard to reach all visible navigation links and the primary action. Confirm focus is visible.
+- [ ] Follow About, How it works, Vehicle catalogue, Shipping, Privacy and Terms links. Confirm each route loads and its wording matches the current car-focused product.
+- [ ] Open `/calculator` and `/compare` directly. Confirm both compatibility routes redirect to `/vehicle-import`.
+- [ ] Confirm the removed currency-converter page and exchange-rate API return 404.
 
-- [ ] Open `/calculator`. Confirm the page loads without a console or visible runtime error.
-- [ ] Leave all cost fields blank. Confirm blank values are shown as not entered and that the known-cost subtotal is zero rather than a populated estimate.
-- [ ] Enter a purchase price and freight amount in USD. Confirm the known-cost subtotal is their sum.
-- [ ] Enter a duty rate only. Confirm duty is calculated from the entered customs-value categories and VAT/GST remains unavailable until both rates are present.
-- [ ] Enter both duty and VAT/GST rates. Check the displayed breakdown against a hand calculation using the formula documented in `src/lib/import-costs.mjs`.
-- [ ] Leave one customs-value category blank. Confirm the page identifies the missing category and warns that the customs value may be understated.
-- [ ] Enter a confirmed zero. Confirm it is treated as entered, not as a missing value.
-- [ ] Enter a negative value, too many decimal places or an unusually large value. Confirm the field rejects it and the combined total is not presented as valid.
-- [ ] Change currency. Confirm the calculator explains that entered amounts are cleared rather than relabelled.
-- [ ] Save an estimate, reload the page, load it, edit it and save the change. Confirm local browser storage reflects the change.
-- [ ] Delete a saved estimate and confirm it is removed.
-- [ ] Print or save the result as PDF. Check that the summary and breakdown are readable and that form controls are not printed.
+## 2. VIN validation and lookup
 
-## 2. Vehicle import planner and catalogue
+Use public test VINs only. A correctly shaped VIN is not proof that a vehicle exists.
 
-- [ ] Open `/vehicle-import` with a fresh browser session. Confirm no 2,000 cm³ capacity or tax estimate is silently assumed before a vehicle is selected or a capacity entered.
-- [ ] Choose a make and model with a single known catalogue variant. Select the engine and confirm its capacity and fuel type appear.
-- [ ] Change the make after selecting an engine. Confirm the old model, engine, capacity and hybrid/classic flags are cleared.
+- [ ] Open `/vin-check`. Confirm the form explains that it looks up technical specifications, not vehicle history.
+- [ ] Submit an empty value, a short value, a long value and values containing I, O or Q. Confirm local validation blocks each malformed value.
+- [ ] Submit a known test VIN such as `1HGCM82633A004352`. Confirm the page shows only fields returned by the provider and identifies the data source.
+- [ ] Confirm a partially decoded response is presented as partial data, not as a complete vehicle specification.
+- [ ] Confirm provider warnings appear in readable language and are not hidden by a generic success message.
+- [ ] Edit the VIN after a result. Confirm the old result and error are cleared before the next lookup.
+- [ ] Confirm the input cannot be submitted repeatedly while a lookup is in progress.
+- [ ] Test an invalid JSON response, empty result, provider no-data response, rate-limit response, upstream server error and request timeout using a mock or controlled test.
+- [ ] Confirm each upstream failure produces a useful message and does not expose raw provider diagnostics.
+- [ ] For a U.S.-market test VIN, check the position-nine result. Confirm the check-digit message is advisory and does not claim global validity.
+- [ ] For a non-U.S. or unknown-market VIN, confirm the U.S. check-digit formula is not treated as a universal rule.
+- [ ] Confirm the page never labels absent history as clean and never invents accident, title, mileage, ownership, service, auction or photo data.
+
+## 3. VIN-to-import hand-off
+
+- [ ] Decode a test VIN with make, model and year available. Continue to the planner and confirm those values arrive in the corresponding fields.
+- [ ] When engine capacity is returned, confirm the value is passed as cm³ and is visible for review before relying on it.
+- [ ] When fuel/electrification fields are returned, confirm the planner applies the mapped value only when the source data is clear.
+- [ ] When steering side is returned, confirm it is passed through. When it is missing or unclear, confirm the planner requires the user to choose it.
+- [ ] Use a VIN with missing make, model, year or engine data. Confirm missing values remain missing and are not replaced with guessed defaults.
+- [ ] Confirm a decoded make/model that does not match the local catalogue remains reviewable and does not silently select an unrelated vehicle.
+- [ ] Change every auto-filled value to match a vehicle document. Confirm the user's correction is retained and the tax estimate responds to the corrected input.
+- [ ] Confirm VIN information is presented as provider-supplied technical data, not as proof that the physical vehicle matches the decoded record.
+
+## 4. Vehicle-import planner inputs
+
+- [ ] Open `/vehicle-import` with a clean session. Confirm no arbitrary engine capacity or complete tax estimate is silently assumed.
+- [ ] Select a make, model and single-capacity engine variant. Confirm the selected capacity and fuel details appear.
+- [ ] Change the make after selecting a model and engine. Confirm dependent model, engine, capacity and relevant vehicle-type selections reset.
 - [ ] Change the model after selecting an engine. Confirm the old engine selection and capacity are cleared.
-- [ ] Choose a catalogue entry whose engine capacity varies by year or market. Confirm the planner requires manual capacity entry and does not calculate from a guessed default.
-- [ ] Enter a valid whole-number capacity from the vehicle's documents. Confirm the estimate becomes available.
-- [ ] Change the manual vehicle type to Hybrid, Non-hybrid and Classic. Confirm the catalogue engine selection and capacity are cleared, then enter a capacity and confirm the selected type remains set.
-- [ ] Select an electric catalogue variant. Confirm the capacity field is treated as electric and the displayed estimate is clearly marked as limited and subject to official verification.
-- [ ] Try an invalid or blank engine capacity. Confirm the page does not present it as a valid estimate.
-- [ ] Check vehicle age at the supported boundary years, including ages 6 and 7. Compare the displayed rate with the source code and current official material.
-- [ ] For a current-regime vehicle older than 6 years, confirm the page shows the GEL 4.50/cm³ base excise band and does not describe age alone as a general registration ban. Check emissions, vehicle category and registration requirements separately.
-- [ ] Check left-hand-drive hybrid and right-hand-drive/converted cases. Confirm the correct warning and estimate are displayed for the selected inputs.
-- [ ] Check a classic-car selection at 30 and 31 years. Confirm the age threshold and legal-classification warning are visible.
-- [ ] Select the previous regime. Confirm the page explains that transitional eligibility must be independently established from the required documents.
-- [ ] Enter purchase, auction, transport, shipping, insurance, port and delivery costs. Confirm the subtotal adds entered amounts once and identifies blank categories.
-- [ ] Enter an invalid cost (negative, excess decimals or too large). Confirm the field reports the error, the overall total changes to “Check details”, and saving is blocked until the field is corrected or cleared.
-- [ ] Set the customs declaration year after the current year. Confirm the page and saved candidate flag the result as a projection using the current tax rules and fee snapshot.
-- [ ] Confirm the result includes the listed GEL 480 fee snapshot once. Verify the current fee schedule with the Revenue Service before treating it as current.
-- [ ] Save a candidate for comparison. Confirm the saved record contains the selected vehicle and cost information.
-- [ ] Print or save the vehicle estimate as PDF. Check that the selected details, warnings and cost breakdown are readable.
+- [ ] Select a catalogue entry with varying capacity across years or markets. Confirm the user must enter the documented engine capacity instead of receiving a guessed value.
+- [ ] Enter a valid whole-number engine capacity from a vehicle document. Confirm the planner can calculate the supported estimate.
+- [ ] Try blank, negative, fractional, excessively large and malformed monetary/capacity inputs. Confirm invalid values do not enter totals.
+- [ ] Confirm a confirmed zero amount differs from an empty field.
+- [ ] Confirm the planner requires a steering selection where it affects the selected tax case.
+- [ ] Confirm uncertain fuel data requires confirmation and is not silently treated as non-hybrid.
+- [ ] Confirm an unknown or unsupported vehicle configuration is not presented as a verified tax result.
 
-## 3. VIN decoder
+## 5. Tax rules and calculation boundaries
 
-Use a test VIN only. A correctly shaped VIN is not proof that a vehicle exists.
+Compare expected results with the exact current implementation and official source material. Do not treat this checklist as proof that a legal rule is current.
 
-- [ ] Open `/vin-check`. Confirm the form explains the difference between technical data and vehicle history.
-- [ ] Submit an empty value, a short value, a long value and a value containing I, O or Q. Confirm local validation blocks each invalid value.
-- [ ] Submit a known test VIN. Confirm the route returns available technical fields and displays the NHTSA vPIC source link.
-- [ ] Select U.S. market for the known U.S. test VIN. Confirm the local position-nine check-digit result matches; change one character in position nine and confirm it warns but still allows the NHTSA request.
-- [ ] Leave the market as "Not sure / another market" for a non-U.S. VIN. Confirm the U.S. check-digit formula is not applied and the VIN is still submitted for decoding.
-- [ ] Use a provider response with some technical fields but no make/model. Confirm the page shows it as partial data instead of discarding it as a total failure.
-- [ ] Edit the VIN after a result is shown. Confirm the old result and error are cleared. Confirm the VIN input cannot change while a request is in progress.
-- [ ] Test malformed upstream JSON, an empty Results array, a rate-limit response and a timeout. Confirm each produces a distinct, readable error.
-- [ ] Check a VIN with an NHTSA warning, where available. Confirm the warning is visible and the page does not suppress it.
-- [ ] Test a VIN that the provider cannot decode. Confirm the page reports that no usable technical result was returned.
-- [ ] Simulate or test an unavailable provider/network. Confirm a clear error appears and no vehicle-history result is invented.
-- [ ] Confirm the page does not call a missing history record “clean” and does not display accident, title, ownership, odometer, service or auction data as if retrieved.
+- [ ] Check the age calculation at declaration year minus manufacture year, including ages 0, 6 and 7.
+- [ ] For the current regime, confirm the base excise rate boundary between age 6 and age 7.
+- [ ] Check right-hand-drive or converted vehicle adjustment.
+- [ ] Check the left-hand-drive hybrid reduction only for the age range supported by the implementation.
+- [ ] Check electric-vehicle cases, including the right-hand-drive/converted case.
+- [ ] Check classic-car treatment at 30 and 31 years and confirm the legal-classification warning is visible.
+- [ ] Check import duty against the implementation formula for a conventional passenger car.
+- [ ] Select the previous regime. Confirm the interface says this is only for eligible transitional cases and the user must independently check the documents.
+- [ ] Confirm the previous regime is not selected automatically from the vehicle's age or origin.
+- [ ] Confirm the planner identifies its selected tax scope and directs users to the Revenue Service for exact classification and assessment.
+- [ ] Confirm GEL 480 in listed standard fees is included once, and the page identifies the amount as a stored snapshot rather than a live lookup.
+- [ ] For a declaration year in the future, confirm the page warns that tax rules and fees may change before that year.
+- [ ] Confirm unsupported classifications and exceptions are not silently treated as covered.
 
-## 4. Vehicle comparison
+## 6. Import-cost inputs and total
 
-- [ ] Save one candidate from the vehicle planner. Confirm it appears on `/compare`.
-- [ ] Save a second candidate with different costs and specifications. Confirm both appear side by side.
-- [ ] Save up to four candidates. Confirm the limit is enforced and the page explains how to remove an item.
-- [ ] Remove one candidate. Confirm the remaining candidates stay in the list.
-- [ ] Clear the list. Confirm it becomes empty.
-- [ ] Reload the page. Confirm browser-saved candidates remain available in the same browser.
-- [ ] Enter a VIN and history note in a candidate. Confirm the page labels them as recorded or user-entered, not verified history.
-- [ ] Test malformed stored data in a disposable browser profile or test harness. Confirm invalid entries are skipped without crashing the comparison page.
-- [ ] Load a legacy comparison entry containing the retired `registrationRestricted` field. Confirm it remains readable and the old age-ban flag is not shown as a current restriction.
-- [ ] Confirm candidates do not appear on another browser/device or automatically sync to an account.
-- [ ] Print or save the comparison as PDF with one to four candidates. Check that the landscape table fits the page, column headings repeat when it spans multiple pages, long notes remain readable and controls are excluded.
+- [ ] Enter purchase price, auction fees, inland transport, international shipping, insurance, port charges and local delivery.
+- [ ] Confirm each entered cost appears in the correct line and is counted only once.
+- [ ] Leave one or more costs blank. Confirm the page identifies the unknown categories and does not call them free.
+- [ ] Enter a confirmed zero. Confirm it is counted as an entered amount.
+- [ ] Enter a negative amount, more than two decimal places or an amount outside the safe range. Confirm the invalid field is identified and the overall total is withheld.
+- [ ] Check the known-cost subtotal with a hand calculation.
+- [ ] Check the displayed tax and fee lines with a hand calculation based on the selected inputs.
+- [ ] Confirm the final label distinguishes known user-entered costs and selected estimates from a guaranteed final landed cost.
+- [ ] Confirm foreign-currency amounts are not silently converted. The user must enter a checked GEL equivalent.
+- [ ] Confirm that broker charges, storage, repair costs, special handling or other unentered items are not implied to be included.
+- [ ] Print or save the planner as PDF. Check selected vehicle details, tax notes, known costs, unknown categories and disclaimers for readability.
 
-## 5. Shipping checklist and quote comparison
+## 7. Vehicle catalogue and shipping guide
 
-- [ ] Open `/shipping`. Confirm the page labels the tool as a checklist and manual comparison, not live market data.
-- [ ] Enter two valid quotes in the same currency. Confirm the lower entered price is identified.
-- [ ] Enter quotes in different currencies. Confirm they are not ranked against each other.
-- [ ] Enter an optional transit-day value with a fraction or negative number. Confirm it is flagged as invalid.
-- [ ] Toggle insurance included. Confirm the status is reflected in the comparison.
-- [ ] Reload or navigate away and return. Confirm the manual quotes are not represented as saved.
-- [ ] Confirm no provider is contacted and no freight rate is fetched by the tool.
+- [ ] Search the vehicle catalogue by make, model, engine label and fuel type.
+- [ ] Confirm the result count changes with the search and an empty search result has a usable recovery action.
+- [ ] Confirm catalogue entries are described as common variants, not a complete or VIN-verified global database.
+- [ ] Follow the action from a catalogue entry to the vehicle-import planner.
+- [ ] Open `/shipping`. Confirm the page describes a checklist and manual quote comparison, not live market rates.
+- [ ] Compare two quotes in the same currency. Confirm the comparison uses the amounts entered.
+- [ ] Enter quotes in different currencies. Confirm they are not ranked as directly comparable.
+- [ ] Test invalid transit-day values and insurance toggles.
+- [ ] Navigate away and return. Confirm temporary quotes are not represented as saved or verified.
 
-## 6. Account and saved estimates (requires a configured Supabase test project)
+## 8. Legacy account area (optional; requires a configured test Supabase project)
 
-Do not perform these tests against production user accounts or real user data.
+The account page is retained for older saved estimates. The current vehicle-import planner does not save estimates to this account area.
 
-- [ ] Confirm the account page clearly reports when Supabase is not configured.
-- [ ] In a test Supabase project, create a test account and sign in.
-- [ ] Save a new general estimate while signed in. Confirm a cloud record appears in the account page.
-- [ ] Sign out and sign in again. Confirm the account can list its own saved estimate.
-- [ ] Load a cloud estimate into the general calculator and confirm the data is copied into local browser storage.
-- [ ] Delete the cloud estimate and confirm it is removed from the account list.
-- [ ] Test password reset using a test mailbox and the configured redirect URL.
-- [ ] Check Supabase row-level security with two separate test users. Confirm one user cannot read, update or delete the other user's estimate.
-- [ ] Confirm browser sign-out clears the local session. Remember that the current prototype stores the session in localStorage rather than an HttpOnly cookie.
+- [ ] Without Supabase configuration, confirm the page explains that account functions are not configured.
+- [ ] Use a dedicated test project and test mailbox. Do not use a real user's account.
+- [ ] Test account creation, email confirmation, sign-in, sign-out and password recovery.
+- [ ] Confirm older saved records can be listed and deleted.
+- [ ] Confirm the interface does not imply old general-import records can be loaded into the current vehicle planner.
+- [ ] Check row-level security with two separate test users. Confirm one user cannot read, update or delete the other user's records.
+- [ ] Confirm failure to reach Supabase is clearly reported and does not look like a successful save.
+- [ ] Remember that the current session implementation uses browser storage rather than an HttpOnly cookie.
 
-If Supabase is paused, missing schema or unavailable, mark the scenario **Blocked**. Do not claim the test passed because the UI loaded.
+Mark tests **Blocked** when the test project, database schema, email delivery or required test account is unavailable. A loaded account page alone does not prove that an account flow passed.
 
-## 7. Accessibility, responsive layout and browser checks
+## 9. Responsive, accessibility and browser checks
 
-- [ ] Navigate the primary pages using only the keyboard. Check visible focus, logical tab order and Escape behavior for the mobile navigation.
-- [ ] Confirm every form control has a visible label and validation errors are announced or associated with their fields.
-- [ ] Check the main pages at approximately 320 px, 390 px, tablet width and desktop width. Look for horizontal overflow, clipped buttons and overlapping content.
-- [ ] Use browser zoom at 200%. Confirm main content remains usable.
+- [ ] Test the home page, VIN form, vehicle planner, catalogue and shipping guide at 320 px, 390 px, tablet and desktop widths.
+- [ ] Confirm there is no horizontal overflow, clipped button, overlapped text or inaccessible input.
+- [ ] Navigate the main workflow with keyboard only. Confirm focus order is logical and visible.
 - [ ] Confirm the skip link moves focus to the main content.
-- [ ] Check the main routes in a second modern browser if available.
-- [ ] Check the browser console and network panel for unhandled errors or failed requests during the main user journeys.
+- [ ] Confirm every field has a visible label and important errors are announced or associated with the field.
+- [ ] Check at 200% browser zoom.
+- [ ] Check a second modern browser if available.
+- [ ] Inspect the browser console and network panel during VIN lookup and planner use for unhandled errors or unexpected requests.
 
-## 8. Release checks
+## 10. Release checks
 
-- [ ] Run `npm ci`.
-- [ ] Run `npm audit --audit-level=moderate`.
-- [ ] Run `npm run lint`.
-- [ ] Run `npm run typecheck`.
-- [ ] Run `npm test`.
-- [ ] Run `npm run build`.
-- [ ] Check the GitHub Actions result for the exact commit being released.
-- [ ] Check the Vercel deployment state and the production routes after deployment.
-- [ ] Review the README, privacy page and terms page against the code that is actually deployed.
+Run the repository checks on the exact candidate commit:
 
-## Notes and defects
+~~~bash
+npm ci
+npm audit --audit-level=moderate
+npm run lint
+npm run typecheck
+npm test
+npm run check:docs
+npm run build
+npm run test:smoke
+~~~
 
-| Test case | Result | Notes / evidence | Follow-up |
+- [ ] Confirm the GitHub Actions run belongs to the exact release commit and every required job passed.
+- [ ] Confirm the Vercel deployment is for the same commit and is marked READY.
+- [ ] Open the production site and verify the main workflow in a browser.
+- [ ] Check the converter routes remain removed and legacy redirects work.
+- [ ] Review the README, privacy policy, terms and manual QA plan against the actual deployed feature set.
+- [ ] Add a dated release record. Separate automated test results from manual browser checks and list anything not run or blocked.
+
+## Results and defects
+
+| Test case | Result | Evidence / notes | Follow-up |
 | --- | --- | --- | --- |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| | | | |
+| | | | |
+| | | | |

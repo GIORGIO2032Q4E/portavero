@@ -127,33 +127,20 @@ export default function AccountPage() {
     }
   }
 
-  function handleLoad(item: CloudEstimate) {
-    try {
-      const raw = window.localStorage.getItem("portavero-saved-estimates");
-      const parsed: unknown = raw ? JSON.parse(raw) : [];
-      const localEstimates = Array.isArray(parsed) ? parsed.filter((entry) => entry && typeof entry === "object") as Record<string, unknown>[] : [];
-      const snapshot = { ...item.data, id: Date.now(), name: item.name, savedAt: item.updated_at };
-      window.localStorage.setItem("portavero-saved-estimates", JSON.stringify([snapshot, ...localEstimates].slice(0, 10)));
-      window.location.assign("/calculator");
-    } catch {
-      setError("Could not load this estimate into the current browser.");
-    }
-  }
-
   return (
     <>
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Account</span>
-          <h1>{session ? "Your saved estimates." : "Save your estimates to your account."}</h1>
-          <p>This page shows import estimates saved to your account in an earlier version of Portavero. The current car-import planner does not yet save its results to your account.</p>
+          <h1>{session ? "Your saved estimates." : "Legacy account access."}</h1>
+          <p>Sign in to view older estimates saved to your account in a previous version of Portavero. The current vehicle-import planner does not save estimates to this account area. Older general-import estimates can be reviewed and deleted, but they cannot be loaded into the current planner.</p>
         </div>
       </section>
       <section className="section">
         <div className="container account-layout">
           {!configured ? (
             <section className="panel account-panel">
-              <h2>Account saving is not set up yet.</h2>
+              <h2>Legacy account access is not configured.</h2>
               <p>Account sign-in uses Supabase. To turn it on, the project URL and publishable key need to be added to the site settings.</p>
               <ol>
                 <li>Create a project at <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Supabase</a>.</li>
@@ -170,7 +157,7 @@ export default function AccountPage() {
                 <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Signed-in account"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
-              <p>Estimates you save while signed in are available on another device when you use the same account. Loading one makes a copy in this browser. Changes to that copy do not change the saved account version.</p>
+              <p>These are legacy estimates from an earlier version of Portavero. They can be reviewed and deleted here, but they are not compatible with the current vehicle-import planner.</p>
               <h3>Saved estimates ({estimates.length})</h3>
               {estimates.length === 0 ? <p className="empty-state">There are no estimates saved to this account yet.</p> : (
                 <div className="account-estimate-list">
@@ -178,19 +165,18 @@ export default function AccountPage() {
                     <div className="account-estimate" key={item.id}>
                       <div><strong>{item.name}</strong><small>Updated {new Date(item.updated_at).toLocaleDateString()}</small></div>
                       <div className="account-estimate-actions">
-                        <button type="button" className="button button-outline button-small" onClick={() => handleLoad(item)}>Load</button>
                         <button type="button" className="button button-outline button-small" onClick={() => void handleDelete(item.id)}>Delete</button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <Link href="/calculator" className="button button-dark">Open import calculator</Link>
+              <Link href="/vehicle-import" className="button button-dark">Open vehicle import planner</Link>
             </section>
           ) : (
             <section className="panel account-panel">
               <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account to access estimates already saved to your Portavero account." : "Sign in to see the import estimates saved to your account."}</p>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account for the retained account area. The current vehicle-import planner does not save estimates to it." : "Sign in to view older estimates saved to your account in a previous version."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
                 {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
