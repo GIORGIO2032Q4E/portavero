@@ -54,6 +54,7 @@ function getImportEstimateHref(result: DecodeResult) {
   const vehicle = result.vehicle;
   const params = new URLSearchParams();
   if (result.identifierType === "vin") params.set("vin", result.identifier);
+  else params.set("chassis", result.identifier);
 
   if (vehicle.make) params.set("make", vehicle.make);
   if (vehicle.model) params.set("model", vehicle.model);
