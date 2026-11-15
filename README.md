@@ -4,7 +4,7 @@
 
 Portavero is a student-built project about one practical part of buying a car from abroad: understanding what it may cost to bring that car into Georgia.
 
-The main workflow starts with a vehicle identification number (VIN). Portavero looks up the technical details that its data source can provide, carries the available details into a vehicle-import planner, and lets the user add purchase, auction, transport, shipping and other known costs. The planner then shows a preliminary estimate for selected passenger-car tax cases.
+The main workflow starts with a vehicle identification number (VIN). Portavero checks NHTSA vPIC and can use an optional international VIN decoder when configured, carries the fields actually returned into a vehicle-import planner, and lets the user add purchase, auction, transport, shipping and other known costs. The planner then shows a preliminary estimate for selected passenger-car tax cases.
 
 It is a planning tool, not a vehicle-history report, shipping quote, customs broker or official tax assessment.
 
@@ -15,7 +15,7 @@ It is a planning tool, not a vehicle-history report, shipping quote, customs bro
 
 ## Main workflow
 
-1. **Enter a VIN.** The server route validates the 17-character format and requests available technical data from NHTSA vPIC.
+1. **Enter a VIN.** The server route validates the 17-character format and requests available technical data from NHTSA vPIC. If the result has important gaps and the optional international provider is configured, it makes a fallback request to CarsXE.
 2. **Review the result.** The lookup may return complete or partial details. Check the result against the actual vehicle and its documents.
 3. **Continue to the import planner.** Available make, model, model year, engine, fuel and steering details are passed to the planner when the source supplies them. Missing or uncertain values must be checked or entered manually.
 4. **Add the costs you know.** Enter the purchase price, auction fees, inland transport, international shipping, insurance, port charges and local delivery in GEL. Convert foreign-currency quotes yourself using a rate you have checked.
@@ -27,7 +27,7 @@ A blank cost is not treated as free. The displayed total is only as complete as 
 
 | Area | Current behaviour | Important limitation |
 | --- | --- | --- |
-| VIN lookup | Validates VIN format, requests technical data from NHTSA vPIC through a server route, and presents available fields and warnings. | NHTSA data is manufacturer-submitted and can be incomplete, especially for vehicles built for markets outside the United States. It is not a history check. |
+| VIN lookup | Validates VIN format, requests technical data from NHTSA vPIC and can supplement missing fields with CarsXE's international VIN decoder when a server-side API key is configured. | Coverage varies by source, manufacturer and market. Japanese domestic frame/chassis numbers are not standard 17-character VINs. It is not a history check. |
 | Vehicle-import planner | Carries over available VIN details, accepts corrections and calculates selected passenger-car tax cases alongside user-entered costs. | It does not cover every classification, exception or transitional case. It is not an official customs assessment. |
 | Vehicle catalogue | Provides a searchable list of common makes, models and engine variants used to help identify a vehicle. | It is a curated reference, not a complete global database or proof of the engine fitted to a specific car. |
 | Shipping guide | Helps users review a carrier's route, inclusions, exclusions, timing and additional charges. The quote comparison uses values entered by the user. | It does not contact carriers, retrieve live freight prices or verify a provider's offer. |
@@ -53,12 +53,12 @@ The former `/calculator` and `/compare` paths redirect to `/vehicle-import` for 
 
 ## Technical structure
 
-The application uses the Next.js App Router. Page components collect input and present results. Reusable validation and calculation logic lives in JavaScript modules so it can be tested with Node's built-in test runner.
+The application uses the Next.js App Router. Page components collect input and present results. Reusable VIN parsing, provider merging, validation and calculation logic lives in JavaScript modules so it can be tested with Node's built-in test runner.
 
 ~~~text
 src/
   app/
-    api/vin-check/       Server route for the NHTSA VIN lookup
+    api/vin-check/       Server route for NHTSA plus optional international VIN fallback
     vin-check/           VIN form and technical-data result
     vehicle-import/      Main vehicle import planner
     vehicles/            Searchable vehicle catalogue
@@ -76,7 +76,7 @@ src/
   data/
     vehicle-catalog.ts   Curated vehicle and engine reference data
   lib/
-    vin.mjs              VIN validation and NHTSA response parsing
+    vin.mjs              VIN validation, NHTSA/CarsXE parsing and safe field merging
     vehicle-tax.mjs      Selected Georgian passenger-car tax rules
     vehicle-import-costs.mjs
                          Import-cost validation and totals
@@ -98,13 +98,13 @@ scripts/
 
 ## VIN data: what it can and cannot tell you
 
-The VIN endpoint calls the NHTSA vPIC `DecodeVinValuesExtended` service from a server-side route. Portavero validates the VIN shape before making the request, applies a timeout, handles upstream errors and turns available technical fields and provider warnings into a readable result.
+The VIN endpoint calls the NHTSA vPIC `DecodeVinValuesExtended` service from a server-side route. When NHTSA leaves key identity or specification fields blank, the route can request additional fields from the CarsXE International VIN Decoder. CarsXE is optional and is only called when the private server-side `CARSXE_API_KEY` environment variable is configured. Its international decoder uses provider credits and may incur charges after any sandbox allowance; check the current plan, quota and overage settings before adding a key. The route applies timeouts, caches the international response for up to 24 hours and keeps the provider key off the client.
 
-The source may provide fields such as make, model, model year, engine capacity, fuel type and steering location. Not every field is available for every VIN. The planner therefore asks the user to confirm or enter information that the decoder did not return.
+The sources may provide fields such as make, model, model year, body style, engine capacity, fuel type, plant country and steering location. Each source returns only the fields it knows. The merge keeps NHTSA values where present and supplements only missing fields. CarsXE's documented international response does not guarantee engine capacity or steering, so those remain blank unless a provider actually returns them. The planner asks the user to confirm or enter information that no source returned.
 
 The lookup does **not** retrieve accident, title, ownership, odometer, service or auction history. It does not return original auction photographs. A valid-looking 17-character string is not proof that a vehicle exists, and a missing history result must never be interpreted as a clean history.
 
-Source: [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/). The VIN is sent to NHTSA for decoding; see the site's Privacy Policy for the data-sharing disclosure.
+Sources: [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/) and, when configured, [CarsXE International VIN Decoder](https://docs.carsxe.com/docs/products/international-vin-decoder). A submitted VIN is sent to NHTSA and is also sent to CarsXE when the optional fallback is used. See the Privacy Policy.
 
 ## Georgian vehicle-tax estimate
 
@@ -128,7 +128,7 @@ These are the rules currently encoded in the project, not a binding interpretati
 ## Data, privacy and security notes
 
 - The vehicle planner performs its arithmetic in the browser. The costs entered for a calculation are not sent to an external service just to calculate the displayed total.
-- A VIN submitted to the VIN checker is sent from the Portavero server route to NHTSA vPIC for decoding.
+- A VIN submitted to the checker is sent from the Portavero server route to NHTSA vPIC. If `CARSXE_API_KEY` is configured and the NHTSA result has important gaps or fails, the VIN may also be sent to CarsXE for international decoding.
 - Shipping quotes are entered by the user. Portavero does not send them to shipping companies.
 - The current planner does not save estimates to a user account. The account page relates to older saved estimates.
 - The legacy account feature uses Supabase when configured. Its session is held in browser storage rather than an HttpOnly cookie. Do not use it on shared or untrusted devices or store sensitive data in estimate names.
@@ -176,6 +176,7 @@ Open http://localhost:3000.
 | `NEXT_PUBLIC_SUPABASE_URL` | Optional legacy account connection |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Optional legacy account connection |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Legacy alternative to the publishable-key variable |
+| `CARSXE_API_KEY` | Optional private key for international VIN fallback. Keep it server-side; never prefix it with `NEXT_PUBLIC_`. |
 
 The site can be used without Supabase credentials. The legacy account functions will be unavailable until Supabase is configured. Only public Supabase keys belong in `NEXT_PUBLIC_*` variables. Never expose a service-role key in browser code or commit secrets to Git.
 
@@ -218,14 +219,15 @@ A deployment marked READY confirms that Vercel completed the deployment process.
 
 ## Known limitations
 
-1. VIN coverage depends on the fields returned by NHTSA vPIC and is more limited for some non-U.S. market vehicles.
-2. The vehicle and engine catalogue is curated and incomplete. Confirm engine size from the car's documents.
-3. Tax calculations cover selected passenger-car cases and do not confirm classification or transitional eligibility.
-4. The GEL 480 standard-fee amount is a stored snapshot, not live data.
-5. Shipping prices and exchange rates must be checked and entered by the user.
-6. The current planner does not save an estimate to a user account. The account area is retained for legacy estimates.
-7. The account session implementation uses browser storage rather than an HttpOnly cookie.
-8. Browser-level and authenticated account testing must be repeated against the exact release before those flows can be described as verified.
+1. VIN coverage depends on the decoder sources, manufacturer and market. The CarsXE international fallback is inactive unless a private API key is configured, and its coverage also varies.
+2. Some Japanese domestic-market vehicles use a frame/chassis number rather than a standard 17-character VIN. Those numbers are not decoded by this tool and need manual identification from the vehicle documents or manufacturer.
+3. The vehicle and engine catalogue is curated and incomplete. Confirm engine size from the car's documents.
+4. Tax calculations cover selected passenger-car cases and do not confirm classification or transitional eligibility.
+5. The GEL 480 standard-fee amount is a stored snapshot, not live data.
+6. Shipping prices and exchange rates must be checked and entered by the user.
+7. The current planner does not save an estimate to a user account. The account area is retained for legacy estimates.
+8. The account session implementation uses browser storage rather than an HttpOnly cookie.
+9. Browser-level and authenticated account testing must be repeated against the exact release before those flows can be described as verified.
 
 The project is intentionally focused. The priority is to make the VIN data, assumptions, cost breakdown and limitations reliable and understandable before adding more services.
 

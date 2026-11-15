@@ -35,6 +35,10 @@ Use public test VINs only. A correctly shaped VIN is not proof that a vehicle ex
 - [ ] Submit a known test VIN such as `1HGCM82633A004352`. Confirm the page shows only fields returned by the provider and identifies the data source.
 - [ ] Confirm a partially decoded response is presented as partial data, not as a complete vehicle specification.
 - [ ] Confirm provider warnings appear in readable language and are not hidden by a generic success message.
+- [ ] With `CARSXE_API_KEY` configured in a local test environment, use a non-U.S. test VIN supported by CarsXE. Confirm the international provider is called only when the NHTSA result has important gaps or fails.
+- [ ] Confirm international data fills only missing NHTSA fields and never overwrites an existing NHTSA value.
+- [ ] Confirm an unavailable or invalid CarsXE response leaves usable NHTSA data visible and does not expose the API key or provider diagnostics.
+- [ ] Without `CARSXE_API_KEY`, confirm the checker clearly identifies that international fallback is not configured when displaying a VIN result.
 - [ ] Edit the VIN after a result. Confirm the old result and error are cleared before the next lookup.
 - [ ] Confirm the input cannot be submitted repeatedly while a lookup is in progress.
 - [ ] Test an invalid JSON response, empty result, provider no-data response, rate-limit response, upstream server error and request timeout using a mock or controlled test.
@@ -51,12 +55,14 @@ Use public test VINs only. A correctly shaped VIN is not proof that a vehicle ex
 - [ ] When steering side is returned, confirm it is passed through. When it is missing or unclear, confirm the planner requires the user to choose it.
 - [ ] Use a VIN with missing make, model, year or engine data. Confirm missing values remain missing and are not replaced with guessed defaults.
 - [ ] Confirm a decoded make/model that does not match the local catalogue remains reviewable and does not silently select an unrelated vehicle.
+- [ ] Confirm Japanese domestic frame/chassis numbers are not treated as standard VINs and the user is directed to manual vehicle identification.
 - [ ] Change every auto-filled value to match a vehicle document. Confirm the user's correction is retained and the tax estimate responds to the corrected input.
 - [ ] Confirm VIN information is presented as provider-supplied technical data, not as proof that the physical vehicle matches the decoded record.
 
 ## 4. Vehicle-import planner inputs
 
-- [ ] Open `/vehicle-import` with a clean session. Confirm no arbitrary engine capacity or complete tax estimate is silently assumed.
+- [ ] Open `/vehicle-import` with a clean session. Confirm the manufacture year is blank, no arbitrary year is assumed and no tax estimate or final total is shown until a valid year is entered.
+- [ ] Pass a VIN with no model year to the planner. Confirm the manufacture-year field remains blank and must be completed manually.
 - [ ] Select a make, model and single-capacity engine variant. Confirm the selected capacity and fuel details appear.
 - [ ] Change the make after selecting a model and engine. Confirm dependent model, engine, capacity and relevant vehicle-type selections reset.
 - [ ] Change the model after selecting an engine. Confirm the old engine selection and capacity are cleared.
