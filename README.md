@@ -98,7 +98,7 @@ scripts/
 
 ## VIN data: what it can and cannot tell you
 
-The VIN endpoint calls the NHTSA vPIC `DecodeVinValuesExtended` service from a server-side route. When NHTSA leaves key identity or specification fields blank, the route can request additional fields from the CarsXE International VIN Decoder. CarsXE is optional and is only called when the private server-side `CARSXE_API_KEY` environment variable is configured. The route applies timeouts, caches the international response for up to 24 hours and keeps the provider key off the client.
+The VIN endpoint calls the NHTSA vPIC `DecodeVinValuesExtended` service from a server-side route. When NHTSA leaves key identity or specification fields blank, the route can request additional fields from the CarsXE International VIN Decoder. CarsXE is optional and is only called when the private server-side `CARSXE_API_KEY` environment variable is configured. Its international decoder uses provider credits and may incur charges after any sandbox allowance; check the current plan, quota and overage settings before adding a key. The route applies timeouts, caches the international response for up to 24 hours and keeps the provider key off the client.
 
 The sources may provide fields such as make, model, model year, body style, engine capacity, fuel type, plant country and steering location. Each source returns only the fields it knows. The merge keeps NHTSA values where present and supplements only missing fields. CarsXE's documented international response does not guarantee engine capacity or steering, so those remain blank unless a provider actually returns them. The planner asks the user to confirm or enter information that no source returned.
 
