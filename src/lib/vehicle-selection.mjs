@@ -40,8 +40,8 @@ export function getVinPowertrain(details = {}) {
   const secondary = typeof details.secondaryFuelType === "string" ? details.secondaryFuelType.trim().toLowerCase() : "";
   const electrification = typeof details.electrificationLevel === "string" ? details.electrificationLevel.trim().toLowerCase() : "";
   const combined = [primary, secondary, electrification].join(" ");
-  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test(electrification);
-  const plugInHybrid = /plug.?in|phev/.test(electrification);
+  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test([primary, secondary, electrification].join(" "));
+  const plugInHybrid = /plug.?in|phev/.test([primary, secondary, electrification].join(" "));
   const hasElectric = /electric|battery|bev/.test(combined);
   const hasCombustion = /gasoline|petrol|diesel|ethanol|lpg|propane|cng|natural gas|hydrogen/.test(combined);
   const pureElectricLevel = /battery electric|bev|pure electric|all electric/.test(electrification);
