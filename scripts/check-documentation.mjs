@@ -6,7 +6,7 @@ import { URL } from "node:url";
 
 const output = new Console(process.stdout, process.stderr);
 
-const [readme, manualQa, privacy, terms, account, home, vinPage, planner] = await Promise.all([
+const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercelConfig] = await Promise.all([
   readFile(new URL("../README.md", import.meta.url), "utf8"),
   readFile(new URL("../docs/MANUAL_QA.md", import.meta.url), "utf8"),
   readFile(new URL("../src/app/privacy-policy/page.tsx", import.meta.url), "utf8"),
@@ -14,7 +14,8 @@ const [readme, manualQa, privacy, terms, account, home, vinPage, planner] = awai
   readFile(new URL("../src/app/account/page.tsx", import.meta.url), "utf8"),
   readFile(new URL("../src/app/page.tsx", import.meta.url), "utf8"),
   readFile(new URL("../src/app/vin-check/page.tsx", import.meta.url), "utf8"),
-  readFile(new URL("../src/app/vehicle-import/page.tsx", import.meta.url), "utf8")
+  readFile(new URL("../src/app/vehicle-import/page.tsx", import.meta.url), "utf8"),
+  readFile(new URL("../vercel.json", import.meta.url), "utf8")
 ]);
 
 assert.match(readme, /student-built project about one practical part of buying a car/i);
@@ -30,6 +31,9 @@ assert.match(readme, /CarsXE International VIN Decoder/i);
 assert.match(readme, /CARSXE_API_KEY/i);
 assert.match(readme, /Cardog Japanese chassis lookup/i);
 assert.match(readme, /CARDOG_API_KEY/i);
+assert.match(readme, /Automatic Vercel deployments are restricted to `main`/);
+assert.match(vercelConfig, /"\*\*": false/);
+assert.match(vercelConfig, /"main": true/);
 assert.match(readme, /frame\/chassis number/i);
 assert.match(planner, /useState<number \| null>\(null\)/);
 assert.match(planner, /hasValidManufactureYear\(year, declarationYear\)/);
@@ -45,6 +49,7 @@ assert.match(manualQa, /VIN-to-import hand-off/i);
 assert.match(manualQa, /Tax rules and calculation boundaries/i);
 assert.match(manualQa, /320 px/i);
 assert.match(manualQa, /Release checks/i);
+assert.match(manualQa, /feature-branch pushes do not create Vercel deployments/);
 assert.doesNotMatch(manualQa, /^## 1\. General import calculator$/m);
 assert.doesNotMatch(manualQa, /^## 4\. Vehicle comparison$/m);
 
