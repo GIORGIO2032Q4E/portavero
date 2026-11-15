@@ -90,8 +90,16 @@ export default function VehicleImportPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const incomingVin = params.get("vin") ?? "";
+    const incomingChassis = params.get("chassis") ?? "";
+    const hasValidVin = validateVin(incomingVin).valid;
+    const hasValidChassis = validateJapaneseChassis(incomingChassis).valid;
+    const incomingIdentifier = hasValidVin
+      ? incomingVin.toUpperCase()
+      : hasValidChassis
+        ? incomingChassis.toUpperCase()
+        : "";
 
-    if (validateVin(incomingVin).valid) {
+    if (incomingIdentifier) {
       const make = (params.get("make") ?? "").slice(0, 80);
       const model = (params.get("model") ?? "").slice(0, 80);
       const matchingMake = findVinMake(make);
