@@ -87,9 +87,7 @@ export async function POST(request: Request) {
   if (decoded.kind === "no-data") {
     return NextResponse.json(
       {
-        error: "No vehicle details were found for this VIN. Check the number and vehicle documents.",
-        providerMessage: decoded.providerMessage,
-        providerWarnings: decoded.providerWarnings
+        error: "No vehicle details were found for this VIN. Check the number and vehicle documents."
       },
       { status: 422 }
     );
