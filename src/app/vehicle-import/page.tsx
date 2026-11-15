@@ -7,11 +7,30 @@ import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 import { validateVin } from "@/lib/vin.mjs";
-import { getEngineCapacityForSelection, getManualVehicleTypeSelection } from "@/lib/vehicle-selection.mjs";
+import { getEngineCapacityForSelection, getManualVehicleTypeSelection, getVinPowertrain, normalizeVinSteering } from "@/lib/vehicle-selection.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = STANDARD_VEHICLE_FEES_GEL;
 type CostFieldKey = "purchase" | "auction" | "inland" | "shipping" | "insurance" | "port" | "delivery";
+
+const normalizeVehicleName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const vinMakeAliases: Record<string, string> = {
+  vw: "volkswagen",
+  mercedes: "mercedesbenz",
+  mercedesamg: "mercedesbenz",
+  benz: "mercedesbenz",
+  "landrover": "landrover",
+  "alfaromeo": "alfaromeo",
+  "rollsroyce": "rollsroyce",
+  "dsautomobiles": "dsautomobiles"
+};
+
+function findVinMake(value: string) {
+  const key = normalizeVehicleName(value);
+  const canonicalKey = vinMakeAliases[key] ?? key;
+  return vehicleCatalog.find((make) => normalizeVehicleName(make.name) === canonicalKey);
+}
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -49,6 +68,7 @@ export default function VehicleImportPage() {
   const [vin, setVin] = useState("");
   const [vinVehicleName, setVinVehicleName] = useState("");
   const [vinElectric, setVinElectric] = useState(false);
+  const [vinFuelNeedsConfirmation, setVinFuelNeedsConfirmation] = useState(false);
   const [invalidCostFields, setInvalidCostFields] = useState<Record<CostFieldKey, boolean>>({
     purchase: false,
     auction: false,
@@ -73,28 +93,60 @@ export default function VehicleImportPage() {
     if (validateVin(incomingVin).valid) {
       const make = (params.get("make") ?? "").slice(0, 80);
       const model = (params.get("model") ?? "").slice(0, 80);
-      const matchingMake = vehicleCatalog.find((item) => item.name.toLowerCase() === make.toLowerCase());
-      const matchingModel = matchingMake?.models.find((item) => item.name.toLowerCase() === model.toLowerCase());
+      const matchingMake = findVinMake(make);
+      const modelKey = normalizeVehicleName(model);
+      const matchingModel = matchingMake?.models.find((item) =>
+        normalizeVehicleName(item.name) === modelKey
+      ) ?? matchingMake?.models
+        .filter((item) => {
+          const candidate = normalizeVehicleName(item.name);
+          return candidate.length >= 3 && (modelKey.startsWith(candidate) || candidate.startsWith(modelKey));
+        })
+        .sort((a, b) => normalizeVehicleName(b.name).length - normalizeVehicleName(a.name).length)[0];
       const modelYear = Number(params.get("year"));
-      const capacity = Number(params.get("engineCc"));
-      const fuel = (params.get("fuel") ?? "").toLowerCase();
+      const capacityValue = Number(params.get("engineCc"));
+      const capacity = Number.isFinite(capacityValue) && capacityValue > 0 && capacityValue <= 100000
+        ? capacityValue
+        : null;
+      const powertrain = getVinPowertrain({
+        primaryFuelType: params.get("fuelPrimary") ?? params.get("fuel") ?? "",
+        secondaryFuelType: params.get("fuelSecondary") ?? "",
+        electrificationLevel: params.get("electrification") ?? ""
+      });
+      const reportedSteering = normalizeVinSteering(
+        params.get("steering") ?? params.get("steeringLocation") ?? ""
+      );
+      const modelEngines = matchingModel?.engines ?? [];
+      const capacityMatches = capacity === null
+        ? []
+        : modelEngines.filter((engine) => engine.cc > 0 && Math.abs(engine.cc - capacity) <= 2);
+      const matchingEngine = modelEngines.find((engine) =>
+        engine.fuel === powertrain.fuel &&
+        (engine.cc === 0 || capacity === null || Math.abs(engine.cc - capacity) <= 2)
+      ) ?? (capacityMatches.length === 1 ? capacityMatches[0] : undefined) ??
+        (powertrain.isElectric ? modelEngines.find((engine) => engine.fuel === "Electric") : undefined);
+      const effectiveFuelNeedsConfirmation = powertrain.needsConfirmation && !matchingEngine;
+      const isElectric = matchingEngine?.fuel === "Electric" || powertrain.isElectric;
+      const isHybrid = matchingEngine
+        ? matchingEngine.fuel === "Hybrid" || matchingEngine.fuel === "Plug-in hybrid"
+        : powertrain.isHybrid;
 
       setVin(incomingVin.toUpperCase());
       setVinVehicleName([make, model].filter(Boolean).join(" ") || "Vehicle from VIN");
-      if (matchingMake) setMakeName(matchingMake.name);
-      if (matchingModel) setModelName(matchingModel.name);
+      setMakeName(matchingMake?.name ?? make);
+      setModelName(matchingModel?.name ?? model);
       if (Number.isInteger(modelYear) && modelYear >= 1960 && modelYear <= new Date().getFullYear() + 2) {
         setYear(modelYear);
         if (modelYear > new Date().getFullYear()) setDeclarationYear(modelYear);
       }
-      if (Number.isFinite(capacity) && capacity > 0 && capacity <= 100000) {
-        setEngineCc(capacity);
-      }
-      setHybrid(fuel.includes("hybrid") || (fuel.includes("gasoline") && fuel.includes("electric")));
-      setVinElectric(fuel.includes("electric") && !fuel.includes("gasoline") && !fuel.includes("diesel") && !fuel.includes("hybrid"));
-      setSteering("");
+      setEngineId(matchingEngine?.id ?? "");
+      setEngineCc(isElectric ? null : capacity);
+      setHybrid(isHybrid);
+      setVinElectric(isElectric);
+      setVinFuelNeedsConfirmation(effectiveFuelNeedsConfirmation);
+      setSteering(reportedSteering);
+      setClassicCar(false);
     }
-
   }, []);
 
   const selectedMake = vehicleCatalog.find((make) => make.name === makeName);
@@ -108,7 +160,7 @@ export default function VehicleImportPage() {
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || vehicleAge > 30;
   const validSteering = steering === "left" || steering === "right";
-  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering;
+  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering && !vinFuelNeedsConfirmation;
   const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
 
   const result = useMemo(() => {
@@ -177,19 +229,21 @@ export default function VehicleImportPage() {
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
             <p className="panel-intro">This planner covers selected passenger cars under HS 8703. It does not cover every vehicle or tax exception, so check unusual cases with the Revenue Service.</p>
             <div className="notice"><strong>Important:</strong> This planner only covers selected passenger cars under HS 8703. It does not determine the car's tariff classification, cover every exemption or confirm transitional eligibility. It also does not include the separate sports-car excise treatment in Article 188(9). Electric and classic-car calculations are limited to the cases shown here. Check special cases with the Revenue Service.</div>
-            {vin && <div className="notice" role="status"><strong>Details loaded from VIN for {vinVehicleName}.</strong> {engineCc === null && !isElectric ? "NHTSA did not return an engine size. Enter it from the car's documents. " : "Check the returned engine size and model year against the car's documents. "}Choose the steering side below; it is not confirmed by this VIN lookup.</div>}
+            {vin && <div className="notice" role="status"><strong>Details loaded from VIN for {vinVehicleName}.</strong> {engineCc === null && !isElectric ? "NHTSA did not return an engine size. Enter it from the car's documents. " : "The available year and engine data have been filled in. Check them against the vehicle documents. "} {validSteering ? "Steering was returned by the decoder; verify it against the vehicle." : "Choose the steering side because the decoder did not identify it."}</div>}
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="make">Make</label>
-                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setClassicCar(false); }}>
+                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setVinFuelNeedsConfirmation(Boolean(vin)); setClassicCar(false); }}>
                   <option value="">Choose a make</option>
+                  {makeName && !vehicleCatalog.some((item) => item.name === makeName) && <option value={makeName}>{makeName} · from VIN</option>}
                   {vehicleCatalog.map((make) => <option key={make.name} value={make.name}>{make.name}</option>)}
                 </select>
               </div>
               <div className="field">
                 <label htmlFor="model">Model</label>
-                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setClassicCar(false); }}>
+                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setVinFuelNeedsConfirmation(Boolean(vin)); setClassicCar(false); }}>
                   <option value="">Choose a model</option>
+                  {modelName && selectedMake && !selectedMake.models.some((item) => item.name === modelName) && <option value={modelName}>{modelName} · from VIN</option>}
                   {selectedMake?.models.map((model) => <option key={model.name} value={model.name}>{model.name}</option>)}
                 </select>
               </div>
@@ -202,6 +256,7 @@ export default function VehicleImportPage() {
                   setVinElectric(false);
                   setEngineCc(getEngineCapacityForSelection(engine));
                   setHybrid(engine?.fuel === "Hybrid" || engine?.fuel === "Plug-in hybrid");
+                  setVinFuelNeedsConfirmation(false);
                   setClassicCar(false);
                 }}>
                   <option value="">Choose an engine variant</option>
@@ -245,15 +300,17 @@ export default function VehicleImportPage() {
               </div>
               <div className="field">
                 <label htmlFor="hybrid">Vehicle type</label>
-                <select id="hybrid" value={isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
+                <select id="hybrid" value={vinFuelNeedsConfirmation ? "" : isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
                   const next = getManualVehicleTypeSelection(event.target.value);
                   setEngineId(next.engineId);
                   setVinElectric(false);
                   setEngineCc(null);
                   setHybrid(next.hybrid);
                   setClassicCar(next.classicCar);
+                  setVinFuelNeedsConfirmation(false);
                 }}>
-                  <option value="electric" disabled>Electric (from selected engine variant)</option>
+                  <option value="" disabled>Confirm vehicle type from documents</option>
+                  <option value="electric" disabled>Electric (from VIN or selected engine)</option>
                   <option value="other">Non-hybrid</option>
                   <option value="hybrid">Hybrid</option>
                   <option value="classic" disabled={vehicleAge <= 30}>Classic car (over 30 years old, classification confirmed)</option>
@@ -261,17 +318,18 @@ export default function VehicleImportPage() {
                 <small>The 60% reduction is only for left-hand-drive hybrids aged 0–6 years. Choose the classic-car option only if the car meets the legal classification.</small>
               </div>
             </div>
-            {vin && !validSteering && <div className="notice" role="alert">Choose whether the car is left-hand drive or right-hand drive before using the tax estimate. The VIN lookup does not confirm steering side.</div>}
+            {vin && !validSteering && <div className="notice" role="alert">Choose whether the car is left-hand drive or right-hand drive before using the tax estimate. The VIN source did not confirm steering side.</div>}
+            {vin && vinFuelNeedsConfirmation && <div className="notice" role="alert">The VIN source did not identify the fuel system clearly enough to choose the correct tax treatment. Confirm whether this car is non-hybrid or hybrid using its documents.</div>}
             {preAprilRegime && <div className="notice" role="status"><strong>Using the previous tax rules?</strong> Selecting this option does not mean the car qualifies. The Revenue Service asks for specific registration and transport documents, and the deadlines depend on how the car was moved. Check your documents with them before relying on this estimate.</div>}
             {declarationYear > currentYear && <div className="notice" role="status"><strong>Planning for {declarationYear}?</strong> This uses the tax rules and GEL 480 fee list currently stored in Portavero. Rates, fees and requirements may change before then, so treat the result as a rough guide, not a forecast.</div>}
             {!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Cars over 6 years old:</strong> the base excise rate is GEL 4.50 per cm³ before any applicable adjustments. The previously proposed age-based registration ban was replaced by this higher rate. Other emissions, vehicle-category and registration rules may still apply, so check the exact car before buying or shipping.</div>}
-            {(!eligibleYear || !validEngine || !validVehicleType || isElectric) && <div className="notice" role="status">{isElectric ? "This planner includes a limited calculation for electric passenger cars. Check the car's classification and any special rules with the Revenue Service." : !validVehicleType ? "The classic-car rate is only available for cars over 30 years old that meet the legal classification." : "Check the manufacture year and engine size before relying on the estimate."}</div>}
+            {(!eligibleYear || !validEngine || !validVehicleType || isElectric || vinFuelNeedsConfirmation) && <div className="notice" role="status">{vinFuelNeedsConfirmation ? "Confirm the vehicle's fuel system before relying on the tax estimate." : isElectric ? "This planner includes a limited calculation for electric passenger cars. Check the car's classification and any special rules with the Revenue Service." : !validVehicleType ? "The classic-car rate is only available for cars over 30 years old that meet the legal classification." : "Check the manufacture year and engine size before relying on the estimate."}</div>}
             {canShowTaxEstimate ? (
               <div className="notice">
                 <strong>Rate used:</strong> {preAprilRegime ? "Previous age-based excise table (transitional cases only)" : "Current rates from 2 April 2026"}. {isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rule: age-based rate × 2,000 for right-hand-drive/converted EVs" : "GEL 3,000 fixed excise for right-hand-drive/converted EVs") : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label}.` : "Check the engine capacity against the car's documents."} The catalogue lists common variants only, not every year or market configuration. Transitional cases and vehicle classification need official verification.
               </div>
             ) : (
-              <div className="notice">Complete the car details, including engine size and steering side, to see the tax rate and total.</div>
+              <div className="notice">Complete the car details, including engine size, fuel type and steering side, to see the tax rate and total.</div>
             )}
           </section>
 
@@ -287,7 +345,7 @@ export default function VehicleImportPage() {
               <div className="result-line"><span>Standard listed clearance and registration fees</span><strong>{money(result.officialFees)}</strong></div>
               <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
               <div className="result-line"><span>Other costs you entered</span><strong>{result.knownCosts === null ? "Check details" : money(result.knownCosts)}</strong></div>
-              <div className="result-line result-line-total"><span>Known costs, estimated taxes and standard fees</span><strong>{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
+              <div className="result-line result-line-total"><span>Known costs so far, estimated taxes and standard fees</span><strong>{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
             </div>
             <div className="disclaimer">{result.invalidAmounts && <><strong>One of the amounts needs checking.</strong> Portavero cannot safely calculate the total until you fix the invalid entry. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "Blank costs are not included, so this is not the final price of the car." : "You've entered an amount for every additional cost."} The total includes GEL 480 in listed standard fees. A broker, storage, special handling, vehicle classification or transitional rules may add costs or change the tax amount.</div>
           </aside>
