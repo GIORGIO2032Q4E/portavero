@@ -26,6 +26,8 @@ export default function TermsPage() {
           <p>The car-import estimate uses the vehicle details and costs you enter. It applies only the tax rules covered by the current version and includes a saved snapshot of standard fees. It does not retrieve a live customs assessment or guarantee what you will be charged. The vehicle list is not complete, and choosing an engine from it does not prove that it is the engine fitted to your car.</p>
           <p>The VIN lookup uses an external vehicle database to find available technical data. It does not check accident, title, ownership, mileage, service or auction history. No result does not mean the car has a clean history. The shipping page only compares the offers you enter. Portavero does not contact shipping companies or verify their prices or terms.</p>
 
+          <p>The USD/GEL converter uses the published reference rate from the National Bank of Georgia. Banks and exchange offices may apply different buying and selling rates, so check the rate offered before exchanging money.</p>
+
           <h2>Please check before you make a decision</h2>
           <p>Use the results as a starting point, not as a final answer. They are not a shipping offer, official customs valuation, tax ruling, legal opinion, insurance policy or promise of the final cost. The car estimate does not cover every vehicle type, exception or transitional case. Rules, fees and provider charges can also change.</p>
 
