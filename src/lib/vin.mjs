@@ -214,7 +214,7 @@ export function parseNhtsaVinResponse(payload, vin) {
 
   const hasMake = Boolean(readField(row, "Make"));
   const hasModel = Boolean(readField(row, "Model"));
-  const quality = hasMake && hasModel ? "complete" : "partial";
+  const quality = hasMake && hasModel && vehicle.modelYear !== null ? "complete" : "partial";
 
   return {
     kind: quality,
