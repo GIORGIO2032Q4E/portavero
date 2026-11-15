@@ -26,7 +26,7 @@ assert.doesNotMatch(readme, /Vehicle comparison \|/i);
 assert.doesNotMatch(readme, /Shipping quote comparison \|/i);
 
 assert.match(manualQa, /VIN-to-import hand-off/i);
-assert.match(manualQa, /selected passenger-car tax cases/i);
+assert.match(manualQa, /Tax rules and calculation boundaries/i);
 assert.match(manualQa, /320 px/i);
 assert.match(manualQa, /Release checks/i);
 assert.doesNotMatch(manualQa, /^## 1\. General import calculator$/m);
