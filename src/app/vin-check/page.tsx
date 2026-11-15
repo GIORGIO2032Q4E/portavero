@@ -26,6 +26,8 @@ type DecodeResult = {
   vin: string;
   vehicle: DecodedVehicle;
   fields: DecodedField[];
+  sources: string[];
+  internationalProviderConfigured: boolean;
 };
 type ApiResponse = {
   error?: string;
@@ -33,6 +35,8 @@ type ApiResponse = {
   quality?: "complete" | "partial";
   vehicle?: unknown;
   fields?: unknown;
+  sources?: unknown;
+  internationalProviderConfigured?: unknown;
 };
 
 function isDecodedField(value: unknown): value is DecodedField {
@@ -119,6 +123,10 @@ export default function VinCheckPage() {
         vin: payload.vin,
         vehicle: payload.vehicle as DecodedVehicle,
         fields,
+        sources: Array.isArray(payload.sources)
+          ? payload.sources.filter((source): source is string => typeof source === "string")
+          : [],
+        internationalProviderConfigured: payload.internationalProviderConfigured === true,
       });
     } catch {
       setError("Could not complete the request. Check your connection and try again.");
@@ -175,6 +183,7 @@ export default function VinCheckPage() {
                     required
                   />
                   <small id="vin-help">Enter all 17 characters. Standard VINs do not use the letters I, O or Q. Do not add spaces or punctuation.</small>
+                  <small>Some Japanese domestic-market cars use a frame or chassis number instead of a standard 17-character VIN. Portavero cannot decode those numbers; use the vehicle documents to enter the details manually.</small>
                 </div>
 
                 <div className="field">
@@ -235,7 +244,8 @@ export default function VinCheckPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="source-note">These details come from the vehicle information linked to the VIN. Check them against the car and its documents.</p>
+                  <p className="source-note">Data source{result.sources.length === 1 ? "" : "s"}: {result.sources.length > 0 ? result.sources.join(" + ") : "VIN decoder"}.</p>
+                  <p className="source-note">The international VIN provider {result.internationalProviderConfigured ? "is configured as a fallback when the first source has gaps." : "is not configured yet. Non-U.S. VIN coverage may therefore remain limited."} Confirm all returned details against the car and its documents.</p>
                   <p className="source-note">VIN submitted: <code>{result.vin}</code></p>
                   <p className="source-note">The calculator will carry over the make, model, year, engine size, fuel system and steering side when available. You only need to confirm details the lookup could not identify.</p>
                   <Link href={getImportEstimateHref(result)} className="button button-dark">Continue to this car’s import estimate ↗</Link>
@@ -277,7 +287,7 @@ export default function VinCheckPage() {
           <h2>What you can get from a VIN</h2>
           <p>Depending on the VIN, the lookup may return the make, model, model year, body type, engine capacity, fuel type, drive type and place of manufacture.</p>
           <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. No result does not mean the car is accident-free.</p>
-          <p>The vehicle database is mainly intended for cars made for the United States market. A car from another market may return only a few details, or none at all. Check the VIN on the car and its documents, and confirm the specifications with the seller or manufacturer.</p>
+          <p>Portavero first checks the NHTSA vPIC database and can use an optional international VIN provider when configured. Coverage still varies by manufacturer, market and model year, and a provider may return only a few fields or none. Some Japanese domestic-market cars use frame or chassis numbers rather than 17-character VINs; those are not supported by this lookup and must be checked against the vehicle documents or manufacturer.</p>
         </div>
       </section>
     </>
