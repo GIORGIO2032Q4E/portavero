@@ -18,7 +18,7 @@ const [readme, manualQa, privacy, terms, account, home, vinPage, planner] = awai
 ]);
 
 assert.match(readme, /student-built project about one practical part of buying a car/i);
-assert.match(readme, /VIN lookup/i);
+assert.match(readme, /vehicle identification/i);
 assert.match(readme, /vehicle-import planner/i);
 assert.match(readme, /retrieve live freight prices/i);
 assert.match(readme, /GEL 480/i);
