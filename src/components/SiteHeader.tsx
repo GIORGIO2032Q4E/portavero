@@ -7,7 +7,6 @@ import { useState } from "react";
 const navigation = [
   { href: "/vin-check", label: "VIN check" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/currency-converter", label: "USD / GEL" },
 ];
 
 export default function SiteHeader() {
