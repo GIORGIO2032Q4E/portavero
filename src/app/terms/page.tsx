@@ -20,11 +20,11 @@ export default function TermsPage() {
           <p><strong>Last updated: November 13, 2026</strong></p>
 
           <h2>What Portavero is for</h2>
-          <p>Portavero is a student project I built to help estimate the cost of importing a car into Georgia. You can check a VIN, review the technical details returned by NHTSA, estimate selected vehicle taxes, add purchase and shipping costs, and review shipping quotes you already have. It is not a customs broker, shipping company, vehicle-history service or government website.</p>
+          <p>Portavero is a student project I built to help estimate the cost of importing a car into Georgia. You can check a VIN, review the technical details returned by the VIN lookup, estimate selected vehicle taxes, add purchase and shipping costs, and review shipping quotes you already have. It is not a customs broker, shipping company, vehicle-history service or government website.</p>
 
           <h2>About the numbers</h2>
           <p>The car-import estimate uses the vehicle details and costs you enter. It applies only the tax rules covered by the current version and includes a saved snapshot of standard fees. It does not retrieve a live customs assessment or guarantee what you will be charged. The vehicle list is not complete, and choosing an engine from it does not prove that it is the engine fitted to your car.</p>
-          <p>The VIN lookup asks NHTSA vPIC for technical data. It does not check accident, title, ownership, mileage, service or auction history. No result does not mean the car has a clean history. The shipping page only compares the offers you enter. Portavero does not contact shipping companies or verify their prices or terms.</p>
+          <p>The VIN lookup uses an external vehicle database to find available technical data. It does not check accident, title, ownership, mileage, service or auction history. No result does not mean the car has a clean history. The shipping page only compares the offers you enter. Portavero does not contact shipping companies or verify their prices or terms.</p>
 
           <h2>Please check before you make a decision</h2>
           <p>Use the results as a starting point, not as a final answer. They are not a shipping offer, official customs valuation, tax ruling, legal opinion, insurance policy or promise of the final cost. The car estimate does not cover every vehicle type, exception or transitional case. Rules, fees and provider charges can also change.</p>

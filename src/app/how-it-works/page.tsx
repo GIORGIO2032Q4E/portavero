@@ -19,11 +19,11 @@ export default function HowItWorksPage() {
       <section className="section">
         <div className="container content-narrow prose">
           <h2>1. Check the VIN</h2>
-          <p>Enter the car's 17-character VIN. Portavero sends it to NHTSA vPIC and displays the technical details returned by that service, such as make, model, model year and engine displacement when available.</p>
-          <p>NHTSA's database is mainly intended for vehicles made for the United States market. Results for cars built for other markets can be incomplete. A VIN decode is not an accident, title, mileage, ownership, service or auction-history report.</p>
+          <p>Enter the car's 17-character VIN. Portavero looks up the details available for that number, such as make, model, model year and engine capacity.</p>
+          <p>The lookup is more reliable for vehicles made for the United States market. Details for cars built for other markets may be incomplete or unavailable. A VIN lookup is not an accident, title, mileage, ownership, service or auction-history report.</p>
 
           <h2>2. Use those details in the estimate</h2>
-          <p>After decoding, continue to the car-import planner. Available make, model, year and engine displacement are carried into the form when NHTSA provides them. Check every value against the car's documents. If the engine size is missing, enter it yourself. Steering side must also be selected because the VIN result does not reliably confirm it.</p>
+          <p>After decoding, continue to the car-import planner. Available make, model, year and engine displacement are carried into the form when they are available. Check every value against the car's documents. If the engine size is missing, enter it yourself. Steering side must also be selected because the lookup may not identify it.</p>
 
           <h2>3. Add the import costs</h2>
           <p>Add the purchase price, auction fees, transport to the export port, international shipping, insurance, port charges and local delivery. Enter amounts in GEL using an exchange rate you have checked. Leave unknown costs blank; a blank amount is not treated as free.</p>

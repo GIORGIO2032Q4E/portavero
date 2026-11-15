@@ -26,10 +26,6 @@ type DecodeResult = {
   vin: string;
   vehicle: DecodedVehicle;
   fields: DecodedField[];
-  source: { name: string; url: string };
-  note: string;
-  providerWarnings: string[];
-  providerMessage?: string;
 };
 type ApiResponse = {
   error?: string;
@@ -37,10 +33,6 @@ type ApiResponse = {
   quality?: "complete" | "partial";
   vehicle?: unknown;
   fields?: unknown;
-  source?: { name: string; url: string };
-  note?: string;
-  providerMessage?: string;
-  providerWarnings?: unknown;
 };
 
 function isDecodedField(value: unknown): value is DecodedField {
@@ -100,36 +92,25 @@ export default function VinCheckPage() {
         ? rawPayload as ApiResponse
         : {};
 
-      const providerWarnings = Array.isArray(payload.providerWarnings)
-        ? payload.providerWarnings.filter((warning): warning is string => typeof warning === "string")
-        : [];
-      const providerMessage = typeof payload.providerMessage === "string"
-        ? payload.providerMessage
-        : "";
-
       if (
         !response.ok ||
         typeof payload.vin !== "string" ||
         !payload.vehicle ||
         typeof payload.vehicle !== "object" ||
         Array.isArray(payload.vehicle) ||
-        !payload.source ||
-        typeof payload.source.name !== "string" ||
-        typeof payload.source.url !== "string" ||
         !Array.isArray(payload.fields)
       ) {
-        const details = [
-          typeof payload.error === "string" ? payload.error : "",
-          providerMessage,
-          ...providerWarnings
-        ].filter(Boolean).join(" ");
-        setError(details || "The VIN could not be decoded. Check the number and try again.");
+        setError(response.ok
+          ? "The VIN lookup did not return a usable result. Check the number and try again."
+          : typeof payload.error === "string"
+            ? payload.error
+            : "The VIN could not be checked. Try again.");
         return;
       }
 
       const fields = payload.fields.filter(isDecodedField);
       if (fields.length === 0) {
-        setError("The decoder did not return any usable technical details for this VIN.");
+        setError("The lookup did not return any vehicle details for this VIN.");
         return;
       }
 
@@ -138,10 +119,6 @@ export default function VinCheckPage() {
         vin: payload.vin,
         vehicle: payload.vehicle as DecodedVehicle,
         fields,
-        source: payload.source,
-        note: typeof payload.note === "string" ? payload.note : "Technical data returned by the source.",
-        providerWarnings,
-        providerMessage
       });
     } catch {
       setError("Could not complete the request. Check your connection and try again.");
@@ -154,12 +131,11 @@ export default function VinCheckPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">VIN check · Technical data</span>
+          <span className="eyebrow">VIN check</span>
           <h1>Check a VIN. Start the car import estimate.</h1>
-          <p>Portavero asks the NHTSA vPIC decoder for manufacturer-reported vehicle details, then carries the available specifications into the Georgian import calculator. Results can be incomplete, depending on the vehicle.</p>
+          <p>Look up the vehicle details available for a VIN, then use them to start an import estimate for Georgia. Some details may be missing, especially for cars built for other markets.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Enter car details manually ↗</Link>
-            <a href="https://vpic.nhtsa.dot.gov/decoder/" target="_blank" rel="noreferrer" className="button button-outline">Open NHTSA's VIN decoder ↗</a>
           </div>
         </div>
       </section>
@@ -175,7 +151,7 @@ export default function VinCheckPage() {
                   <h2>Check the VIN</h2>
                 </div>
               </div>
-              <p className="panel-intro">First, Portavero checks the VIN format for typing mistakes. Then it sends the number to NHTSA vPIC and shows whatever manufacturer data comes back.</p>
+              <p className="panel-intro">First, Portavero checks the VIN format. Then it looks up the vehicle details available for that number.</p>
               <form onSubmit={decodeVin}>
                 <div className="field">
                   <label htmlFor="vin">Vehicle identification number (VIN)</label>
@@ -248,15 +224,9 @@ export default function VinCheckPage() {
                 <div className="vin-result" aria-live="polite">
                   <div className="notice" role="status">
                     {result.quality === "complete"
-                      ? <><strong>NHTSA returned vehicle details.</strong> Compare the available fields with the car's documents before relying on them.</>
-                      : <><strong>NHTSA returned only part of the information.</strong> It did not provide both the make and model, so check the details below against the car's documents.</>}
+                      ? <><strong>Vehicle details found.</strong> Compare them with the car and its documents before using the estimate.</>
+                      : <><strong>Only some details were found.</strong> The make or model may be missing. Check the information below against the car's documents.</>}
                   </div>
-                  {result.providerWarnings.length > 0 && (
-                    <div className="notice" role="alert">
-                      <strong>NHTSA decoder warning:</strong> {result.providerWarnings.join(" ")}
-                    </div>
-                  )}
-                  {result.providerMessage && <p className="source-note">NHTSA message: {result.providerMessage}</p>}
                   <div className="result-lines">
                     {result.fields.map((field) => (
                       <div className="result-line" key={field.label}>
@@ -265,9 +235,9 @@ export default function VinCheckPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="source-note">{result.note} Source: <a href={result.source.url} target="_blank" rel="noreferrer">{result.source.name}</a>.</p>
+                  <p className="source-note">These details come from the vehicle information linked to the VIN. Check them against the car and its documents.</p>
                   <p className="source-note">VIN submitted: <code>{result.vin}</code></p>
-                  <p className="source-note">The calculator will carry over the decoded make, model, year, engine size, fuel system and steering location when NHTSA provides them. You only need to confirm details the decoder could not identify.</p>
+                  <p className="source-note">The calculator will carry over the make, model, year, engine size, fuel system and steering side when available. You only need to confirm details the lookup could not identify.</p>
                   <Link href={getImportEstimateHref(result)} className="button button-dark">Continue to this car’s import estimate ↗</Link>
                 </div>
               )}
@@ -279,7 +249,7 @@ export default function VinCheckPage() {
               <div className="result-lines">
                 <div className="result-line">
                   <span>VIN decoding</span>
-                  <strong>Available from NHTSA vPIC</strong>
+                  <strong>Shown when available</strong>
                 </div>
                 <div className="result-line">
                   <span>Accident, title and ownership records</span>
@@ -305,10 +275,9 @@ export default function VinCheckPage() {
       <section className="section section-tint">
         <div className="container content-narrow prose">
           <h2>What you can get from a VIN</h2>
-          <p>NHTSA vPIC reads vehicle information submitted by manufacturers. Depending on the VIN, it may return the make, model, model year, body type, engine, fuel type, drive type and place of manufacture.</p>
+          <p>Depending on the VIN, the lookup may return the make, model, model year, body type, engine capacity, fuel type, drive type and place of manufacture.</p>
           <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. No result does not mean the car is accident-free.</p>
-          <p>NHTSA's database is mainly intended for vehicles made for sale or import into the United States. A car from another market may return only a few details, or none at all. Check the VIN on the car and its documents, and confirm the specifications with the seller or manufacturer.</p>
-          <p>Source: <a href="https://vpic.nhtsa.dot.gov/api/" target="_blank" rel="noreferrer">NHTSA vPIC API documentation</a> and the <a href="https://vpic.nhtsa.dot.gov/" target="_blank" rel="noreferrer">vPIC website</a>.</p>
+          <p>The vehicle database is mainly intended for cars made for the United States market. A car from another market may return only a few details, or none at all. Check the VIN on the car and its documents, and confirm the specifications with the seller or manufacturer.</p>
         </div>
       </section>
     </>

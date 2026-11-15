@@ -4,7 +4,7 @@ const steps = [
   {
     number: "01",
     title: "Check the car's VIN",
-    description: "Enter the 17-character VIN. Portavero asks NHTSA for the make, model, year and engine details it can find.",
+    description: "Enter the 17-character VIN to look up available details about the car, including its make, model, year and engine.",
     href: "/vin-check",
     link: "Check a VIN"
   },
@@ -74,7 +74,7 @@ export default function HomePage() {
             <h2>Check these details first.</h2>
           </div>
           <ol>
-            <li><strong>Match the car.</strong><span>Compare the VIN result with the car and its documents. NHTSA may not return every field.</span></li>
+            <li><strong>Match the car.</strong><span>Compare the VIN result with the car and its documents. Some details may be missing.</span></li>
             <li><strong>Confirm the tax details.</strong><span>Check the engine size and steering side. The VIN decoder does not reliably confirm every detail used in the tax estimate.</span></li>
             <li><strong>Add real costs.</strong><span>Use the purchase price and actual auction, shipping, port and delivery quotes. Leave unknown costs blank.</span></li>
           </ol>

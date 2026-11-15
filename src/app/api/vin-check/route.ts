@@ -32,8 +32,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: timedOut
-          ? "The NHTSA decoder took too long to respond. Try again in a moment."
-          : "Could not reach the NHTSA decoder. Check your connection and try again."
+          ? "The VIN lookup took too long to respond. Try again in a moment."
+          : "Could not connect to the VIN lookup service. Check your connection and try again."
       },
       { status: timedOut ? 504 : 502 }
     );
@@ -46,10 +46,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: rateLimited
-          ? "NHTSA is receiving too many requests. Wait a little before trying again."
+          ? "Too many VIN checks are being made. Wait a little before trying again."
           : unavailable
-            ? "The NHTSA decoder is temporarily unavailable. Please try again shortly."
-            : "NHTSA could not process this VIN request. Check the number and try again."
+            ? "The VIN lookup service is temporarily unavailable. Please try again shortly."
+            : "The VIN could not be checked. Check the number and try again."
       },
       {
         status: rateLimited || unavailable ? 503 : 502,
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     payload = await response.json();
   } catch {
     return NextResponse.json(
-      { error: "NHTSA returned a response Portavero could not read. Please try again later." },
+      { error: "The VIN lookup returned a response that could not be read. Please try again later." },
       { status: 502 }
     );
   }
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
   if (decoded.kind === "invalid-response") {
     return NextResponse.json(
-      { error: "NHTSA returned an unexpected response. Please try again later." },
+      { error: "The VIN lookup returned an unexpected response. Please try again later." },
       { status: 502 }
     );
   }
@@ -87,9 +87,7 @@ export async function POST(request: Request) {
   if (decoded.kind === "no-data") {
     return NextResponse.json(
       {
-        error: "NHTSA did not return usable technical details for this VIN. Check the characters and vehicle documents.",
-        providerMessage: decoded.providerMessage,
-        providerWarnings: decoded.providerWarnings
+        error: "No vehicle details were found for this VIN. Check the number and vehicle documents."
       },
       { status: 422 }
     );

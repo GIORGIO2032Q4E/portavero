@@ -93,28 +93,21 @@ const decodedFields = [
   ["Make", "Make"],
   ["Model", "Model"],
   ["ModelYear", "Model year"],
-  ["Manufacturer", "Manufacturer"],
-  ["VehicleType", "Vehicle type"],
-  ["BodyClass", "Body class"],
+  ["BodyClass", "Body style"],
   ["Series", "Series"],
   ["Trim", "Trim"],
-  ["EngineCylinders", "Engine cylinders"],
-  ["EngineConfiguration", "Engine configuration"],
-  ["EngineModel", "Engine model"],
-  ["DisplacementL", "Engine displacement (L)"],
-  ["DisplacementCC", "Engine displacement (cm³)"],
-  ["FuelTypePrimary", "Primary fuel type"],
-  ["FuelTypeSecondary", "Secondary fuel type"],
-  ["ElectrificationLevel", "Electrification level"],
-  ["SteeringLocation", "Steering location"],
-  ["DriveType", "Drive type"],
+  ["EngineCylinders", "Cylinders"],
+  ["FuelTypePrimary", "Fuel"],
+  ["FuelTypeSecondary", "Additional fuel"],
+  ["ElectrificationLevel", "Powertrain"],
+  ["SteeringLocation", "Steering side"],
+  ["DriveType", "Drive"],
   ["TransmissionStyle", "Transmission"],
-  ["PlantCountry", "Manufacturing country"],
-  ["PlantCity", "Manufacturing city"]
+  ["PlantCountry", "Made in"]
 ];
 
 const vpicSource = {
-  name: "NHTSA vPIC",
+  name: "Vehicle information database",
   url: "https://vpic.nhtsa.dot.gov/api/"
 };
 
@@ -195,9 +188,19 @@ export function parseNhtsaVinResponse(payload, vin) {
   const row = payload.Results.find(isRecord);
   if (!row) return { kind: "no-result" };
 
+  const vehicle = getVehicleFromVpic(row);
   const fields = decodedFields
     .map(([key, label]) => ({ label, value: readField(row, key) }))
     .filter((field) => field.value.length > 0);
+  if (vehicle.engineCc !== null) {
+    const anchorIndex = ["Cylinders", "Model year", "Model"]
+      .map((label) => fields.findIndex((field) => field.label === label))
+      .find((index) => index >= 0) ?? -1;
+    fields.splice(anchorIndex + 1, 0, {
+      label: "Engine capacity",
+      value: `${vehicle.engineCc.toLocaleString("en-US")} cm³`
+    });
+  }
   const providerWarnings = getVinWarnings(row.ErrorCode);
   const providerMessage = readField(row, "ErrorText");
 
@@ -218,14 +221,14 @@ export function parseNhtsaVinResponse(payload, vin) {
     result: {
       quality,
       vin,
-      vehicle: getVehicleFromVpic(row),
+      vehicle,
       fields,
       providerWarnings,
       providerMessage: providerMessage || undefined,
       source: vpicSource,
       note: quality === "complete"
-        ? "These are manufacturer-reported technical details available in NHTSA vPIC. Availability and accuracy can vary, especially for vehicles not built for the United States market."
-        : "NHTSA returned some technical fields, but not both make and model. Treat this as a partial result and check the details against the vehicle documents."
+        ? "These are vehicle specifications linked to the VIN. Availability and accuracy can vary, especially for cars not built for the United States market."
+        : "Only some vehicle details were found. The make or model may be missing, so check the available information against the vehicle documents."
     }
   };
 }
