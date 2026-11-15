@@ -226,9 +226,154 @@ export function parseNhtsaVinResponse(payload, vin) {
       providerWarnings,
       providerMessage: providerMessage || undefined,
       source: vpicSource,
+      sources: [vpicSource.name],
       note: quality === "complete"
         ? "These are vehicle specifications linked to the VIN. Availability and accuracy can vary, especially for cars not built for the United States market."
         : "Only some vehicle details were found. The make or model may be missing, so check the available information against the vehicle documents."
+    }
+  };
+}
+
+
+const carsXeSource = {
+  name: "CarsXE International VIN Decoder",
+  url: "https://docs.carsxe.com/docs/products/international-vin-decoder"
+};
+
+/**
+ * Normalize the documented CarsXE international VIN response.
+ * Only attributes explicitly returned by the provider are carried forward.
+ * Engine capacity and steering remain unknown unless a source supplies them.
+ * @param {unknown} payload
+ * @param {string} vin
+ */
+export function parseCarsXeVinResponse(payload, vin) {
+  if (!isRecord(payload) || payload.success !== true || !isRecord(payload.attributes)) {
+    return { kind: "no-data" };
+  }
+
+  const attributes = payload.attributes;
+  const make = readField(attributes, "make");
+  const model = readField(attributes, "model");
+  const yearValue = Number(readField(attributes, "year"));
+  const modelYear = Number.isInteger(yearValue) && yearValue >= 1886 && yearValue <= 2100
+    ? yearValue
+    : null;
+  const primaryFuelType = readField(attributes, "fuel_type");
+  const fuelText = primaryFuelType.toLowerCase();
+  const isElectric = /\b(electric|battery electric|bev)\b/.test(fuelText);
+  const isHybrid = !isElectric && /hybrid|phev|hev|mhev|plug.?in/.test(fuelText);
+  const vehicle = {
+    make,
+    model,
+    modelYear,
+    engineCc: null,
+    primaryFuelType,
+    secondaryFuelType: "",
+    electrificationLevel: "",
+    steeringLocation: "",
+    steering: "",
+    isElectric,
+    isHybrid,
+    isPlugInHybrid: /plug.?in|phev/i.test(primaryFuelType),
+    series: readField(attributes, "series"),
+    trim: ""
+  };
+
+  const fields = [
+    ["Make", make],
+    ["Model", model],
+    ["Model year", modelYear === null ? "" : String(modelYear)],
+    ["Body style", readField(attributes, "body")],
+    ["Series", vehicle.series],
+    ["Fuel", primaryFuelType],
+    ["Manufacturer", readField(attributes, "manufacturer")],
+    ["Made in", readField(attributes, "plant_country")]
+  ].filter(([, value]) => value !== "").map(([label, value]) => ({ label, value }));
+
+  if (fields.length === 0) return { kind: "no-data" };
+
+  const quality = make && model && modelYear !== null ? "complete" : "partial";
+  return {
+    kind: quality,
+    result: {
+      quality,
+      vin,
+      vehicle,
+      fields,
+      providerWarnings: [],
+      source: carsXeSource,
+      sources: [carsXeSource.name],
+      note: quality === "complete"
+        ? "These details were returned by an international VIN data provider. Check them against the vehicle and its documents."
+        : "The international lookup returned only some technical details. Missing values have been left blank; check the vehicle documents."
+    }
+  };
+}
+
+/**
+ * Fill missing NHTSA fields from the international provider without replacing
+ * values already supplied by NHTSA. No catalogue guesses or inferred engine
+ * sizes are introduced during the merge.
+ * @param {{kind: string, result?: object}|null} primary
+ * @param {{kind: string, result?: object}|null} supplemental
+ */
+export function mergeVinDecoderResults(primary, supplemental) {
+  const main = primary?.result;
+  const extra = supplemental?.result;
+  if (!main && !extra) return primary || supplemental || { kind: "no-data" };
+  if (!main) return supplemental;
+  if (!extra) return primary;
+
+  const vehicle = { ...main.vehicle };
+  const stringKeys = [
+    "make", "model", "primaryFuelType", "secondaryFuelType",
+    "electrificationLevel", "steeringLocation", "steering", "series", "trim"
+  ];
+  for (const key of stringKeys) {
+    if (!vehicle[key] && extra.vehicle[key]) vehicle[key] = extra.vehicle[key];
+  }
+  if (vehicle.modelYear === null && extra.vehicle.modelYear !== null) {
+    vehicle.modelYear = extra.vehicle.modelYear;
+  }
+  if (vehicle.engineCc === null && extra.vehicle.engineCc !== null) {
+    vehicle.engineCc = extra.vehicle.engineCc;
+  }
+
+  const primaryHasFuel = Boolean(
+    main.vehicle.primaryFuelType ||
+    main.vehicle.secondaryFuelType ||
+    main.vehicle.electrificationLevel
+  );
+  if (!primaryHasFuel) {
+    vehicle.isElectric = extra.vehicle.isElectric;
+    vehicle.isHybrid = extra.vehicle.isHybrid;
+    vehicle.isPlugInHybrid = extra.vehicle.isPlugInHybrid;
+  }
+
+  const fields = [...main.fields];
+  const knownLabels = new Set(fields.map((field) => field.label));
+  for (const field of extra.fields) {
+    if (!knownLabels.has(field.label)) {
+      fields.push(field);
+      knownLabels.add(field.label);
+    }
+  }
+
+  const quality = vehicle.make && vehicle.model && vehicle.modelYear !== null
+    ? "complete"
+    : "partial";
+  const sources = [...new Set([...(main.sources || []), ...(extra.sources || [])])];
+
+  return {
+    kind: quality,
+    result: {
+      ...main,
+      quality,
+      vehicle,
+      fields,
+      sources,
+      note: "Available fields were collected from more than one VIN data source. Each source can be incomplete; confirm the details against the vehicle and its documents."
     }
   };
 }
