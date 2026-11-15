@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
+import { Console } from "node:console";
 import { readFile } from "node:fs/promises";
+import process from "node:process";
+import { URL } from "node:url";
+
+const output = new Console(process.stdout, process.stderr);
 
 const [readme, manualQa, privacy, terms, account, home, vinPage, planner] = await Promise.all([
   readFile(new URL("../README.md", import.meta.url), "utf8"),
@@ -49,4 +54,4 @@ assert.match(home, /Check a car's VIN/i);
 assert.match(vinPage, /vehicle details/i);
 assert.match(planner, /Known costs so far/i);
 
-console.log("Documentation consistency checks passed.");
+output.log("Documentation consistency checks passed.");
