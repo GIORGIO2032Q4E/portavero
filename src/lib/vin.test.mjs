@@ -320,3 +320,122 @@ test("marks a make and model without a model year as a partial VIN result", () =
   assert.equal(response.result.quality, "partial");
   assert.equal(response.result.vehicle.modelYear, null);
 });
+
+
+test("validates a Japanese domestic chassis identifier in CODE-SERIAL format", async () => {
+  const { validateJapaneseChassis } = await import("./vin.mjs");
+  assert.deepEqual(validateJapaneseChassis(" zrr80-0143041 "), {
+    valid: true,
+    chassis: "ZRR80-0143041"
+  });
+  assert.equal(validateJapaneseChassis("").valid, false);
+  assert.equal(validateJapaneseChassis("ZRR800143041").valid, false);
+  assert.equal(validateJapaneseChassis("ZRR80-01/3041").valid, false);
+});
+
+test("parses one Japanese MLIT chassis match without inventing manufacture year", async () => {
+  const { parseCardogChassisResponse } = await import("./vin.mjs");
+  const result = parseCardogChassisResponse({
+    response: {
+      chassis: "ZRR80-0143041",
+      code: "ZRR80",
+      serial: "0143041",
+      status: "read",
+      candidates: [{
+        makerJa: "トヨタ",
+        makeRef: "make:toyota",
+        code: "ZRR80",
+        modelsEn: ["Noah"],
+        modelsJa: ["ノア"],
+        typeApprovals: ["DBA-ZRR80G"],
+        emissions: [{
+          code: "DBA",
+          regulationJa: "平成17年規制",
+          regulationYear: 2005,
+          fuel: "petrol-lpg",
+          hybrid: false,
+          use: "passenger"
+        }],
+        built: { start: "2014-01-01", end: "2017-06-30", consistent: true },
+        engines: [{
+          engineCode: "3ZR",
+          displacementCc: 1986,
+          fuel: "petrol-lpg",
+          hybrid: false,
+          drives: ["F"],
+          transmissions: ["CVT"]
+        }],
+        notices: [{ notification: "1141851", campaign: "recall" }]
+      }]
+    }
+  }, "ZRR80-0143041");
+
+  assert.equal(result.kind, "partial");
+  assert.equal(result.result.vehicle.make, "Toyota");
+  assert.equal(result.result.vehicle.model, "Noah");
+  assert.equal(result.result.vehicle.engineCc, 1986);
+  assert.equal(result.result.vehicle.modelYear, null);
+  assert.ok(result.result.fields.some((field) => field.label === "Published production window"));
+  assert.ok(result.result.fields.some((field) => field.label === "MLIT notices covering this serial"));
+  assert.equal(result.result.sources[0], "Cardog Japanese chassis lookup (Japan MLIT records)");
+});
+
+test("does not choose between ambiguous Japanese chassis makers", async () => {
+  const { parseCardogChassisResponse } = await import("./vin.mjs");
+  const result = parseCardogChassisResponse({
+    response: {
+      chassis: "ABC10-1234567",
+      status: "ambiguous",
+      candidates: [
+        { makerJa: "Maker A", makeRef: "make:maker-a", modelsEn: ["Model A"], engines: [{ displacementCc: 1600 }] },
+        { makerJa: "Maker B", makeRef: "make:maker-b", modelsEn: ["Model B"], engines: [{ displacementCc: 2000 }] }
+      ]
+    }
+  }, "ABC10-1234567");
+
+  assert.equal(result.kind, "partial");
+  assert.equal(result.result.vehicle.make, "");
+  assert.equal(result.result.vehicle.model, "");
+  assert.equal(result.result.vehicle.engineCc, null);
+  assert.ok(result.result.fields.some((field) => field.label === "Possible matches"));
+});
+
+test("does not choose among multiple engine candidates for a Japanese chassis", async () => {
+  const { parseCardogChassisResponse } = await import("./vin.mjs");
+  const result = parseCardogChassisResponse({
+    response: {
+      chassis: "ZRR80-0143041",
+      status: "read",
+      candidates: [{
+        makeRef: "make:toyota",
+        modelsEn: ["Noah"],
+        modelsJa: ["ノア"],
+        engines: [
+          { engineCode: "3ZR", displacementCc: 1986, fuel: "petrol-lpg" },
+          { engineCode: "2ZR", displacementCc: 1797, fuel: "petrol-lpg-electric", hybrid: true }
+        ]
+      }]
+    }
+  }, "ZRR80-0143041");
+
+  assert.equal(result.result.vehicle.make, "Toyota");
+  assert.equal(result.result.vehicle.model, "Noah");
+  assert.equal(result.result.vehicle.engineCc, null);
+  assert.equal(result.result.vehicle.primaryFuelType, "");
+  assert.ok(result.result.fields.some((field) => field.label === "Possible engines (confirm exact variant)"));
+});
+
+test("returns no-data when Cardog does not recognize a Japanese chassis code", async () => {
+  const { parseCardogChassisResponse } = await import("./vin.mjs");
+  const result = parseCardogChassisResponse({
+    response: { chassis: "UNKNOWN-123456", status: "code_unknown", candidates: [] }
+  }, "UNKNOWN-123456");
+  assert.equal(result.kind, "no-data");
+});
+
+test("rejects an unreadable Cardog chassis response", async () => {
+  const { parseCardogChassisResponse } = await import("./vin.mjs");
+  assert.deepEqual(parseCardogChassisResponse({ unexpected: true }, "ZRR80-0143041"), {
+    kind: "invalid-response"
+  });
+});
