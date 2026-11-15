@@ -117,7 +117,7 @@ export default function CurrencyConverter() {
             </div>
             <div className="currency-amount-input">
               <span aria-hidden="true">{fromSymbol}</span>
-              <label className="visually-hidden" htmlFor="currency-amount">Amount in {fromCurrency}</label>
+              <label className="currency-visually-hidden" htmlFor="currency-amount">Amount in {fromCurrency}</label>
               <input
                 id="currency-amount"
                 type="text"
