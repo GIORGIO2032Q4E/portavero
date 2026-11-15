@@ -309,3 +309,14 @@ test("rejects a malformed international decoder payload", async () => {
   const { parseCarsXeVinResponse } = await import("./vin.mjs");
   assert.deepEqual(parseCarsXeVinResponse({ success: false }, "WF0MXXGBWM8R43240"), { kind: "no-data" });
 });
+
+
+test("marks a make and model without a model year as a partial VIN result", () => {
+  const response = parseNhtsaVinResponse({
+    Results: [{ Make: "Toyota", Model: "Corolla", ModelYear: "" }]
+  }, "JTDBR32E720123456");
+
+  assert.equal(response.kind, "partial");
+  assert.equal(response.result.quality, "partial");
+  assert.equal(response.result.vehicle.modelYear, null);
+});
