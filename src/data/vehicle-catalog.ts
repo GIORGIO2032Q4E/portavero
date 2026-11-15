@@ -453,8 +453,7 @@ export const vehicleCatalog: VehicleMake[] = [
     { name: "Model Y", engines: [
       e("tesla-my-ev", "Electric motor", 0, "Electric", "all generations", "A limited electric-vehicle estimate is included; confirm the current treatment and vehicle classification with the Revenue Service."),
       ] }
-  ]}
-
+  ]},
   { name: "Acura", models: [
     { name: "MDX", engines: [u("acura-mdx-p","Petrol · capacity varies","Petrol"), u("acura-mdx-h","Hybrid · capacity varies","Hybrid")] },
     { name: "RDX", engines: [u("acura-rdx-p","Petrol · capacity varies","Petrol")] },
