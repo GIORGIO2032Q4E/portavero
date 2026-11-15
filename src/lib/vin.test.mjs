@@ -157,3 +157,73 @@ test("reports rows without usable technical fields as no-data", () => {
   assert.equal(response.providerMessage, "No data");
   assert.match(response.providerWarnings.join(" "), /not registered with NHTSA/);
 });
+
+
+test("extracts exact engine displacement, both fuels and steering for the calculator", () => {
+  const response = parseNhtsaVinResponse({
+    Results: [{
+      Make: "HONDA",
+      Model: "Accord",
+      ModelYear: "2021",
+      DisplacementL: "2.0",
+      DisplacementCC: "1993",
+      FuelTypePrimary: "Gasoline",
+      FuelTypeSecondary: "Electric",
+      ElectrificationLevel: "Hybrid Electric Vehicle (HEV)",
+      SteeringLocation: "Left-Hand Drive",
+      ErrorCode: "0"
+    }]
+  }, "1HGCM82633A004352");
+
+  assert.equal(response.kind, "complete");
+  assert.deepEqual(response.result.vehicle, {
+    make: "HONDA",
+    model: "Accord",
+    modelYear: 2021,
+    engineCc: 1993,
+    primaryFuelType: "Gasoline",
+    secondaryFuelType: "Electric",
+    electrificationLevel: "Hybrid Electric Vehicle (HEV)",
+    steeringLocation: "Left-Hand Drive",
+    steering: "left",
+    isElectric: false,
+    isHybrid: true,
+    isPlugInHybrid: false,
+    series: "",
+    trim: ""
+  });
+  assert.ok(response.result.fields.some((field) => field.label === "Engine displacement (cm³)" && field.value === "1993"));
+  assert.ok(response.result.fields.some((field) => field.label === "Steering location" && field.value === "Left-Hand Drive"));
+});
+
+test("uses engine displacement in litres when the exact cc value is unavailable", () => {
+  const response = parseNhtsaVinResponse({
+    Results: [{ Make: "Toyota", Model: "Camry", ModelYear: "2020", DisplacementL: "2.5" }]
+  }, "1HGCM82633A004352");
+
+  assert.equal(response.result.vehicle.engineCc, 2500);
+});
+
+test("recognizes a battery electric vehicle without inventing an engine size", () => {
+  const response = parseNhtsaVinResponse({
+    Results: [{
+      Make: "Tesla",
+      Model: "Model 3",
+      ModelYear: "2022",
+      FuelTypePrimary: "Electric",
+      ElectrificationLevel: "Battery Electric Vehicle (BEV)"
+    }]
+  }, "1HGCM82633A004352");
+
+  assert.equal(response.result.vehicle.isElectric, true);
+  assert.equal(response.result.vehicle.isHybrid, false);
+  assert.equal(response.result.vehicle.engineCc, null);
+});
+
+test("keeps steering unconfirmed when NHTSA does not provide it", () => {
+  const response = parseNhtsaVinResponse({
+    Results: [{ Make: "Toyota", Model: "Prius", ModelYear: "2018" }]
+  }, "1HGCM82633A004352");
+
+  assert.equal(response.result.vehicle.steering, "");
+});

@@ -34,3 +34,50 @@ export function getEngineCapacityForSelection(engine) {
     ? engine.cc
     : null;
 }
+
+/**
+ * @param {{ primaryFuelType?: unknown, secondaryFuelType?: unknown, electrificationLevel?: unknown }} details
+ */
+export function getVinPowertrain(details = {}) {
+  const primary = typeof details.primaryFuelType === "string" ? details.primaryFuelType.trim().toLowerCase() : "";
+  const secondary = typeof details.secondaryFuelType === "string" ? details.secondaryFuelType.trim().toLowerCase() : "";
+  const electrification = typeof details.electrificationLevel === "string" ? details.electrificationLevel.trim().toLowerCase() : "";
+  const combined = [primary, secondary, electrification].join(" ");
+  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test([primary, secondary, electrification].join(" "));
+  const plugInHybrid = /plug.?in|phev/.test([primary, secondary, electrification].join(" "));
+  const hasElectric = /electric|battery|bev/.test(combined);
+  const hasCombustion = /gasoline|petrol|diesel|ethanol|lpg|propane|cng|natural gas|hydrogen/.test(combined);
+  const pureElectricLevel = /battery electric|bev|pure electric|all electric/.test(electrification);
+  const isElectric = !hybridLevel && (pureElectricLevel || (hasElectric && !hasCombustion));
+  const isHybrid = !isElectric && (hybridLevel || (hasElectric && hasCombustion));
+
+  let fuel = "unknown";
+  if (isElectric) fuel = "Electric";
+  else if (isHybrid) fuel = plugInHybrid ? "Plug-in hybrid" : "Hybrid";
+  else if (/diesel/.test(primary || secondary)) fuel = "Diesel";
+  else if (/gasoline|petrol/.test(primary || secondary)) fuel = "Petrol";
+  else if (/liquefied petroleum|\blpg\b|propane/.test(combined)) fuel = "LPG";
+  else if (/compressed natural gas|\bcng\b|natural gas/.test(combined)) fuel = "CNG";
+
+  return {
+    fuel,
+    isElectric,
+    isHybrid,
+    isPlugInHybrid: plugInHybrid,
+    needsConfirmation: fuel === "unknown"
+  };
+}
+
+/**
+ * @param {unknown} value
+ * @returns {"" | "left" | "right"}
+ */
+export function normalizeVinSteering(value) {
+  if (typeof value !== "string") return "";
+  const steering = value.trim().toLowerCase();
+
+  if (/right/.test(steering) || /\brhd\b/.test(steering)) return "right";
+  if (/left/.test(steering) || /\blhd\b/.test(steering)) return "left";
+
+  return "";
+}
