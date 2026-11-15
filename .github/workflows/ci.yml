@@ -37,6 +37,8 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         run: npm test
+      - name: Check documentation consistency
+        run: npm run check:docs
       - name: Build
         run: npm run build
         env:
