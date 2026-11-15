@@ -68,7 +68,7 @@ export async function GET() {
 
   const unitRate = getUnitRate(rate, quantity);
 
-  if (unitRate === null || !/^\\d{4}-\\d{2}-\\d{2}$/.test(rateDate)) {
+  if (unitRate === null || Number.isNaN(Date.parse(rateDate))) {
     return NextResponse.json(
       { error: "The USD exchange rate could not be read." },
       { status: 502 }
