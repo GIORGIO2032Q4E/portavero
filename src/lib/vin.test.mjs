@@ -98,11 +98,14 @@ test("turns a complete vPIC row into display fields", () => {
 
   assert.equal(response.kind, "complete");
   assert.equal(response.result.quality, "complete");
+  assert.ok(response.result.fields.every((field) =>
+    !["Manufacturer", "Vehicle type", "Engine configuration", "Engine model", "Electrification level", "Manufacturing city"].includes(field.label)
+  ));
   assert.deepEqual(response.result.fields, [
     { label: "Make", value: "HONDA" },
     { label: "Model", value: "Accord" },
     { label: "Model year", value: "2003" },
-    { label: "Engine displacement (L)", value: "2.4" }
+    { label: "Engine capacity", value: "2,400 cm³" }
   ]);
 });
 
