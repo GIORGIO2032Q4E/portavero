@@ -18,7 +18,7 @@ const server = spawn(
 
 const pages = [
   "/", "/about", "/how-it-works", "/vehicle-import",
-  "/vehicles", "/vin-check", "/currency-converter", "/shipping", "/account",
+  "/vehicles", "/vin-check", "/shipping", "/account",
   "/privacy-policy", "/terms"
 ];
 
@@ -81,6 +81,12 @@ try {
     assert.match(response.body, /<main[^>]+id="main-content"/i, `${path} should render the main landmark`);
     assert.match(response.body, /Portavero/i, `${path} should include the site identity`);
     output.log(`PASS ${path}`);
+  }
+
+  for (const path of ["/currency-converter", "/api/exchange-rate"]) {
+    const response = await request(path);
+    assert.equal(response.status, 404, `${path} should no longer exist`);
+    output.log(`PASS ${path} is removed`);
   }
 
   for (const path of redirects) {
