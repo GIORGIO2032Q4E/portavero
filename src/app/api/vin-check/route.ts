@@ -52,6 +52,7 @@ async function decodeWithNhtsa(vin: string) {
         decoded: null,
         failure: {
           status: 502,
+          retryAfter: null,
           error: "The first VIN data source returned a response that could not be read."
         }
       };
@@ -64,6 +65,7 @@ async function decodeWithNhtsa(vin: string) {
       decoded: null,
       failure: {
         status: timedOut ? 504 : 502,
+        retryAfter: null,
         error: timedOut
           ? "The first VIN data source took too long to respond."
           : "Could not connect to the first VIN data source."
