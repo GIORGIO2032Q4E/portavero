@@ -377,3 +377,215 @@ export function mergeVinDecoderResults(primary, supplemental) {
     }
   };
 }
+
+
+/**
+ * Validate the CODE-SERIAL identifier used by many Japanese domestic-market
+ * vehicles. This is not a VIN and is sent only to the separate chassis lookup.
+ * @param {unknown} value
+ * @returns {{valid: true, chassis: string} | {valid: false, chassis: string, message: string}}
+ */
+export function validateJapaneseChassis(value) {
+  const chassis = typeof value === "string" ? value.trim().toUpperCase() : "";
+
+  if (!chassis) {
+    return { valid: false, chassis, message: "Enter the Japanese frame or chassis number." };
+  }
+
+  if (chassis.length > 34 || !/^[A-Z0-9]{2,12}(?:-[A-Z0-9]{1,8})?-[A-Z0-9]{4,12}$/.test(chassis)) {
+    return {
+      valid: false,
+      chassis,
+      message: "Enter the chassis number in its CODE-SERIAL format, including the hyphen, as shown on the vehicle plate or export documents."
+    };
+  }
+
+  return { valid: true, chassis };
+}
+
+function readStringArray(value) {
+  return Array.isArray(value)
+    ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim())
+    : [];
+}
+
+function formatRegistryMake(value) {
+  if (typeof value !== "string" || !value.startsWith("make:")) return "";
+  return value.slice(5).split(/[-_]/).filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function isPositiveCc(value) {
+  return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= 100000;
+}
+
+/**
+ * Normalize Cardog's Japanese chassis response. Engine details are transferred
+ * to the planner only when the provider reports exactly one engine candidate.
+ * The build window is displayed as context, never converted into a guessed year.
+ * @param {unknown} payload
+ * @param {string} chassis
+ */
+export function parseCardogChassisResponse(payload, chassis) {
+  if (!isRecord(payload)) return { kind: "invalid-response" };
+
+  const response = isRecord(payload.response) ? payload.response : payload;
+  const status = readField(response, "status");
+  const returnedChassis = readField(response, "chassis").toUpperCase();
+  const requestedChassis = typeof chassis === "string" ? chassis.trim().toUpperCase() : "";
+  const supportedStatuses = new Set(["read", "ambiguous", "serial_unfit", "code_unknown"]);
+  if (
+    !supportedStatuses.has(status) ||
+    !returnedChassis ||
+    returnedChassis !== requestedChassis ||
+    !Array.isArray(response.candidates)
+  ) {
+    return { kind: "invalid-response" };
+  }
+  const candidates = response.candidates.filter(isRecord);
+  const selected = status === "read" && candidates.length === 1 ? candidates[0] : null;
+
+  const make = selected ? formatRegistryMake(readField(selected, "makeRef")) : "";
+  const modelsEn = selected ? readStringArray(selected.modelsEn) : [];
+  const modelsJa = selected ? readStringArray(selected.modelsJa) : [];
+  // Cardog notes that modelsEn is not index-aligned with modelsJa. Auto-fill
+  // only when both sources expose exactly one model name.
+  const model = modelsEn.length === 1 && modelsJa.length === 1 ? modelsEn[0] : "";
+  const engines = selected && Array.isArray(selected.engines)
+    ? selected.engines.filter(isRecord)
+    : [];
+  const onlyEngine = engines.length === 1 ? engines[0] : null;
+  const engineCc = onlyEngine && isPositiveCc(onlyEngine.displacementCc)
+    ? onlyEngine.displacementCc
+    : null;
+  const fuel = onlyEngine ? readField(onlyEngine, "fuel") : "";
+  const hybrid = onlyEngine?.hybrid === true;
+  const isElectric = fuel.toLowerCase() === "electric";
+  const isHybrid = !isElectric && (hybrid || /-electric$/.test(fuel.toLowerCase()));
+
+  const fields = [
+    { label: "Japanese chassis number", value: returnedChassis },
+    { label: "Lookup status", value: status || "Unresolved" }
+  ];
+
+  if (selected) {
+    const makerJa = readField(selected, "makerJa");
+    const code = readField(selected, "code");
+    const serial = readField(response, "serial");
+    const typeApprovals = readStringArray(selected.typeApprovals);
+    const emissions = Array.isArray(selected.emissions)
+      ? selected.emissions.filter(isRecord)
+      : [];
+
+    if (make) fields.push({ label: "Make", value: make });
+    if (makerJa) fields.push({ label: "Manufacturer (MLIT record)", value: makerJa });
+    if (code) fields.push({ label: "Japanese model code", value: code });
+    if (serial) fields.push({ label: "Production serial", value: serial });
+    if (modelsEn.length > 0) fields.push({ label: "Model names (English)", value: modelsEn.join(", ") });
+    if (modelsJa.length > 0) fields.push({ label: "Model names (Japanese)", value: modelsJa.join(", ") });
+    if (typeApprovals.length > 0) fields.push({ label: "Type approvals", value: typeApprovals.join(", ") });
+
+    if (emissions.length > 0) {
+      const rules = emissions.map((item) =>
+        readField(item, "regulationJa") ||
+        (readField(item, "regulationYear") ? `Regulation year ${readField(item, "regulationYear")}` : readField(item, "code"))
+      ).filter(Boolean);
+      if (rules.length > 0) fields.push({ label: "Emissions rules on record", value: [...new Set(rules)].join("; ") });
+    }
+
+    const built = isRecord(selected.built) ? selected.built : null;
+    const buildStart = built ? readField(built, "start") : "";
+    const buildEnd = built ? readField(built, "end") : "";
+    if (buildStart || buildEnd) {
+      fields.push({
+        label: "Published production window",
+        value: [buildStart, buildEnd].filter(Boolean).join(" to ")
+      });
+    }
+
+    if (engines.length > 0) {
+      const engineDescriptions = engines.map((engine) => {
+        const codeValue = readField(engine, "engineCode");
+        const displacement = isPositiveCc(engine.displacementCc)
+          ? `${engine.displacementCc.toLocaleString("en-US")} cm³`
+          : "";
+        const fuelValue = readField(engine, "fuel");
+        const hybridValue = engine.hybrid === true ? "hybrid" : "";
+        return [codeValue, displacement, fuelValue, hybridValue].filter(Boolean).join(" · ");
+      }).filter(Boolean);
+      if (engineDescriptions.length > 0) {
+        fields.push({
+          label: engines.length === 1 ? "Engine listed" : "Possible engines (confirm exact variant)",
+          value: engineDescriptions.join("; ")
+        });
+      }
+    }
+
+    if (onlyEngine) {
+      const drives = readStringArray(onlyEngine.drives);
+      const transmissions = readStringArray(onlyEngine.transmissions);
+      if (drives.length > 0) fields.push({ label: "Drive layouts listed", value: drives.join(", ") });
+      if (transmissions.length > 0) fields.push({ label: "Transmission options listed", value: transmissions.join(", ") });
+    }
+
+    const notices = Array.isArray(selected.notices) ? selected.notices.filter(isRecord) : [];
+    if (notices.length > 0) {
+      fields.push({
+        label: "MLIT notices covering this serial",
+        value: notices.map((notice) => {
+          const notification = readField(notice, "notification");
+          const campaign = readField(notice, "campaign");
+          return [notification, campaign].filter(Boolean).join(" · ");
+        }).filter(Boolean).join("; ")
+      });
+    }
+  } else if (candidates.length > 0) {
+    const possibilities = candidates.map((candidate) => {
+      const makeValue = formatRegistryMake(readField(candidate, "makeRef")) || readField(candidate, "makerJa");
+      const models = readStringArray(candidate.modelsEn);
+      return [makeValue, models.join(", ")].filter(Boolean).join(": ");
+    }).filter(Boolean);
+    if (possibilities.length > 0) {
+      fields.push({ label: "Possible matches", value: possibilities.join("; ") });
+    }
+  }
+
+  const source = {
+    name: "Cardog Japanese chassis lookup (Japan MLIT records)",
+    url: "https://cardog.app/docs/reference/chassis"
+  };
+
+  if (fields.length <= 2 && status === "code_unknown") {
+    return { kind: "no-data", status, chassis: returnedChassis, source };
+  }
+
+  return {
+    kind: "partial",
+    status,
+    result: {
+      quality: "partial",
+      chassis: returnedChassis,
+      vehicle: {
+        make,
+        model,
+        modelYear: null,
+        engineCc,
+        primaryFuelType: fuel,
+        secondaryFuelType: "",
+        electrificationLevel: hybrid ? "hybrid" : "",
+        steeringLocation: "",
+        steering: "",
+        isElectric,
+        isHybrid,
+        isPlugInHybrid: false,
+        series: selected ? readField(selected, "code") : "",
+        trim: ""
+      },
+      fields,
+      source,
+      sources: [source.name],
+      note: "Japanese chassis data may list model and engine candidates rather than one exact factory configuration. The manufacture year and any ambiguous variant must be confirmed from the vehicle's export or registration documents."
+    }
+  };
+}

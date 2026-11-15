@@ -46,6 +46,13 @@ Use public test VINs only. A correctly shaped VIN is not proof that a vehicle ex
 - [ ] For a U.S.-market test VIN, check the position-nine result. Confirm the check-digit message is advisory and does not claim global validity.
 - [ ] For a non-U.S. or unknown-market VIN, confirm the U.S. check-digit formula is not treated as a universal rule.
 - [ ] Confirm the page never labels absent history as clean and never invents accident, title, mileage, ownership, service, auction or photo data.
+- [ ] Select Japanese domestic frame/chassis number and confirm the U.S. check-digit selector is hidden and the correct CODE-SERIAL help text is shown.
+- [ ] Test a public example such as `ZRR80-0143041` with `CARDOG_API_KEY` configured. Confirm the Cardog source is identified and only fields present in its response are shown.
+- [ ] Confirm an ambiguous chassis response lists candidates and does not select one model or engine automatically.
+- [ ] Confirm a single engine candidate may pass its reported displacement to the planner, while multiple engine candidates leave the calculator capacity blank.
+- [ ] Confirm a published production window is displayed as a window and never copied into the manufacture-year field.
+- [ ] Without `CARDOG_API_KEY`, confirm a clear not-configured message appears and no external chassis lookup is attempted.
+- [ ] Test malformed chassis identifiers, provider no-match, credit-limit, rate-limit, timeout and invalid-response cases.
 
 ## 3. VIN-to-import hand-off
 
@@ -55,9 +62,10 @@ Use public test VINs only. A correctly shaped VIN is not proof that a vehicle ex
 - [ ] When steering side is returned, confirm it is passed through. When it is missing or unclear, confirm the planner requires the user to choose it.
 - [ ] Use a VIN with missing make, model, year or engine data. Confirm missing values remain missing and are not replaced with guessed defaults.
 - [ ] Confirm a decoded make/model that does not match the local catalogue remains reviewable and does not silently select an unrelated vehicle.
-- [ ] Confirm Japanese domestic frame/chassis numbers are not treated as standard VINs and the user is directed to manual vehicle identification.
+- [ ] Confirm Japanese frame/chassis numbers are handled through the separate identifier option, not sent to the standard VIN endpoints.
 - [ ] Change every auto-filled value to match a vehicle document. Confirm the user's correction is retained and the tax estimate responds to the corrected input.
 - [ ] Confirm VIN information is presented as provider-supplied technical data, not as proof that the physical vehicle matches the decoded record.
+- [ ] For a Japanese chassis result, confirm the hand-off does not include a fabricated VIN or manufacture year. Only a unique make/model/engine result may be passed on; uncertain data remains for manual confirmation.
 
 ## 4. Vehicle-import planner inputs
 

@@ -4,7 +4,7 @@
 
 Portavero is a student-built project about one practical part of buying a car from abroad: understanding what it may cost to bring that car into Georgia.
 
-The main workflow starts with a vehicle identification number (VIN). Portavero checks NHTSA vPIC and can use an optional international VIN decoder when configured, carries the fields actually returned into a vehicle-import planner, and lets the user add purchase, auction, transport, shipping and other known costs. The planner then shows a preliminary estimate for selected passenger-car tax cases.
+The main workflow starts with a vehicle identifier. Standard 17-character VINs are checked with NHTSA vPIC and can use an optional CarsXE international fallback. Japanese domestic-market frame/chassis numbers can use a separate optional Cardog lookup based on Japan MLIT records. Portavero carries only the fields returned by the selected source into the vehicle-import planner, where the user adds purchase, auction, transport, shipping and other known costs.
 
 It is a planning tool, not a vehicle-history report, shipping quote, customs broker or official tax assessment.
 
@@ -15,7 +15,7 @@ It is a planning tool, not a vehicle-history report, shipping quote, customs bro
 
 ## Main workflow
 
-1. **Enter a VIN.** The server route validates the 17-character format and requests available technical data from NHTSA vPIC. If the result has important gaps and the optional international provider is configured, it makes a fallback request to CarsXE.
+1. **Choose an identifier.** Use a standard 17-character VIN for the NHTSA/CarsXE path, or choose Japanese domestic frame/chassis number for the separate Cardog path. Each path validates the identifier format and sends it only to its matching source.
 2. **Review the result.** The lookup may return complete or partial details. Check the result against the actual vehicle and its documents.
 3. **Continue to the import planner.** Available make, model, model year, engine, fuel and steering details are passed to the planner when the source supplies them. Missing or uncertain values must be checked or entered manually.
 4. **Add the costs you know.** Enter the purchase price, auction fees, inland transport, international shipping, insurance, port charges and local delivery in GEL. Convert foreign-currency quotes yourself using a rate you have checked.
@@ -27,7 +27,7 @@ A blank cost is not treated as free. The displayed total is only as complete as 
 
 | Area | Current behaviour | Important limitation |
 | --- | --- | --- |
-| VIN lookup | Validates VIN format, requests technical data from NHTSA vPIC and can supplement missing fields with CarsXE's international VIN decoder when a server-side API key is configured. | Coverage varies by source, manufacturer and market. Japanese domestic frame/chassis numbers are not standard 17-character VINs. It is not a history check. |
+| Vehicle identification | Standard VINs use NHTSA vPIC with an optional CarsXE international fallback. Japanese domestic frame/chassis numbers use a separate optional Cardog lookup based on Japan MLIT records. | Each provider requires its own private server-side API key. Coverage can be partial or ambiguous. Neither path provides vehicle history. |
 | Vehicle-import planner | Carries over available VIN details, accepts corrections and calculates selected passenger-car tax cases alongside user-entered costs. | It does not cover every classification, exception or transitional case. It is not an official customs assessment. |
 | Vehicle catalogue | Provides a searchable list of common makes, models and engine variants used to help identify a vehicle. | It is a curated reference, not a complete global database or proof of the engine fitted to a specific car. |
 | Shipping guide | Helps users review a carrier's route, inclusions, exclusions, timing and additional charges. The quote comparison uses values entered by the user. | It does not contact carriers, retrieve live freight prices or verify a provider's offer. |
@@ -58,7 +58,7 @@ The application uses the Next.js App Router. Page components collect input and p
 ~~~text
 src/
   app/
-    api/vin-check/       Server route for NHTSA plus optional international VIN fallback
+    api/vin-check/       Server route for VIN and optional Japanese chassis lookups
     vin-check/           VIN form and technical-data result
     vehicle-import/      Main vehicle import planner
     vehicles/            Searchable vehicle catalogue
@@ -76,7 +76,7 @@ src/
   data/
     vehicle-catalog.ts   Curated vehicle and engine reference data
   lib/
-    vin.mjs              VIN validation, NHTSA/CarsXE parsing and safe field merging
+    vin.mjs              VIN/chassis validation, NHTSA/CarsXE/Cardog parsing and safe field merging
     vehicle-tax.mjs      Selected Georgian passenger-car tax rules
     vehicle-import-costs.mjs
                          Import-cost validation and totals
@@ -98,13 +98,13 @@ scripts/
 
 ## VIN data: what it can and cannot tell you
 
-The VIN endpoint calls the NHTSA vPIC `DecodeVinValuesExtended` service from a server-side route. When NHTSA leaves key identity or specification fields blank, the route can request additional fields from the CarsXE International VIN Decoder. CarsXE is optional and is only called when the private server-side `CARSXE_API_KEY` environment variable is configured. Its international decoder uses provider credits and may incur charges after any sandbox allowance; check the current plan, quota and overage settings before adding a key. The route applies timeouts, caches the international response for up to 24 hours and keeps the provider key off the client.
+The standard VIN path calls NHTSA vPIC `DecodeVinValuesExtended`. When NHTSA leaves key identity or specification fields blank, it can request extra fields from the CarsXE International VIN Decoder. CarsXE is optional and is only called when the private server-side `CARSXE_API_KEY` is configured. Its international decoder uses provider credits; check current plan, quota and overage settings before adding a key. Japanese domestic frame/chassis numbers use a separate Cardog endpoint based on Japan MLIT recall and fuel-economy records. That path is optional and is called only when the user selects Japanese chassis number and the private server-side `CARDOG_API_KEY` is configured. Cardog's published free plan has a monthly credit allowance, and chassis lookups consume credits. Both provider keys stay on the server; responses are cached for up to 24 hours.
 
-The sources may provide fields such as make, model, model year, body style, engine capacity, fuel type, plant country and steering location. Each source returns only the fields it knows. The merge keeps NHTSA values where present and supplements only missing fields. CarsXE's documented international response does not guarantee engine capacity or steering, so those remain blank unless a provider actually returns them. The planner asks the user to confirm or enter information that no source returned.
+VIN sources may return make, model, year, body style, engine capacity, fuel type, plant country and steering location. NHTSA values are kept when present and CarsXE fills only missing fields. CarsXE does not guarantee engine capacity or steering. The Japanese chassis source may return model-code candidates, possible engines, type approvals, production windows and recall/fuel-economy records. When several models or engines are listed, Portavero shows the candidates instead of selecting one. It transfers engine capacity only when the provider returns exactly one engine candidate. It never converts a production window into a manufacture year. Missing or ambiguous fields stay blank for the user to confirm from documents.
 
 The lookup does **not** retrieve accident, title, ownership, odometer, service or auction history. It does not return original auction photographs. A valid-looking 17-character string is not proof that a vehicle exists, and a missing history result must never be interpreted as a clean history.
 
-Sources: [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/) and, when configured, [CarsXE International VIN Decoder](https://docs.carsxe.com/docs/products/international-vin-decoder). A submitted VIN is sent to NHTSA and is also sent to CarsXE when the optional fallback is used. See the Privacy Policy.
+Sources: [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/), [CarsXE International VIN Decoder](https://docs.carsxe.com/docs/products/international-vin-decoder), and [Cardog Japanese chassis lookup](https://cardog.app/docs/reference/chassis). A standard VIN is sent to NHTSA and may also be sent to CarsXE when its fallback is used. A Japanese chassis number is sent to Cardog only when that option is selected and `CARDOG_API_KEY` is configured. See the Privacy Policy.
 
 ## Georgian vehicle-tax estimate
 
@@ -128,7 +128,8 @@ These are the rules currently encoded in the project, not a binding interpretati
 ## Data, privacy and security notes
 
 - The vehicle planner performs its arithmetic in the browser. The costs entered for a calculation are not sent to an external service just to calculate the displayed total.
-- A VIN submitted to the checker is sent from the Portavero server route to NHTSA vPIC. If `CARSXE_API_KEY` is configured and the NHTSA result has important gaps or fails, the VIN may also be sent to CarsXE for international decoding.
+- A standard VIN is sent from the Portavero server route to NHTSA vPIC and may also be sent to CarsXE when `CARSXE_API_KEY` is configured and NHTSA leaves important gaps.
+- A Japanese domestic frame/chassis number is sent to Cardog only when that identifier type is selected and `CARDOG_API_KEY` is configured.
 - Shipping quotes are entered by the user. Portavero does not send them to shipping companies.
 - The current planner does not save estimates to a user account. The account page relates to older saved estimates.
 - The legacy account feature uses Supabase when configured. Its session is held in browser storage rather than an HttpOnly cookie. Do not use it on shared or untrusted devices or store sensitive data in estimate names.
@@ -177,6 +178,7 @@ Open http://localhost:3000.
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Optional legacy account connection |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Legacy alternative to the publishable-key variable |
 | `CARSXE_API_KEY` | Optional private key for international VIN fallback. Keep it server-side; never prefix it with `NEXT_PUBLIC_`. |
+| `CARDOG_API_KEY` | Optional private key for Japanese domestic frame/chassis lookup. Keep it server-side; never prefix it with `NEXT_PUBLIC_`. |
 
 The site can be used without Supabase credentials. The legacy account functions will be unavailable until Supabase is configured. Only public Supabase keys belong in `NEXT_PUBLIC_*` variables. Never expose a service-role key in browser code or commit secrets to Git.
 
@@ -220,7 +222,7 @@ A deployment marked READY confirms that Vercel completed the deployment process.
 ## Known limitations
 
 1. VIN coverage depends on the decoder sources, manufacturer and market. The CarsXE international fallback is inactive unless a private API key is configured, and its coverage also varies.
-2. Some Japanese domestic-market vehicles use a frame/chassis number rather than a standard 17-character VIN. Those numbers are not decoded by this tool and need manual identification from the vehicle documents or manufacturer.
+2. Japanese frame/chassis lookup requires `CARDOG_API_KEY`. MLIT records may return ambiguous model or engine candidates; the tool does not resolve every vehicle or return a verified manufacture year.
 3. The vehicle and engine catalogue is curated and incomplete. Confirm engine size from the car's documents.
 4. Tax calculations cover selected passenger-car cases and do not confirm classification or transitional eligibility.
 5. The GEL 480 standard-fee amount is a stored snapshot, not live data.

@@ -18,7 +18,7 @@ const [readme, manualQa, privacy, terms, account, home, vinPage, planner] = awai
 ]);
 
 assert.match(readme, /student-built project about one practical part of buying a car/i);
-assert.match(readme, /VIN lookup/i);
+assert.match(readme, /vehicle identification/i);
 assert.match(readme, /vehicle-import planner/i);
 assert.match(readme, /retrieve live freight prices/i);
 assert.match(readme, /GEL 480/i);
@@ -28,10 +28,14 @@ assert.match(readme, /docs\/MANUAL_QA\.md/);
 assert.match(readme, /NHTSA vPIC/i);
 assert.match(readme, /CarsXE International VIN Decoder/i);
 assert.match(readme, /CARSXE_API_KEY/i);
+assert.match(readme, /Cardog Japanese chassis lookup/i);
+assert.match(readme, /CARDOG_API_KEY/i);
 assert.match(readme, /frame\/chassis number/i);
 assert.match(planner, /useState<number \| null>\(null\)/);
 assert.match(planner, /hasValidManufactureYear\(year, declarationYear\)/);
-assert.match(vinPage, /Japanese domestic-market cars use a frame or chassis number/i);
+assert.match(vinPage, /Japanese domestic frame\/chassis number/i);
+assert.match(vinPage, /Cardog/i);
+assert.match(vinPage, /identifierType/);
 assert.match(vinPage, /internationalProviderConfigured/);
 assert.doesNotMatch(readme, /General import calculator \|/i);
 assert.doesNotMatch(readme, /Vehicle comparison \|/i);
@@ -47,6 +51,8 @@ assert.doesNotMatch(manualQa, /^## 4\. Vehicle comparison$/m);
 assert.match(privacy, /November 15, 2026/);
 assert.match(privacy, /technical specifications/);
 assert.match(privacy, /CarsXE International VIN Decoder/);
+assert.match(privacy, /Cardog/);
+assert.match(privacy, /CARDOG_API_KEY/);
 assert.match(privacy, /current vehicle-import planner does not save estimates to an account/i);
 
 assert.match(terms, /November 15, 2026/);
