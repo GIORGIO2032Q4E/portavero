@@ -6,7 +6,7 @@ import { vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
-import { validateVin } from "@/lib/vin.mjs";
+import { validateJapaneseChassis, validateVin } from "@/lib/vin.mjs";
 import { getVehicleAge, hasValidManufactureYear } from "@/lib/vehicle-import-inputs.mjs";
 import { getEngineCapacityForSelection, getManualVehicleTypeSelection, getVinPowertrain, normalizeVinSteering } from "@/lib/vehicle-selection.mjs";
 
@@ -66,8 +66,8 @@ export default function VehicleImportPage() {
   const [insurance, setInsurance] = useState<number | null>(null);
   const [port, setPort] = useState<number | null>(null);
   const [delivery, setDelivery] = useState<number | null>(null);
-  const [vin, setVin] = useState("");
-  const [vinVehicleName, setVinVehicleName] = useState("");
+  const [vehicleIdentifier, setVehicleIdentifier] = useState("");
+  const [identifiedVehicleName, setIdentifiedVehicleName] = useState("");
   const [vinElectric, setVinElectric] = useState(false);
   const [vinFuelNeedsConfirmation, setVinFuelNeedsConfirmation] = useState(false);
   const [invalidCostFields, setInvalidCostFields] = useState<Record<CostFieldKey, boolean>>({
