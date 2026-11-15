@@ -1,3 +1,4 @@
+import { getUnitRate } from "@/lib/currency.mjs";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -73,7 +74,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    rate: rate / quantity,
+    rate: unitRate,
     rateDate,
     source: "National Bank of Georgia"
   });
