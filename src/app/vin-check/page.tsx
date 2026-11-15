@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { calculateUsVinCheckDigit, validateVin } from "@/lib/vin.mjs";
+import { calculateUsVinCheckDigit, validateJapaneseChassis, validateVin } from "@/lib/vin.mjs";
 
 type DecodedField = { label: string; value: string };
 type DecodedVehicle = {
@@ -23,20 +23,24 @@ type DecodedVehicle = {
 };
 type DecodeResult = {
   quality: "complete" | "partial";
-  vin: string;
+  identifier: string;
+  identifierType: "vin" | "japanese-chassis";
   vehicle: DecodedVehicle;
   fields: DecodedField[];
   sources: string[];
   internationalProviderConfigured: boolean;
+  cardogConfigured: boolean;
 };
 type ApiResponse = {
   error?: string;
-  vin?: string;
+  identifier?: string;
+  identifierType?: string;
   quality?: "complete" | "partial";
   vehicle?: unknown;
   fields?: unknown;
   sources?: unknown;
   internationalProviderConfigured?: unknown;
+  cardogConfigured?: unknown;
 };
 
 function isDecodedField(value: unknown): value is DecodedField {
@@ -48,7 +52,8 @@ function isDecodedField(value: unknown): value is DecodedField {
 
 function getImportEstimateHref(result: DecodeResult) {
   const vehicle = result.vehicle;
-  const params = new URLSearchParams({ vin: result.vin });
+  const params = new URLSearchParams();
+  if (result.identifierType === "vin") params.set("vin", result.identifier);
 
   if (vehicle.make) params.set("make", vehicle.make);
   if (vehicle.model) params.set("model", vehicle.model);
@@ -66,13 +71,14 @@ function getImportEstimateHref(result: DecodeResult) {
 
 export default function VinCheckPage() {
   const [vin, setVin] = useState("");
+  const [identifierType, setIdentifierType] = useState<"vin" | "japanese-chassis">("vin");
   const [market, setMarket] = useState<"unknown" | "us">("unknown");
   const [result, setResult] = useState<DecodeResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const checkedInput = validateVin(vin);
-  const expectedUsCheckDigit = market === "us" && checkedInput.valid
+  const expectedUsCheckDigit = identifierType === "vin" && market === "us" && checkedInput.valid
     ? calculateUsVinCheckDigit(checkedInput.vin)
     : null;
   const usCheckDigitMatches = expectedUsCheckDigit !== null &&
@@ -83,13 +89,30 @@ export default function VinCheckPage() {
     event.preventDefault();
     setResult(null);
     setError("");
-    setLoading(true);
 
+    let identifier = "";
+    if (identifierType === "vin") {
+      const checked = validateVin(vin);
+      if (!checked.valid) {
+        setError(checked.message);
+        return;
+      }
+      identifier = checked.vin;
+    } else {
+      const checked = validateJapaneseChassis(vin);
+      if (!checked.valid) {
+        setError(checked.message);
+        return;
+      }
+      identifier = checked.chassis;
+    }
+
+    setLoading(true);
     try {
       const response = await fetch("/api/vin-check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vin })
+        body: JSON.stringify({ identifier, identifierType: identifierType === "vin" ? "vin" : "japanese-chassis" })
       });
       const rawPayload: unknown = await response.json();
       const payload: ApiResponse = rawPayload && typeof rawPayload === "object" && !Array.isArray(rawPayload)
@@ -98,7 +121,7 @@ export default function VinCheckPage() {
 
       if (
         !response.ok ||
-        typeof payload.vin !== "string" ||
+        typeof payload.identifier !== "string" ||
         !payload.vehicle ||
         typeof payload.vehicle !== "object" ||
         Array.isArray(payload.vehicle) ||
@@ -120,13 +143,15 @@ export default function VinCheckPage() {
 
       setResult({
         quality: payload.quality === "partial" ? "partial" : "complete",
-        vin: payload.vin,
+        identifier: payload.identifier,
+        identifierType: payload.identifierType === "japanese-chassis" ? "japanese-chassis" : "vin",
         vehicle: payload.vehicle as DecodedVehicle,
         fields,
         sources: Array.isArray(payload.sources)
           ? payload.sources.filter((source): source is string => typeof source === "string")
           : [],
         internationalProviderConfigured: payload.internationalProviderConfigured === true,
+        cardogConfigured: payload.cardogConfigured === true,
       });
     } catch {
       setError("Could not complete the request. Check your connection and try again.");
@@ -140,8 +165,8 @@ export default function VinCheckPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">VIN check</span>
-          <h1>Check a VIN. Start the car import estimate.</h1>
-          <p>Look up the vehicle details available for a VIN, then use them to start an import estimate for Georgia. Some details may be missing, especially for cars built for other markets.</p>
+          <h1>Identify the car. Start the import estimate.</h1>
+          <p>Check a standard VIN or a Japanese domestic-market chassis number, then carry the available vehicle details into a Georgia import estimate.</p>
           <div className="hero-actions">
             <Link href="/vehicle-import" className="button button-dark">Enter car details manually ↗</Link>
           </div>
@@ -155,14 +180,31 @@ export default function VinCheckPage() {
               <div className="vehicle-section-heading">
                 <span className="step-chip">01</span>
                 <div>
-                  <span className="eyebrow">Enter the VIN</span>
-                  <h2>Check the VIN</h2>
+                  <span className="eyebrow">Identify the vehicle</span>
+                  <h2>Check its number</h2>
                 </div>
               </div>
-              <p className="panel-intro">First, Portavero checks the VIN format. Then it looks up the vehicle details available for that number.</p>
+              <p className="panel-intro">Choose the identifier type shown on the vehicle documents. Portavero sends it only to the matching data source.</p>
               <form onSubmit={decodeVin}>
                 <div className="field">
-                  <label htmlFor="vin">Vehicle identification number (VIN)</label>
+                  <label htmlFor="identifier-type">Identifier type</label>
+                  <select
+                    id="identifier-type"
+                    value={identifierType}
+                    onChange={(event) => {
+                      setIdentifierType(event.target.value === "japanese-chassis" ? "japanese-chassis" : "vin");
+                      setVin("");
+                      setResult(null);
+                      setError("");
+                    }}
+                    disabled={loading}
+                  >
+                    <option value="vin">Standard 17-character VIN</option>
+                    <option value="japanese-chassis">Japanese domestic frame/chassis number</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="vin">{identifierType === "vin" ? "Vehicle identification number (VIN)" : "Japanese frame/chassis number"}</label>
                   <input
                     id="vin"
                     name="vin"
@@ -173,20 +215,23 @@ export default function VinCheckPage() {
                       setResult(null);
                       setError("");
                     }}
-                    maxLength={17}
+                    maxLength={identifierType === "vin" ? 17 : 34}
                     disabled={loading}
                     autoComplete="off"
                     autoCapitalize="characters"
                     spellCheck={false}
-                    placeholder="e.g. 1HGCM82633A004352"
-                    aria-describedby="vin-help"
+                    placeholder={identifierType === "vin" ? "e.g. 1HGCM82633A004352" : "e.g. ZRR80-0143041"}
+                    aria-describedby="identifier-help"
                     required
                   />
-                  <small id="vin-help">Enter all 17 characters. Standard VINs do not use the letters I, O or Q. Do not add spaces or punctuation.</small>
-                  <small>Some Japanese domestic-market cars use a frame or chassis number instead of a standard 17-character VIN. Portavero cannot decode those numbers; use the vehicle documents to enter the details manually.</small>
+                  {identifierType === "vin" ? (
+                    <small id="identifier-help">Enter all 17 characters. Standard VINs do not use the letters I, O or Q. Do not add spaces or punctuation.</small>
+                  ) : (
+                    <small id="identifier-help">Enter the model/frame code and serial number with the hyphen, exactly as shown on the Japanese vehicle plate or export documents. Example: ZRR80-0143041.</small>
+                  )}
                 </div>
 
-                <div className="field">
+                {identifierType === "vin" && <div className="field">
                   <label htmlFor="vin-market">Vehicle market for check-digit test</label>
                   <select
                     id="vin-market"
@@ -197,7 +242,7 @@ export default function VinCheckPage() {
                     <option value="us">Built for the U.S. market</option>
                   </select>
                   <small>The ninth character is checked only when you choose U.S. market. VIN rules can differ in other markets.</small>
-                </div>
+                </div>}
 
                 {expectedUsCheckDigit !== null && (
                   <div className="notice" role="status">
@@ -210,7 +255,7 @@ export default function VinCheckPage() {
 
                 <div className="hero-actions">
                   <button type="submit" className="button button-dark" disabled={loading}>
-                    {loading ? "Checking VIN…" : "Decode VIN"}
+                    {loading ? "Checking vehicle…" : identifierType === "vin" ? "Decode VIN" : "Check Japanese chassis"}
                   </button>
                   <button
                     type="button"
@@ -225,16 +270,18 @@ export default function VinCheckPage() {
 
               {error && (
                 <div className="notice" role="alert">
-                  <strong>VIN not decoded.</strong> {error}
+                  <strong>{identifierType === "vin" ? "VIN not decoded." : "Chassis number not decoded."}</strong> {error}
                 </div>
               )}
 
               {result && (
                 <div className="vin-result" aria-live="polite">
                   <div className="notice" role="status">
-                    {result.quality === "complete"
-                      ? <><strong>Vehicle details found.</strong> Compare them with the car and its documents before using the estimate.</>
-                      : <><strong>Only some details were found.</strong> The make or model may be missing. Check the information below against the car's documents.</>}
+                    {result.identifierType === "japanese-chassis"
+                      ? <><strong>Japanese chassis record found.</strong> The source may list several models or engine variants. Confirm the exact car and manufacture year from its documents.</>
+                      : result.quality === "complete"
+                        ? <><strong>Vehicle details found.</strong> Compare them with the car and its documents before using the estimate.</>
+                        : <><strong>Only some details were found.</strong> Some vehicle specifications may be missing. Check the information below against the car's documents.</>}
                   </div>
                   <div className="result-lines">
                     {result.fields.map((field) => (
@@ -245,9 +292,13 @@ export default function VinCheckPage() {
                     ))}
                   </div>
                   <p className="source-note">Data source{result.sources.length === 1 ? "" : "s"}: {result.sources.length > 0 ? result.sources.join(" + ") : "VIN decoder"}.</p>
-                  <p className="source-note">The international VIN provider {result.internationalProviderConfigured ? "is configured as a fallback when the first source has gaps." : "is not configured yet. Non-U.S. VIN coverage may therefore remain limited."} Confirm all returned details against the car and its documents.</p>
-                  <p className="source-note">VIN submitted: <code>{result.vin}</code></p>
-                  <p className="source-note">The calculator will carry over the make, model, year, engine size, fuel system and steering side when available. You only need to confirm details the lookup could not identify.</p>
+                  {result.identifierType === "vin" ? (
+                    <p className="source-note">The international VIN provider {result.internationalProviderConfigured ? "is configured as a fallback when the first source has gaps." : "is not configured yet. Non-U.S. VIN coverage may therefore remain limited."} Confirm all returned details against the car and its documents.</p>
+                  ) : (
+                    <p className="source-note">Japanese chassis details come from published MLIT recall and fuel-economy records through Cardog. The result may describe possible models and engines, not an exact trim or individual vehicle history. {result.cardogConfigured ? "The Japanese chassis provider is configured." : "The Japanese chassis provider is not configured."}</p>
+                  )}
+                  <p className="source-note">Identifier submitted: <code>{result.identifier}</code></p>
+                  <p className="source-note">The calculator carries over only unambiguous make, model and engine details. Manufacture year, steering side and any uncertain engine variant must be confirmed from the vehicle documents.</p>
                   <Link href={getImportEstimateHref(result)} className="button button-dark">Continue to this car’s import estimate ↗</Link>
                 </div>
               )}
@@ -284,10 +335,10 @@ export default function VinCheckPage() {
 
       <section className="section section-tint">
         <div className="container content-narrow prose">
-          <h2>What you can get from a VIN</h2>
-          <p>Depending on the VIN, the lookup may return the make, model, model year, body type, engine capacity, fuel type, drive type and place of manufacture.</p>
+          <h2>What the lookup can return</h2>
+          <p>A standard VIN may return make, model, model year, body type, engine capacity, fuel type, drive type and place of manufacture. A Japanese domestic chassis number can return model-code candidates, possible engines, type approvals and published production information when those records are available.</p>
           <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. No result does not mean the car is accident-free.</p>
-          <p>Portavero first checks the NHTSA vPIC database and can use an optional international VIN provider when configured. Coverage still varies by manufacturer, market and model year, and a provider may return only a few fields or none. Some Japanese domestic-market cars use frame or chassis numbers rather than 17-character VINs; those are not supported by this lookup and must be checked against the vehicle documents or manufacturer.</p>
+          <p>Standard VINs are checked with NHTSA vPIC and can use an optional CarsXE international fallback. Japanese domestic chassis numbers use a separate optional Cardog lookup based on Japan MLIT records. Coverage varies and a record may be partial or ambiguous. Neither path searches accident, title, ownership, odometer, service or auction history, and neither guarantees a vehicle has a clean history.</p>
         </div>
       </section>
     </>
