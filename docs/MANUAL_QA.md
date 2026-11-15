@@ -168,7 +168,9 @@ npm run test:smoke
 ~~~
 
 - [ ] Confirm the GitHub Actions run belongs to the exact release commit and every required job passed.
-- [ ] Confirm the Vercel deployment is for the same commit and is marked READY.
+- [ ] Confirm GitHub Actions validates the pull request, including lint, types, unit tests, docs, build and smoke tests.
+- [ ] Confirm feature-branch pushes do not create Vercel deployments; automatic Vercel deployment is reserved for `main`.
+- [ ] After merge, confirm the Vercel production deployment is for the same `main` commit and is marked READY.
 - [ ] Open the production site and verify the main workflow in a browser.
 - [ ] Check the converter routes remain removed and legacy redirects work.
 - [ ] Review the README, privacy policy, terms and manual QA plan against the actual deployed feature set.
