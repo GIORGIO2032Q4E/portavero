@@ -193,8 +193,10 @@ export function parseNhtsaVinResponse(payload, vin) {
     .map(([key, label]) => ({ label, value: readField(row, key) }))
     .filter((field) => field.value.length > 0);
   if (vehicle.engineCc !== null) {
-    const cylindersIndex = fields.findIndex((field) => field.label === "Cylinders");
-    fields.splice(cylindersIndex + 1, 0, {
+    const anchorIndex = ["Cylinders", "Model year", "Model"]
+      .map((label) => fields.findIndex((field) => field.label === label))
+      .find((index) => index >= 0) ?? -1;
+    fields.splice(anchorIndex + 1, 0, {
       label: "Engine capacity",
       value: `${vehicle.engineCc.toLocaleString("en-US")} cm³`
     });
