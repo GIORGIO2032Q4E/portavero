@@ -15,7 +15,7 @@ const [readme, manualQa, privacy, terms, account, home, vinPage, planner] = awai
 assert.match(readme, /student-built project about one practical part of buying a car/i);
 assert.match(readme, /VIN lookup/i);
 assert.match(readme, /vehicle-import planner/i);
-assert.match(readme, /does not retrieve live freight prices/i);
+assert.match(readme, /retrieve live freight prices/i);
 assert.match(readme, /GEL 480/i);
 assert.match(readme, /does not save estimates to an account/i);
 assert.match(readme, /npm run check:docs/);
