@@ -149,7 +149,7 @@ export default function VehicleImportPage() {
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
           <h1>{vin ? "Import estimate for this car" : "Estimate the cost of importing a car."}</h1>
-          <p>{vin ? "Available details from the VIN have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Start with a VIN to fill in the car details, or enter them manually. Then add the costs you know to estimate selected Georgian vehicle taxes and import expenses."}</p>
+          <p>{vin ? "Available details from the VIN have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Enter a VIN first. Available details for that specific car will be added below. Check them against the car’s documents, fill in any missing technical details, then add its purchase, auction, shipping and local delivery costs."}</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
