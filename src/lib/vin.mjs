@@ -573,7 +573,7 @@ export function parseCardogChassisResponse(payload, chassis) {
         engineCc,
         primaryFuelType: fuel,
         secondaryFuelType: "",
-        electrificationLevel: "",
+        electrificationLevel: hybrid ? "hybrid" : "",
         steeringLocation: "",
         steering: "",
         isElectric,
