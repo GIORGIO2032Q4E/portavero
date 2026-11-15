@@ -90,22 +90,14 @@ export default function VinCheckPage() {
     setResult(null);
     setError("");
 
-    let identifier = "";
-    if (identifierType === "vin") {
-      const checked = validateVin(vin);
-      if (!checked.valid) {
-        setError(checked.message);
-        return;
-      }
-      identifier = checked.vin;
-    } else {
-      const checked = validateJapaneseChassis(vin);
-      if (!checked.valid) {
-        setError(checked.message);
-        return;
-      }
-      identifier = checked.chassis;
+    const checked = identifierType === "vin"
+      ? validateVin(vin)
+      : validateJapaneseChassis(vin);
+    if (!checked.valid) {
+      setError(checked.message);
+      return;
     }
+    const identifier = "vin" in checked ? checked.vin : checked.chassis;
 
     setLoading(true);
     try {
