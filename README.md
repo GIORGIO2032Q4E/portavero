@@ -215,7 +215,7 @@ An earlier manual production check is recorded in [the 9 November 2026 QA record
 
 ## Deployment
 
-The repository is connected to Vercel. Pull requests receive preview deployments and merges to `main` trigger production deployment at https://portavero.vercel.app.
+The repository is connected to Vercel. Automatic Vercel deployments are restricted to `main` to avoid spending the Hobby team's daily deployment allowance on every intermediate feature-branch commit. Pull requests are validated by GitHub Actions; they do not receive automatic Vercel preview URLs. Merges to `main` trigger the production deployment at https://portavero.vercel.app.
 
 A deployment marked READY confirms that Vercel completed the deployment process. It does not replace the browser and calculation checks described above.
 
