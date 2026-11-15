@@ -93,24 +93,17 @@ const decodedFields = [
   ["Make", "Make"],
   ["Model", "Model"],
   ["ModelYear", "Model year"],
-  ["Manufacturer", "Manufacturer"],
-  ["VehicleType", "Vehicle type"],
-  ["BodyClass", "Body class"],
+  ["BodyClass", "Body style"],
   ["Series", "Series"],
   ["Trim", "Trim"],
-  ["EngineCylinders", "Engine cylinders"],
-  ["EngineConfiguration", "Engine configuration"],
-  ["EngineModel", "Engine model"],
-  ["DisplacementL", "Engine displacement (L)"],
-  ["DisplacementCC", "Engine displacement (cm³)"],
-  ["FuelTypePrimary", "Primary fuel type"],
-  ["FuelTypeSecondary", "Secondary fuel type"],
-  ["ElectrificationLevel", "Electrification level"],
-  ["SteeringLocation", "Steering location"],
-  ["DriveType", "Drive type"],
+  ["EngineCylinders", "Cylinders"],
+  ["FuelTypePrimary", "Fuel"],
+  ["FuelTypeSecondary", "Additional fuel"],
+  ["ElectrificationLevel", "Powertrain"],
+  ["SteeringLocation", "Steering side"],
+  ["DriveType", "Drive"],
   ["TransmissionStyle", "Transmission"],
-  ["PlantCountry", "Manufacturing country"],
-  ["PlantCity", "Manufacturing city"]
+  ["PlantCountry", "Made in"]
 ];
 
 const vpicSource = {
@@ -195,9 +188,17 @@ export function parseNhtsaVinResponse(payload, vin) {
   const row = payload.Results.find(isRecord);
   if (!row) return { kind: "no-result" };
 
+  const vehicle = getVehicleFromVpic(row);
   const fields = decodedFields
     .map(([key, label]) => ({ label, value: readField(row, key) }))
     .filter((field) => field.value.length > 0);
+  if (vehicle.engineCc !== null) {
+    const cylindersIndex = fields.findIndex((field) => field.label === "Cylinders");
+    fields.splice(cylindersIndex + 1, 0, {
+      label: "Engine capacity",
+      value: `${vehicle.engineCc.toLocaleString("en-US")} cm³`
+    });
+  }
   const providerWarnings = getVinWarnings(row.ErrorCode);
   const providerMessage = readField(row, "ErrorText");
 
@@ -218,7 +219,7 @@ export function parseNhtsaVinResponse(payload, vin) {
     result: {
       quality,
       vin,
-      vehicle: getVehicleFromVpic(row),
+      vehicle,
       fields,
       providerWarnings,
       providerMessage: providerMessage || undefined,
