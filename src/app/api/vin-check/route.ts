@@ -122,7 +122,7 @@ export async function POST(request: Request) {
   if (carsXeApiKey && needsInternationalLookup(decoded)) {
     const international = await decodeWithCarsXe(checked.vin, carsXeApiKey);
     if (international) {
-      decoded = mergeVinDecoderResults(decoded, international);
+      decoded = mergeVinDecoderResults(decoded, international) as typeof decoded;
     }
   }
 
