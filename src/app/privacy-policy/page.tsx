@@ -39,6 +39,7 @@ export default function PrivacyPolicyPage() {
           <p>Portavero is hosted by Vercel. Like most hosting services, Vercel may process technical details such as IP addresses, request information, timestamps and security logs to keep the site running and protect it. What is collected and how long it is kept depends on Vercel's settings and current terms. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">Vercel's privacy policy</a>.</p>
 
           <h2>Analytics and outside services</h2>
+          <p>The currency converter retrieves the published USD reference rate from the National Bank of Georgia. The amount you enter is converted in your browser and is not sent to the bank.</p>
           <p>The current version does not intentionally use advertising or analytics trackers. It uses the fonts already available on your device. The VIN checker is the feature that shares the VIN with NHTSA for a vehicle-details lookup. Other external links take you to government or provider websites, which have their own privacy policies.</p>
 
           <h2>Your options</h2>

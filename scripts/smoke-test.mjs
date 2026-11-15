@@ -18,7 +18,7 @@ const server = spawn(
 
 const pages = [
   "/", "/about", "/how-it-works", "/vehicle-import",
-  "/vehicles", "/vin-check", "/shipping", "/account",
+  "/vehicles", "/vin-check", "/currency-converter", "/shipping", "/account",
   "/privacy-policy", "/terms"
 ];
 
