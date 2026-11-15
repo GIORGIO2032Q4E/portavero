@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { importCountries, vehicleCatalog } from "@/data/vehicle-catalog";
+import { vehicleCatalog } from "@/data/vehicle-catalog";
 import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
@@ -34,9 +34,8 @@ export default function VehicleImportPage() {
   const [makeName, setMakeName] = useState("");
   const [modelName, setModelName] = useState("");
   const [engineId, setEngineId] = useState("");
-  const [sourceCountry, setSourceCountry] = useState("United States");
   const [engineCc, setEngineCc] = useState<number | null>(null);
-  const [steering, setSteering] = useState("left");
+  const [steering, setSteering] = useState("");
   const [hybrid, setHybrid] = useState(false);
   const [classicCar, setClassicCar] = useState(false);
   const [preAprilRegime, setPreAprilRegime] = useState(false);
@@ -153,7 +152,6 @@ export default function VehicleImportPage() {
           <p>{vin ? "Available details from the VIN have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Start with a VIN to fill in the car details, or enter them manually. Then add the costs you know to estimate selected Georgian vehicle taxes and import expenses."}</p>
           <div className="hero-actions">
             <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
-            <Link href="/vehicles" className="button button-dark">Browse vehicle catalogue</Link>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
             <button type="button" className="button button-dark print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
           </div>
@@ -170,7 +168,6 @@ export default function VehicleImportPage() {
             <div><span>Vehicle</span><strong>{vinVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
             {vin && <div><span>VIN</span><strong>{vin}</strong></div>}
             <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (engineCc === null ? "Not entered" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
-            <div><span>Purchase country</span><strong>{sourceCountry}</strong></div>
             <div><span>Manufacture year</span><strong>{year}</strong></div>
             <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge} year(s)</strong></div>
             <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : steering === "left" ? "Left-hand drive" : "Steering not confirmed"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
@@ -182,13 +179,6 @@ export default function VehicleImportPage() {
             <div className="notice"><strong>Important:</strong> This planner only covers selected passenger cars under HS 8703. It does not determine the car's tariff classification, cover every exemption or confirm transitional eligibility. It also does not include the separate sports-car excise treatment in Article 188(9). Electric and classic-car calculations are limited to the cases shown here. Check special cases with the Revenue Service.</div>
             {vin && <div className="notice" role="status"><strong>Details loaded from VIN for {vinVehicleName}.</strong> {engineCc === null && !isElectric ? "NHTSA did not return an engine size. Enter it from the car's documents. " : "Check the returned engine size and model year against the car's documents. "}Choose the steering side below; it is not confirmed by this VIN lookup.</div>}
             <div className="form-grid">
-              <div className="field">
-                <label htmlFor="source-country">Country of purchase</label>
-                <select id="source-country" value={sourceCountry} onChange={(event) => setSourceCountry(event.target.value)}>
-                  {importCountries.map((country) => <option key={country} value={country}>{country}</option>)}
-                </select>
-                <small>This is saved with the car so you can recognise it later. The current tax calculation does not use the purchase country.</small>
-              </div>
               <div className="field">
                 <label htmlFor="make">Make</label>
                 <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setClassicCar(false); }}>
