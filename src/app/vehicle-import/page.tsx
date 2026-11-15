@@ -304,7 +304,7 @@ export default function VehicleImportPage() {
                   const next = getManualVehicleTypeSelection(event.target.value);
                   setEngineId(next.engineId);
                   setVinElectric(false);
-                  setEngineCc(null);
+                  if (!vin) setEngineCc(null);
                   setHybrid(next.hybrid);
                   setClassicCar(next.classicCar);
                   setVinFuelNeedsConfirmation(false);
