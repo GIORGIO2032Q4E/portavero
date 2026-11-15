@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
           <p>Shipping quotes are kept only while that page is open. They are not saved after you leave, and they are not sent to a shipping company.</p>
 
           <h2>When you check a VIN</h2>
-          <p>When you submit a VIN, your browser sends it to Portavero's VIN API route. That route sends it to the U.S. National Highway Traffic Safety Administration (NHTSA), which provides available vehicle specifications. Your VIN is shared with NHTSA for this lookup. The request does not search accident, title, ownership, mileage, service or auction records. The request does not search accident, title, ownership, mileage, service or auction records.</p>
+          <p>When you enter a VIN, Portavero sends it to the U.S. National Highway Traffic Safety Administration (NHTSA) to look up available vehicle specifications. Your VIN is shared with NHTSA for this lookup. The lookup does not search accident, title, ownership, mileage, service or auction records.</p>
           <p>Read the <a href="https://vpic.nhtsa.dot.gov/" target="_blank" rel="noreferrer">NHTSA vehicle information service details</a> for more about the lookup.</p>
 
           <h2>When you use an account</h2>
