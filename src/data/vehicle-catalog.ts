@@ -15,6 +15,10 @@ type VehicleMake = { name: string; models: VehicleModel[] };
 const e = (id: string, label: string, cc: number, fuel: EngineVariant["fuel"], years: string, note?: string): EngineVariant =>
   ({ id, label, cc, fuel, years, note });
 
+
+const u = (id: string, label: string, fuel: EngineVariant["fuel"]): EngineVariant =>
+  e(id, label, 0, fuel, "varies by year and market", "Exact engine displacement is not fixed for this model. Enter the capacity shown in the vehicle documents before calculating import tax.");
+
 export const vehicleCatalog: VehicleMake[] = [
   { name: "Toyota", models: [
     { name: "Prius", engines: [
@@ -450,6 +454,163 @@ export const vehicleCatalog: VehicleMake[] = [
       e("tesla-my-ev", "Electric motor", 0, "Electric", "all generations", "A limited electric-vehicle estimate is included; confirm the current treatment and vehicle classification with the Revenue Service."),
       ] }
   ]}
+
+  { name: "Acura", models: [
+    { name: "MDX", engines: [u("acura-mdx-p","Petrol · capacity varies","Petrol"), u("acura-mdx-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "RDX", engines: [u("acura-rdx-p","Petrol · capacity varies","Petrol")] },
+    { name: "TLX", engines: [u("acura-tlx-p","Petrol · capacity varies","Petrol")] },
+    { name: "ILX", engines: [u("acura-ilx-p","Petrol · capacity varies","Petrol"), u("acura-ilx-h","Hybrid · capacity varies","Hybrid")] }
+  ]},
+  { name: "Alfa Romeo", models: [
+    { name: "Giulia", engines: [u("alfa-giulia-p","Petrol · capacity varies","Petrol"), u("alfa-giulia-d","Diesel · capacity varies","Diesel")] },
+    { name: "Stelvio", engines: [u("alfa-stelvio-p","Petrol · capacity varies","Petrol"), u("alfa-stelvio-d","Diesel · capacity varies","Diesel")] },
+    { name: "Tonale", engines: [u("alfa-tonale-p","Petrol · capacity varies","Petrol"), u("alfa-tonale-h","Plug-in hybrid · capacity varies","Plug-in hybrid")] }
+  ]},
+  { name: "BYD", models: [
+    { name: "Atto 3", engines: [u("byd-atto3-ev","Electric motor","Electric")] },
+    { name: "Dolphin", engines: [u("byd-dolphin-ev","Electric motor","Electric")] },
+    { name: "Han", engines: [u("byd-han-ev","Electric motor","Electric"), u("byd-han-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Seal", engines: [u("byd-seal-ev","Electric motor","Electric")] },
+    { name: "Song Plus", engines: [u("byd-song-phev","Plug-in hybrid · capacity varies","Plug-in hybrid"), u("byd-song-ev","Electric motor","Electric")] },
+    { name: "Tang", engines: [u("byd-tang-ev","Electric motor","Electric"), u("byd-tang-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Qin", engines: [u("byd-qin-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] }
+  ]},
+  { name: "Buick", models: [
+    { name: "Encore", engines: [u("buick-encore-p","Petrol · capacity varies","Petrol")] },
+    { name: "Envision", engines: [u("buick-envision-p","Petrol · capacity varies","Petrol")] },
+    { name: "Enclave", engines: [u("buick-enclave-p","Petrol · capacity varies","Petrol")] },
+    { name: "Regal", engines: [u("buick-regal-p","Petrol · capacity varies","Petrol"), u("buick-regal-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Cadillac", models: [
+    { name: "ATS", engines: [u("cad-ats-p","Petrol · capacity varies","Petrol")] },
+    { name: "CTS", engines: [u("cad-cts-p","Petrol · capacity varies","Petrol")] },
+    { name: "CT5", engines: [u("cad-ct5-p","Petrol · capacity varies","Petrol")] },
+    { name: "XT4", engines: [u("cad-xt4-p","Petrol · capacity varies","Petrol")] },
+    { name: "XT5", engines: [u("cad-xt5-p","Petrol · capacity varies","Petrol")] },
+    { name: "Escalade", engines: [u("cad-escalade-p","Petrol · capacity varies","Petrol"), u("cad-escalade-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Chery", models: [
+    { name: "Tiggo 4", engines: [u("chery-t4-p","Petrol · capacity varies","Petrol")] },
+    { name: "Tiggo 7", engines: [u("chery-t7-p","Petrol · capacity varies","Petrol"), u("chery-t7-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Tiggo 8", engines: [u("chery-t8-p","Petrol · capacity varies","Petrol"), u("chery-t8-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Arrizo 5", engines: [u("chery-a5-p","Petrol · capacity varies","Petrol")] },
+    { name: "Arrizo 8", engines: [u("chery-a8-p","Petrol · capacity varies","Petrol"), u("chery-a8-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] }
+  ]},
+  { name: "Chrysler", models: [
+    { name: "300", engines: [u("chrysler-300-p","Petrol · capacity varies","Petrol")] },
+    { name: "200", engines: [u("chrysler-200-p","Petrol · capacity varies","Petrol")] },
+    { name: "Pacifica", engines: [u("chrysler-pac-p","Petrol · capacity varies","Petrol"), u("chrysler-pac-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] }
+  ]},
+  { name: "Dodge", models: [
+    { name: "Charger", engines: [u("dodge-charger-p","Petrol · capacity varies","Petrol")] },
+    { name: "Challenger", engines: [u("dodge-challenger-p","Petrol · capacity varies","Petrol")] },
+    { name: "Durango", engines: [u("dodge-durango-p","Petrol · capacity varies","Petrol"), u("dodge-durango-d","Diesel · capacity varies","Diesel")] },
+    { name: "Journey", engines: [u("dodge-journey-p","Petrol · capacity varies","Petrol")] }
+  ]},
+  { name: "Genesis", models: [
+    { name: "G70", engines: [u("genesis-g70-p","Petrol · capacity varies","Petrol"), u("genesis-g70-d","Diesel · capacity varies","Diesel")] },
+    { name: "G80", engines: [u("genesis-g80-p","Petrol · capacity varies","Petrol"), u("genesis-g80-d","Diesel · capacity varies","Diesel"), u("genesis-g80-ev","Electric motor","Electric")] },
+    { name: "G90", engines: [u("genesis-g90-p","Petrol · capacity varies","Petrol")] },
+    { name: "GV70", engines: [u("genesis-gv70-p","Petrol · capacity varies","Petrol"), u("genesis-gv70-d","Diesel · capacity varies","Diesel"), u("genesis-gv70-ev","Electric motor","Electric")] },
+    { name: "GV80", engines: [u("genesis-gv80-p","Petrol · capacity varies","Petrol"), u("genesis-gv80-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Geely", models: [
+    { name: "Coolray", engines: [u("geely-coolray-p","Petrol · capacity varies","Petrol")] },
+    { name: "Atlas / Boyue", engines: [u("geely-atlas-p","Petrol · capacity varies","Petrol"), u("geely-atlas-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Monjaro", engines: [u("geely-monjaro-p","Petrol · capacity varies","Petrol"), u("geely-monjaro-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Emgrand", engines: [u("geely-emgrand-p","Petrol · capacity varies","Petrol")] },
+    { name: "Geometry C", engines: [u("geely-geometry-c-ev","Electric motor","Electric")] }
+  ]},
+  { name: "GMC", models: [
+    { name: "Terrain", engines: [u("gmc-terrain-p","Petrol · capacity varies","Petrol"), u("gmc-terrain-d","Diesel · capacity varies","Diesel")] },
+    { name: "Acadia", engines: [u("gmc-acadia-p","Petrol · capacity varies","Petrol")] },
+    { name: "Yukon", engines: [u("gmc-yukon-p","Petrol · capacity varies","Petrol"), u("gmc-yukon-d","Diesel · capacity varies","Diesel")] },
+    { name: "Sierra", engines: [u("gmc-sierra-p","Petrol · capacity varies","Petrol"), u("gmc-sierra-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Great Wall", models: [
+    { name: "Haval H6", engines: [u("gwm-h6-p","Petrol · capacity varies","Petrol"), u("gwm-h6-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Haval Jolion", engines: [u("gwm-jolion-p","Petrol · capacity varies","Petrol"), u("gwm-jolion-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Tank 300", engines: [u("gwm-tank300-p","Petrol · capacity varies","Petrol"), u("gwm-tank300-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Poer", engines: [u("gwm-poer-p","Petrol · capacity varies","Petrol"), u("gwm-poer-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Haval", models: [
+    { name: "H2", engines: [u("haval-h2-p","Petrol · capacity varies","Petrol")] },
+    { name: "H6", engines: [u("haval-h6-p","Petrol · capacity varies","Petrol"), u("haval-h6-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Jolion", engines: [u("haval-jolion-p","Petrol · capacity varies","Petrol"), u("haval-jolion-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "F7", engines: [u("haval-f7-p","Petrol · capacity varies","Petrol")] }
+  ]},
+  { name: "Jaguar", models: [
+    { name: "XE", engines: [u("jag-xe-p","Petrol · capacity varies","Petrol"), u("jag-xe-d","Diesel · capacity varies","Diesel")] },
+    { name: "XF", engines: [u("jag-xf-p","Petrol · capacity varies","Petrol"), u("jag-xf-d","Diesel · capacity varies","Diesel")] },
+    { name: "XJ", engines: [u("jag-xj-p","Petrol · capacity varies","Petrol"), u("jag-xj-d","Diesel · capacity varies","Diesel")] },
+    { name: "F-Pace", engines: [u("jag-fpace-p","Petrol · capacity varies","Petrol"), u("jag-fpace-d","Diesel · capacity varies","Diesel"), u("jag-fpace-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "I-Pace", engines: [u("jag-ipace-ev","Electric motor","Electric")] }
+  ]},
+  { name: "Lincoln", models: [
+    { name: "MKZ", engines: [u("lincoln-mkz-p","Petrol · capacity varies","Petrol"), u("lincoln-mkz-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "MKC", engines: [u("lincoln-mkc-p","Petrol · capacity varies","Petrol")] },
+    { name: "Corsair", engines: [u("lincoln-corsair-p","Petrol · capacity varies","Petrol"), u("lincoln-corsair-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Nautilus", engines: [u("lincoln-nautilus-p","Petrol · capacity varies","Petrol"), u("lincoln-nautilus-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Navigator", engines: [u("lincoln-navigator-p","Petrol · capacity varies","Petrol")] }
+  ]},
+  { name: "Li Auto", models: [
+    { name: "L6", engines: [u("li-l6-phev","Range-extender hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "L7", engines: [u("li-l7-phev","Range-extender hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "L8", engines: [u("li-l8-phev","Range-extender hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "L9", engines: [u("li-l9-phev","Range-extender hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Mega", engines: [u("li-mega-ev","Electric motor","Electric")] }
+  ]},
+  { name: "MG", models: [
+    { name: "MG 3", engines: [u("mg3-p","Petrol · capacity varies","Petrol"), u("mg3-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "MG 4", engines: [u("mg4-ev","Electric motor","Electric")] },
+    { name: "MG 5", engines: [u("mg5-p","Petrol · capacity varies","Petrol"), u("mg5-ev","Electric motor","Electric")] },
+    { name: "ZS", engines: [u("mg-zs-p","Petrol · capacity varies","Petrol"), u("mg-zs-ev","Electric motor","Electric")] },
+    { name: "HS", engines: [u("mg-hs-p","Petrol · capacity varies","Petrol"), u("mg-hs-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Marvel R", engines: [u("mg-marvel-ev","Electric motor","Electric")] }
+  ]},
+  { name: "MINI", models: [
+    { name: "Cooper", engines: [u("mini-cooper-p","Petrol · capacity varies","Petrol"), u("mini-cooper-d","Diesel · capacity varies","Diesel"), u("mini-cooper-ev","Electric motor","Electric")] },
+    { name: "Countryman", engines: [u("mini-countryman-p","Petrol · capacity varies","Petrol"), u("mini-countryman-d","Diesel · capacity varies","Diesel"), u("mini-countryman-phev","Plug-in hybrid · capacity varies","Plug-in hybrid")] },
+    { name: "Clubman", engines: [u("mini-clubman-p","Petrol · capacity varies","Petrol"), u("mini-clubman-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "NIO", models: [
+    { name: "ET5", engines: [u("nio-et5-ev","Electric motor","Electric")] },
+    { name: "ET7", engines: [u("nio-et7-ev","Electric motor","Electric")] },
+    { name: "ES6 / EL6", engines: [u("nio-es6-ev","Electric motor","Electric")] },
+    { name: "ES8 / EL8", engines: [u("nio-es8-ev","Electric motor","Electric")] },
+    { name: "EC6", engines: [u("nio-ec6-ev","Electric motor","Electric")] }
+  ]},
+  { name: "RAM", models: [
+    { name: "1500", engines: [u("ram-1500-p","Petrol · capacity varies","Petrol"), u("ram-1500-d","Diesel · capacity varies","Diesel")] },
+    { name: "2500", engines: [u("ram-2500-p","Petrol · capacity varies","Petrol"), u("ram-2500-d","Diesel · capacity varies","Diesel")] },
+    { name: "ProMaster", engines: [u("ram-promaster-p","Petrol · capacity varies","Petrol"), u("ram-promaster-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Zeekr", models: [
+    { name: "001", engines: [u("zeekr-001-ev","Electric motor","Electric")] },
+    { name: "X", engines: [u("zeekr-x-ev","Electric motor","Electric")] },
+    { name: "007", engines: [u("zeekr-007-ev","Electric motor","Electric")] },
+    { name: "009", engines: [u("zeekr-009-ev","Electric motor","Electric")] },
+    { name: "7X", engines: [u("zeekr-7x-ev","Electric motor","Electric")] }
+  ]},
+  { name: "Isuzu", models: [
+    { name: "D-Max", engines: [u("isuzu-dmax-d","Diesel · capacity varies","Diesel"), u("isuzu-dmax-p","Petrol · capacity varies","Petrol")] },
+    { name: "MU-X", engines: [u("isuzu-mux-d","Diesel · capacity varies","Diesel")] },
+    { name: "Trooper", engines: [u("isuzu-trooper-p","Petrol · capacity varies","Petrol"), u("isuzu-trooper-d","Diesel · capacity varies","Diesel")] }
+  ]},
+  { name: "Daihatsu", models: [
+    { name: "Mira", engines: [u("daihatsu-mira-p","Petrol · capacity varies","Petrol")] },
+    { name: "Move", engines: [u("daihatsu-move-p","Petrol · capacity varies","Petrol")] },
+    { name: "Tanto", engines: [u("daihatsu-tanto-p","Petrol · capacity varies","Petrol")] },
+    { name: "Rocky", engines: [u("daihatsu-rocky-p","Petrol · capacity varies","Petrol"), u("daihatsu-rocky-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Terios", engines: [u("daihatsu-terios-p","Petrol · capacity varies","Petrol")] }
+  ]},
+  { name: "Fiat", models: [
+    { name: "500", engines: [u("fiat-500-p","Petrol · capacity varies","Petrol"), u("fiat-500-h","Hybrid · capacity varies","Hybrid"), u("fiat-500-ev","Electric motor","Electric")] },
+    { name: "Panda", engines: [u("fiat-panda-p","Petrol · capacity varies","Petrol"), u("fiat-panda-d","Diesel · capacity varies","Diesel"), u("fiat-panda-h","Hybrid · capacity varies","Hybrid")] },
+    { name: "Tipo", engines: [u("fiat-tipo-p","Petrol · capacity varies","Petrol"), u("fiat-tipo-d","Diesel · capacity varies","Diesel")] },
+    { name: "500X", engines: [u("fiat-500x-p","Petrol · capacity varies","Petrol"), u("fiat-500x-d","Diesel · capacity varies","Diesel")] }
+  ]}
+
 ];
 
 export const importCountries = [
