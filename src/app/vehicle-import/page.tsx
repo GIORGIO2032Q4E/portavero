@@ -68,8 +68,8 @@ export default function VehicleImportPage() {
   const [delivery, setDelivery] = useState<number | null>(null);
   const [vehicleIdentifier, setVehicleIdentifier] = useState("");
   const [identifiedVehicleName, setIdentifiedVehicleName] = useState("");
-  const [vinElectric, setVinElectric] = useState(false);
-  const [vinFuelNeedsConfirmation, setVinFuelNeedsConfirmation] = useState(false);
+  const [lookupElectric, setLookupElectric] = useState(false);
+  const [lookupFuelNeedsConfirmation, setLookupFuelNeedsConfirmation] = useState(false);
   const [invalidCostFields, setInvalidCostFields] = useState<Record<CostFieldKey, boolean>>({
     purchase: false,
     auction: false,
@@ -151,8 +151,8 @@ export default function VehicleImportPage() {
       setEngineId(matchingEngine?.id ?? "");
       setEngineCc(isElectric ? null : capacity);
       setHybrid(isHybrid);
-      setVinElectric(isElectric);
-      setVinFuelNeedsConfirmation(effectiveFuelNeedsConfirmation);
+      setLookupElectric(isElectric);
+      setLookupFuelNeedsConfirmation(effectiveFuelNeedsConfirmation);
       setSteering(reportedSteering);
       setClassicCar(false);
     }
@@ -161,7 +161,7 @@ export default function VehicleImportPage() {
   const selectedMake = vehicleCatalog.find((make) => make.name === makeName);
   const selectedModel = selectedMake?.models.find((model) => model.name === modelName);
   const selectedEngine = selectedModel?.engines.find((engine) => engine.id === engineId);
-  const isElectric = selectedEngine?.fuel === "Electric" || vinElectric;
+  const isElectric = selectedEngine?.fuel === "Electric" || lookupElectric;
 
   const currentYear = new Date().getFullYear();
   const vehicleAge = getVehicleAge(year, declarationYear);
@@ -169,7 +169,7 @@ export default function VehicleImportPage() {
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
   const validVehicleType = !classicCar || (vehicleAge !== null && vehicleAge > 30);
   const validSteering = steering === "left" || steering === "right";
-  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering && !vinFuelNeedsConfirmation;
+  const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering && !lookupFuelNeedsConfirmation;
   const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
 
   const result = useMemo(() => {
@@ -244,17 +244,17 @@ export default function VehicleImportPage() {
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="make">Make</label>
-                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setVinFuelNeedsConfirmation(Boolean(vin)); setClassicCar(false); }}>
+                <select id="make" value={makeName} onChange={(event) => { setMakeName(event.target.value); setModelName(""); setEngineId(""); setEngineCc(null); setHybrid(false); setLookupElectric(false); setLookupFuelNeedsConfirmation(Boolean(vehicleIdentifier)); setClassicCar(false); }}>
                   <option value="">Choose a make</option>
-                  {makeName && !vehicleCatalog.some((item) => item.name === makeName) && <option value={makeName}>{makeName} · from VIN</option>}
+                  {makeName && !vehicleCatalog.some((item) => item.name === makeName) && <option value={makeName}>{makeName} · from lookup</option>}
                   {vehicleCatalog.map((make) => <option key={make.name} value={make.name}>{make.name}</option>)}
                 </select>
               </div>
               <div className="field">
                 <label htmlFor="model">Model</label>
-                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setVinElectric(false); setVinFuelNeedsConfirmation(Boolean(vin)); setClassicCar(false); }}>
+                <select id="model" value={modelName} disabled={!selectedMake} onChange={(event) => { setModelName(event.target.value); setEngineId(""); setEngineCc(null); setHybrid(false); setLookupElectric(false); setLookupFuelNeedsConfirmation(Boolean(vehicleIdentifier)); setClassicCar(false); }}>
                   <option value="">Choose a model</option>
-                  {modelName && selectedMake && !selectedMake.models.some((item) => item.name === modelName) && <option value={modelName}>{modelName} · from VIN</option>}
+                  {modelName && selectedMake && !selectedMake.models.some((item) => item.name === modelName) && <option value={modelName}>{modelName} · from lookup</option>}
                   {selectedMake?.models.map((model) => <option key={model.name} value={model.name}>{model.name}</option>)}
                 </select>
               </div>
@@ -264,10 +264,10 @@ export default function VehicleImportPage() {
                   const id = event.target.value;
                   const engine = selectedModel?.engines.find((item) => item.id === id);
                   setEngineId(id);
-                  setVinElectric(false);
+                  setLookupElectric(false);
                   setEngineCc(getEngineCapacityForSelection(engine));
                   setHybrid(engine?.fuel === "Hybrid" || engine?.fuel === "Plug-in hybrid");
-                  setVinFuelNeedsConfirmation(false);
+                  setLookupFuelNeedsConfirmation(false);
                   setClassicCar(false);
                 }}>
                   <option value="">Choose an engine variant</option>
@@ -293,7 +293,7 @@ export default function VehicleImportPage() {
                 </select>
                 <small>The planner uses the declaration year to work out the car's age.</small>
               </div>
-              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} max={100000} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); setVinElectric(false); }} hint={selectedEngine?.cc === 0 && !isElectric ? "This model comes with different engine sizes. Enter the capacity shown in the car's documents. Portavero will not guess it." : "If you chose an engine above, its capacity is filled in here. Check it against the car's documents."} />
+              <NumberField id="engine-cc" label="Engine capacity (cm³)" value={engineCc} step={1} max={100000} inputMode="numeric" onChange={(value) => { setEngineCc(value); setEngineId(""); setLookupElectric(false); }} hint={selectedEngine?.cc === 0 && !isElectric ? "This model comes with different engine sizes. Enter the capacity shown in the car's documents. Portavero will not guess it." : "If you chose an engine above, its capacity is filled in here. Check it against the car's documents."} />
               <div className="field">
                 <label htmlFor="pre-april-regime">Tax regime for this import</label>
                 <select id="pre-april-regime" value={preAprilRegime ? "previous" : "current"} onChange={(event) => setPreAprilRegime(event.target.value === "previous")}>
@@ -312,14 +312,14 @@ export default function VehicleImportPage() {
               </div>
               <div className="field">
                 <label htmlFor="hybrid">Vehicle type</label>
-                <select id="hybrid" value={vinFuelNeedsConfirmation ? "" : isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
+                <select id="hybrid" value={lookupFuelNeedsConfirmation ? "" : isElectric ? "electric" : hybrid ? "hybrid" : classicCar ? "classic" : "other"} disabled={isElectric} onChange={(event) => {
                   const next = getManualVehicleTypeSelection(event.target.value);
                   setEngineId(next.engineId);
-                  setVinElectric(false);
-                  if (!vin) setEngineCc(null);
+                  setLookupElectric(false);
+                  if (!vehicleIdentifier) setEngineCc(null);
                   setHybrid(next.hybrid);
                   setClassicCar(next.classicCar);
-                  setVinFuelNeedsConfirmation(false);
+                  setLookupFuelNeedsConfirmation(false);
                 }}>
                   <option value="" disabled>Confirm vehicle type from documents</option>
                   <option value="electric" disabled>Electric (from VIN or selected engine)</option>
@@ -330,12 +330,12 @@ export default function VehicleImportPage() {
                 <small>The 60% reduction is only for left-hand-drive hybrids aged 0–6 years. Choose the classic-car option only if the car meets the legal classification.</small>
               </div>
             </div>
-            {vin && !validSteering && <div className="notice" role="alert">Choose whether the car is left-hand drive or right-hand drive before using the tax estimate. The VIN lookup could not confirm steering side.</div>}
-            {vin && vinFuelNeedsConfirmation && <div className="notice" role="alert">The VIN lookup did not identify the fuel system clearly enough to choose the correct tax treatment. Confirm whether this car is non-hybrid or hybrid using its documents.</div>}
+            {vehicleIdentifier && !validSteering && <div className="notice" role="alert">Choose whether the car is left-hand drive or right-hand drive before using the tax estimate. The vehicle lookup could not confirm steering side.</div>}
+            {vehicleIdentifier && lookupFuelNeedsConfirmation && <div className="notice" role="alert">The vehicle lookup did not identify the fuel system clearly enough to choose the correct tax treatment. Confirm whether this car is non-hybrid or hybrid using its documents.</div>}
             {preAprilRegime && <div className="notice" role="status"><strong>Using the previous tax rules?</strong> Selecting this option does not mean the car qualifies. The Revenue Service asks for specific registration and transport documents, and the deadlines depend on how the car was moved. Check your documents with them before relying on this estimate.</div>}
             {declarationYear > currentYear && <div className="notice" role="status"><strong>Planning for {declarationYear}?</strong> This uses the tax rules and GEL 480 fee list currently stored in Portavero. Rates, fees and requirements may change before then, so treat the result as a rough guide, not a forecast.</div>}
             {!preAprilRegime && vehicleAge !== null && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Cars over 6 years old:</strong> the base excise rate is GEL 4.50 per cm³ before any applicable adjustments. The previously proposed age-based registration ban was replaced by this higher rate. Other emissions, vehicle-category and registration rules may still apply, so check the exact car before buying or shipping.</div>}
-            {(!eligibleYear || !validEngine || !validVehicleType || isElectric || vinFuelNeedsConfirmation) && <div className="notice" role="status">{vinFuelNeedsConfirmation ? "Confirm the vehicle's fuel system before relying on the tax estimate." : isElectric ? "This planner includes a limited calculation for electric passenger cars. Check the car's classification and any special rules with the Revenue Service." : !validVehicleType ? "The classic-car rate is only available for cars over 30 years old that meet the legal classification." : "Check the manufacture year and engine size before relying on the estimate."}</div>}
+            {(!eligibleYear || !validEngine || !validVehicleType || isElectric || lookupFuelNeedsConfirmation) && <div className="notice" role="status">{lookupFuelNeedsConfirmation ? "Confirm the vehicle's fuel system before relying on the tax estimate." : isElectric ? "This planner includes a limited calculation for electric passenger cars. Check the car's classification and any special rules with the Revenue Service." : !validVehicleType ? "The classic-car rate is only available for cars over 30 years old that meet the legal classification." : "Check the manufacture year and engine size before relying on the estimate."}</div>}
             {canShowTaxEstimate ? (
               <div className="notice">
                 <strong>Rate used:</strong> {preAprilRegime ? "Previous age-based excise table (transitional cases only)" : "Current rates from 2 April 2026"}. {isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rule: age-based rate × 2,000 for right-hand-drive/converted EVs" : "GEL 3,000 fixed excise for right-hand-drive/converted EVs") : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label}.` : "Check the engine capacity against the car's documents."} The catalogue lists common variants only, not every year or market configuration. Transitional cases and vehicle classification need official verification.
