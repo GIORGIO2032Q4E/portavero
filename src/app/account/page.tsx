@@ -127,26 +127,13 @@ export default function AccountPage() {
     }
   }
 
-  function handleLoad(item: CloudEstimate) {
-    try {
-      const raw = window.localStorage.getItem("portavero-saved-estimates");
-      const parsed: unknown = raw ? JSON.parse(raw) : [];
-      const localEstimates = Array.isArray(parsed) ? parsed.filter((entry) => entry && typeof entry === "object") as Record<string, unknown>[] : [];
-      const snapshot = { ...item.data, id: Date.now(), name: item.name, savedAt: item.updated_at };
-      window.localStorage.setItem("portavero-saved-estimates", JSON.stringify([snapshot, ...localEstimates].slice(0, 10)));
-      window.location.assign("/calculator");
-    } catch {
-      setError("Could not load this estimate into the current browser.");
-    }
-  }
-
   return (
     <>
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Account</span>
           <h1>{session ? "Your saved estimates." : "Save your estimates to your account."}</h1>
-          <p>This page shows import estimates saved to your account in an earlier version of Portavero. The current car-import planner does not yet save its results to your account.</p>
+          <p>This page is kept for older estimates saved to your account in a previous version of Portavero. The current vehicle-import planner does not save estimates to this account area. Older general-import estimates can be reviewed and deleted, but they cannot be loaded into the current planner.</p>
         </div>
       </section>
       <section className="section">
@@ -170,7 +157,7 @@ export default function AccountPage() {
                 <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Signed-in account"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
-              <p>Estimates you save while signed in are available on another device when you use the same account. Loading one makes a copy in this browser. Changes to that copy do not change the saved account version.</p>
+              <p>These are legacy estimates from an earlier version of Portavero. They can be reviewed and deleted here, but they are not compatible with the current vehicle-import planner.</p>
               <h3>Saved estimates ({estimates.length})</h3>
               {estimates.length === 0 ? <p className="empty-state">There are no estimates saved to this account yet.</p> : (
                 <div className="account-estimate-list">
@@ -178,14 +165,13 @@ export default function AccountPage() {
                     <div className="account-estimate" key={item.id}>
                       <div><strong>{item.name}</strong><small>Updated {new Date(item.updated_at).toLocaleDateString()}</small></div>
                       <div className="account-estimate-actions">
-                        <button type="button" className="button button-outline button-small" onClick={() => handleLoad(item)}>Load</button>
                         <button type="button" className="button button-outline button-small" onClick={() => void handleDelete(item.id)}>Delete</button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <Link href="/calculator" className="button button-dark">Open import calculator</Link>
+              <Link href="/vehicle-import" className="button button-dark">Open vehicle import planner</Link>
             </section>
           ) : (
             <section className="panel account-panel">
