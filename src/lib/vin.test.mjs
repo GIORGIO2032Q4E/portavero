@@ -123,7 +123,7 @@ test("keeps partial technical fields when make or model is missing", () => {
   assert.equal(response.kind, "partial");
   assert.equal(response.result.quality, "partial");
   assert.equal(response.result.fields.length, 2);
-  assert.match(response.result.note, /partial result/i);
+  assert.match(response.result.note, /only some vehicle details/i);
   assert.equal(response.result.providerMessage, "Some data is unavailable");
   assert.match(response.result.providerWarnings.join(" "), /detailed data is not currently available/);
 });
@@ -195,8 +195,8 @@ test("extracts exact engine displacement, both fuels and steering for the calcul
     series: "",
     trim: ""
   });
-  assert.ok(response.result.fields.some((field) => field.label === "Engine displacement (cm³)" && field.value === "1993"));
-  assert.ok(response.result.fields.some((field) => field.label === "Steering location" && field.value === "Left-Hand Drive"));
+  assert.ok(response.result.fields.some((field) => field.label === "Engine capacity" && field.value === "1,993 cm³"));
+  assert.ok(response.result.fields.some((field) => field.label === "Steering side" && field.value === "Left-Hand Drive"));
 });
 
 test("uses engine displacement in litres when the exact cc value is unavailable", () => {
