@@ -439,3 +439,26 @@ test("rejects an unreadable Cardog chassis response", async () => {
     kind: "invalid-response"
   });
 });
+
+
+test("does not infer an English model from a partial non-aligned model list", async () => {
+  const { parseCardogChassisResponse } = await import("./vin.mjs");
+  const result = parseCardogChassisResponse({
+    response: {
+      chassis: "ABC10-1234567",
+      status: "read",
+      candidates: [{
+        makeRef: "make:toyota",
+        modelsEn: ["Model A"],
+        modelsJa: ["モデルA", "モデルB"],
+        engines: [{ engineCode: "E1", displacementCc: 1500 }]
+      }]
+    }
+  }, "ABC10-1234567");
+
+  assert.equal(result.result.vehicle.make, "Toyota");
+  assert.equal(result.result.vehicle.model, "");
+  assert.equal(result.result.vehicle.engineCc, 1500);
+  assert.ok(result.result.fields.some((field) => field.label === "Model names (English)" && field.value === "Model A"));
+  assert.ok(result.result.fields.some((field) => field.label === "Model names (Japanese)" && field.value.includes("モデルB")));
+});
