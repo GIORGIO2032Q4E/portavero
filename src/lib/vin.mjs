@@ -107,7 +107,7 @@ const decodedFields = [
 ];
 
 const vpicSource = {
-  name: "Vehicle information database",
+  name: "NHTSA vPIC",
   url: "https://vpic.nhtsa.dot.gov/api/"
 };
 
