@@ -48,7 +48,7 @@ const enteredGroup = (values: Array<number | null>) => {
 };
 
 export default function VehicleImportPage() {
-  const [year, setYear] = useState(2020);
+  const [year, setYear] = useState<number | null>(null);
   const [declarationYear, setDeclarationYear] = useState(new Date().getFullYear());
   const [makeName, setMakeName] = useState("");
   const [modelName, setModelName] = useState("");
@@ -155,16 +155,18 @@ export default function VehicleImportPage() {
   const isElectric = selectedEngine?.fuel === "Electric" || vinElectric;
 
   const currentYear = new Date().getFullYear();
-  const vehicleAge = declarationYear - year;
-  const eligibleYear = vehicleAge >= 0 && year <= declarationYear;
+  const vehicleAge = year === null ? null : declarationYear - year;
+  const eligibleYear = year !== null && Number.isInteger(year) && vehicleAge !== null && vehicleAge >= 0 && year <= declarationYear;
   const validEngine = isElectric || (engineCc !== null && Number.isFinite(engineCc) && engineCc > 0);
-  const validVehicleType = !classicCar || vehicleAge > 30;
+  const validVehicleType = !classicCar || (vehicleAge !== null && vehicleAge > 30);
   const validSteering = steering === "left" || steering === "right";
   const canShowTaxEstimate = eligibleYear && validEngine && validVehicleType && validSteering && !vinFuelNeedsConfirmation;
   const hasInvalidCostField = Object.values(invalidCostFields).some(Boolean);
 
   const result = useMemo(() => {
-    const taxes = calculateVehicleTaxes({
+    const taxes = year === null
+      ? { excise: Number.NaN, importDuty: Number.NaN, rate: Number.NaN }
+      : calculateVehicleTaxes({
       manufactureYear: year,
       declarationYear,
       engineCc: engineCc ?? 0,
@@ -220,8 +222,8 @@ export default function VehicleImportPage() {
             <div><span>Vehicle</span><strong>{vinVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
             {vin && <div><span>VIN</span><strong>{vin}</strong></div>}
             <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (engineCc === null ? "Not entered" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
-            <div><span>Manufacture year</span><strong>{year}</strong></div>
-            <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge} year(s)</strong></div>
+            <div><span>Manufacture year</span><strong>{year ?? "Not entered"}</strong></div>
+            <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge === null ? "age not available" : `${vehicleAge} year(s)`}</strong></div>
             <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : steering === "left" ? "Left-hand drive" : "Steering not confirmed"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
           </div>
           <div className="tool-layout">
@@ -266,7 +268,8 @@ export default function VehicleImportPage() {
               </div>
               <div className="field">
                 <label htmlFor="manufacture-year">Manufacture year</label>
-                <select id="manufacture-year" value={year} onChange={(event) => { setYear(Number(event.target.value)); setClassicCar(false); }}>
+                <select id="manufacture-year" value={year ?? ""} required onChange={(event) => { setYear(event.target.value ? Number(event.target.value) : null); setClassicCar(false); }}>
+                  <option value="">Select manufacture year</option>
                   {Array.from({ length: currentYear - 1960 + 3 }, (_, index) => currentYear + 2 - index).map((value) => (
                     <option key={value} value={value}>{value}</option>
                   ))}
@@ -313,7 +316,7 @@ export default function VehicleImportPage() {
                   <option value="electric" disabled>Electric (from VIN or selected engine)</option>
                   <option value="other">Non-hybrid</option>
                   <option value="hybrid">Hybrid</option>
-                  <option value="classic" disabled={vehicleAge <= 30}>Classic car (over 30 years old, classification confirmed)</option>
+                  <option value="classic" disabled={vehicleAge === null || vehicleAge <= 30}>Classic car (over 30 years old, classification confirmed)</option>
                 </select>
                 <small>The 60% reduction is only for left-hand-drive hybrids aged 0–6 years. Choose the classic-car option only if the car meets the legal classification.</small>
               </div>
@@ -322,14 +325,14 @@ export default function VehicleImportPage() {
             {vin && vinFuelNeedsConfirmation && <div className="notice" role="alert">The VIN lookup did not identify the fuel system clearly enough to choose the correct tax treatment. Confirm whether this car is non-hybrid or hybrid using its documents.</div>}
             {preAprilRegime && <div className="notice" role="status"><strong>Using the previous tax rules?</strong> Selecting this option does not mean the car qualifies. The Revenue Service asks for specific registration and transport documents, and the deadlines depend on how the car was moved. Check your documents with them before relying on this estimate.</div>}
             {declarationYear > currentYear && <div className="notice" role="status"><strong>Planning for {declarationYear}?</strong> This uses the tax rules and GEL 480 fee list currently stored in Portavero. Rates, fees and requirements may change before then, so treat the result as a rough guide, not a forecast.</div>}
-            {!preAprilRegime && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Cars over 6 years old:</strong> the base excise rate is GEL 4.50 per cm³ before any applicable adjustments. The previously proposed age-based registration ban was replaced by this higher rate. Other emissions, vehicle-category and registration rules may still apply, so check the exact car before buying or shipping.</div>}
+            {!preAprilRegime && vehicleAge !== null && vehicleAge > 6 && !isElectric && !classicCar && <div className="notice" role="status"><strong>Cars over 6 years old:</strong> the base excise rate is GEL 4.50 per cm³ before any applicable adjustments. The previously proposed age-based registration ban was replaced by this higher rate. Other emissions, vehicle-category and registration rules may still apply, so check the exact car before buying or shipping.</div>}
             {(!eligibleYear || !validEngine || !validVehicleType || isElectric || vinFuelNeedsConfirmation) && <div className="notice" role="status">{vinFuelNeedsConfirmation ? "Confirm the vehicle's fuel system before relying on the tax estimate." : isElectric ? "This planner includes a limited calculation for electric passenger cars. Check the car's classification and any special rules with the Revenue Service." : !validVehicleType ? "The classic-car rate is only available for cars over 30 years old that meet the legal classification." : "Check the manufacture year and engine size before relying on the estimate."}</div>}
             {canShowTaxEstimate ? (
               <div className="notice">
                 <strong>Rate used:</strong> {preAprilRegime ? "Previous age-based excise table (transitional cases only)" : "Current rates from 2 April 2026"}. {isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rule: age-based rate × 2,000 for right-hand-drive/converted EVs" : "GEL 3,000 fixed excise for right-hand-drive/converted EVs") : "GEL 0 excise for left-hand-drive EVs") : classicCar ? "GEL 1.00 per cm³ for a vehicle classified as a classic car" : `${money(result.rate)} per cm³`}. {makeName && modelName && selectedEngine ? `${makeName} ${modelName} · ${selectedEngine.label}.` : "Check the engine capacity against the car's documents."} The catalogue lists common variants only, not every year or market configuration. Transitional cases and vehicle classification need official verification.
               </div>
             ) : (
-              <div className="notice">Complete the car details, including engine size, fuel type and steering side, to see the tax rate and total.</div>
+              <div className="notice">Enter the manufacture year from the vehicle documents, then confirm engine size, fuel type and steering side to see the tax rate and total.</div>
             )}
           </section>
 
