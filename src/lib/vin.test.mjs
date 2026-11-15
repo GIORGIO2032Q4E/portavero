@@ -230,3 +230,82 @@ test("keeps steering unconfirmed when NHTSA does not provide it", () => {
 
   assert.equal(response.result.vehicle.steering, "");
 });
+
+
+test("normalizes only documented CarsXE international attributes", async () => {
+  const { parseCarsXeVinResponse } = await import("./vin.mjs");
+  const result = parseCarsXeVinResponse({
+    success: true,
+    input: { vin: "WF0MXXGBWM8R43240" },
+    attributes: {
+      make: "Ford",
+      model: "Galaxy",
+      year: "2008",
+      body: "Wagon",
+      series: "WA6",
+      fuel_type: "Diesel",
+      manufacturer: "Ford Werke GmbH",
+      plant_country: "Germany"
+    }
+  }, "WF0MXXGBWM8R43240");
+
+  assert.equal(result.kind, "complete");
+  assert.equal(result.result.vehicle.modelYear, 2008);
+  assert.equal(result.result.vehicle.engineCc, null);
+  assert.equal(result.result.vehicle.steering, "");
+  assert.ok(result.result.fields.some((field) => field.label === "Made in" && field.value === "Germany"));
+  assert.equal(result.result.sources[0], "CarsXE International VIN Decoder");
+});
+
+test("leaves missing international attributes blank instead of guessing", async () => {
+  const { parseCarsXeVinResponse } = await import("./vin.mjs");
+  const result = parseCarsXeVinResponse({
+    success: true,
+    input: { vin: "WF0MXXGBWM8R43240" },
+    attributes: { make: "Ford" }
+  }, "WF0MXXGBWM8R43240");
+
+  assert.equal(result.kind, "partial");
+  assert.equal(result.result.vehicle.model, "");
+  assert.equal(result.result.vehicle.modelYear, null);
+  assert.equal(result.result.vehicle.engineCc, null);
+  assert.deepEqual(result.result.fields, [{ label: "Make", value: "Ford" }]);
+});
+
+test("merges international fields only where NHTSA left gaps", async () => {
+  const { mergeVinDecoderResults, parseCarsXeVinResponse, parseNhtsaVinResponse } = await import("./vin.mjs");
+  const nhtsa = parseNhtsaVinResponse({
+    Results: [{
+      Make: "FORD",
+      Model: "Focus",
+      ModelYear: "",
+      DisplacementL: "1.6",
+      FuelTypePrimary: "Diesel",
+      ErrorCode: "0"
+    }]
+  }, "WF0MXXGBWM8R43240");
+  const international = parseCarsXeVinResponse({
+    success: true,
+    attributes: {
+      make: "Ford",
+      model: "Galaxy",
+      year: "2010",
+      body: "Wagon",
+      plant_country: "Germany"
+    }
+  }, "WF0MXXGBWM8R43240");
+
+  const merged = mergeVinDecoderResults(nhtsa, international);
+  assert.equal(merged.result.vehicle.make, "FORD");
+  assert.equal(merged.result.vehicle.model, "Focus");
+  assert.equal(merged.result.vehicle.modelYear, 2010);
+  assert.equal(merged.result.vehicle.engineCc, 1600);
+  assert.equal(merged.result.fields.find((field) => field.label === "Model").value, "Focus");
+  assert.ok(merged.result.sources.includes("NHTSA vPIC"));
+  assert.ok(merged.result.sources.includes("CarsXE International VIN Decoder"));
+});
+
+test("rejects a malformed international decoder payload", async () => {
+  const { parseCarsXeVinResponse } = await import("./vin.mjs");
+  assert.deepEqual(parseCarsXeVinResponse({ success: false }, "WF0MXXGBWM8R43240"), { kind: "no-data" });
+});
