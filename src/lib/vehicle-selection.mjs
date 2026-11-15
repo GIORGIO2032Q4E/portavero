@@ -35,6 +35,9 @@ export function getEngineCapacityForSelection(engine) {
     : null;
 }
 
+/**
+ * @param {{ primaryFuelType?: unknown, secondaryFuelType?: unknown, electrificationLevel?: unknown }} details
+ */
 export function getVinPowertrain(details = {}) {
   const primary = typeof details.primaryFuelType === "string" ? details.primaryFuelType.trim().toLowerCase() : "";
   const secondary = typeof details.secondaryFuelType === "string" ? details.secondaryFuelType.trim().toLowerCase() : "";
@@ -65,6 +68,10 @@ export function getVinPowertrain(details = {}) {
   };
 }
 
+/**
+ * @param {unknown} value
+ * @returns {"" | "left" | "right"}
+ */
 export function normalizeVinSteering(value) {
   if (typeof value !== "string") return "";
   const steering = value.trim().toLowerCase();
