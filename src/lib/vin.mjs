@@ -12,7 +12,7 @@ export function validateVin(value) {
   }
 
   if (vin.length !== 17) {
-    return { valid: false, vin, message: "A standard VIN must contain exactly 17 characters." };
+    return { valid: false, vin, message: "A standard VIN must contain exactly 17 characters. Some Japanese domestic-market vehicles use a frame or chassis number instead; check the vehicle documents and enter the car details manually." };
   }
 
   if (/[IOQ]/.test(vin)) {
