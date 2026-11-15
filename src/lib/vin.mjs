@@ -432,11 +432,13 @@ export function parseCardogChassisResponse(payload, chassis) {
 
   const response = isRecord(payload.response) ? payload.response : payload;
   const status = readField(response, "status");
-  const returnedChassis = readField(response, "chassis");
+  const returnedChassis = readField(response, "chassis").toUpperCase();
+  const requestedChassis = typeof chassis === "string" ? chassis.trim().toUpperCase() : "";
   const supportedStatuses = new Set(["read", "ambiguous", "serial_unfit", "code_unknown"]);
   if (
     !supportedStatuses.has(status) ||
     !returnedChassis ||
+    returnedChassis !== requestedChassis ||
     !Array.isArray(response.candidates)
   ) {
     return { kind: "invalid-response" };
