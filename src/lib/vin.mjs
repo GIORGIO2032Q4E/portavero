@@ -107,7 +107,7 @@ const decodedFields = [
 ];
 
 const vpicSource = {
-  name: "NHTSA vPIC",
+  name: "Vehicle information database",
   url: "https://vpic.nhtsa.dot.gov/api/"
 };
 
@@ -225,8 +225,8 @@ export function parseNhtsaVinResponse(payload, vin) {
       providerMessage: providerMessage || undefined,
       source: vpicSource,
       note: quality === "complete"
-        ? "These are manufacturer-reported technical details available in NHTSA vPIC. Availability and accuracy can vary, especially for vehicles not built for the United States market."
-        : "NHTSA returned some technical fields, but not both make and model. Treat this as a partial result and check the details against the vehicle documents."
+        ? "These are vehicle specifications linked to the VIN. Availability and accuracy can vary, especially for cars not built for the United States market."
+        : "Only some vehicle details were found. The make or model may be missing, so check the available information against the vehicle documents."
     }
   };
 }
