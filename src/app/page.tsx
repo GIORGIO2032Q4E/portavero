@@ -28,7 +28,6 @@ export default function HomePage() {
             <p className="simple-lede">Start with the VIN to bring in the car's available technical details. Use those details in an import estimate, add the costs from the auction and shipping quotes, and see what the total may look like in Georgia.</p>
             <div className="hero-actions">
               <Link href="/vin-check" className="button button-dark">Start with a VIN</Link>
-              <Link href="/vehicle-import" className="simple-text-link">Enter the car details manually <span aria-hidden="true">→</span></Link>
             </div>
             <p className="simple-note">VIN data can be incomplete. Tax and fee estimates cover selected cases and must be checked with the Revenue Service.</p>
           </div>
