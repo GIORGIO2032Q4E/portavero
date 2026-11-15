@@ -19,7 +19,6 @@ The project brings those figures into one place. It also includes a limited vehi
 | Vehicle import planner | Uses vehicle details and a limited set of rules to estimate selected excise and import-duty amounts for passenger vehicles. It adds GEL 480 in listed standard fees and accepts other costs entered by the user. | It is not an official assessment. It does not cover every vehicle classification, exception or transitional case. The fee amount and rules must be checked before use. |
 | Vehicle catalogue | Provides a curated starter list of makes, models and engine variants. | It is not a complete database. Engine specifications vary by model year and market. Where a variant covers more than one engine size, the planner asks for the exact capacity rather than selecting one on the user's behalf. |
 | VIN check | Sends a VIN from the server route to the U.S. National Highway Traffic Safety Administration's vPIC decoder and displays available technical fields. | It does not search accident, title, ownership, odometer, service or auction records. It does not return original auction photos. |
-| USD / GEL converter | Converts in both directions using the latest published National Bank of Georgia reference rate. The rate date is shown. | It is not a bank buy/sell quote. Exchange offices and banks may offer different rates. The amount entered stays in the browser. |
 | Vehicle comparison | Stores up to four candidates in the current browser and compares entered specifications, costs and notes. | The list does not sync to an account or another device. VINs are recorded for reference and are not decoded by the comparison page. User notes are not verified. |
 | Shipping quote comparison | Compares up to three offers entered on the shipping page. It groups price comparisons by currency and shows provider-entered transit days and insurance status. | It does not contact carriers, fetch live quotes, verify offers or save the comparison after leaving the page. |
 | Saved estimates | Keeps up to ten general calculator estimates in browser storage. With Supabase configured, a signed-in user can save a copy to their account, list it, load it into the browser calculator and delete it. | Local edits to an already saved estimate do not update the existing cloud record automatically. Cloud storage needs a working Supabase project and the database setup below. |
@@ -35,8 +34,6 @@ The project uses the Next.js App Router. Page components handle the forms and pr
 src/
   app/
     api/vin-check/       Server route that calls NHTSA vPIC
-    api/exchange-rate/  Server route that reads the NBG USD reference rate
-    currency-converter/ USD/GEL converter page
     calculator/          General import calculator
     vehicle-import/      Vehicle cost and tax estimate
     vin-check/            VIN input and technical-data display
@@ -58,7 +55,6 @@ src/
     vehicle-selection.mjs Manual powertrain-selection state
     number-input.mjs      Numeric input validation
     vin.mjs               VIN format and NHTSA warning handling
-    currency.mjs          USD/GEL conversion arithmetic
     saved-vehicles.mjs    Validation of browser-saved comparison data
     auth.ts               Supabase Auth and saved-estimate requests
 supabase/
@@ -92,7 +88,7 @@ Several parts are intentionally manual:
 - **Validate before calculating.** Blank values remain different from confirmed zero values. Negative, malformed and unsafe values are rejected so an invalid amount does not silently become part of a total.
 - **Send VIN requests through a server route.** The route validates the VIN shape, calls NHTSA vPIC with a timeout and returns selected fields plus provider warnings. It keeps the external request in one place and makes the source of the returned data visible.
 - **Use local storage for small personal working lists.** General estimates and vehicle candidates stay in the current browser, with fixed limits. Supabase is optional for general saved estimates rather than being required just to use the calculators.
-- **Do not imply live information that is not connected.** Freight prices, exchange rates and customs rates are either entered by the user or checked against linked official sources. The site labels the result as a planning estimate instead of presenting it as a quote or ruling.
+- **Do not imply live information that is not connected.** Freight prices and customs rates are entered by the user or checked against linked official sources. The site labels the result as a planning estimate instead of presenting it as a quote or ruling.
 - **Keep legal calculations conservative.** The vehicle-tax module is limited to selected passenger-vehicle cases. When the catalogue does not know a single engine displacement, the form asks for the capacity rather than choosing one arbitrarily.
 
 CI also starts the compiled production server and checks the main routes, metadata endpoints, baseline HTTP security headers and rejection of malformed VINs. It does not click through the site in a browser. Email delivery, two-user account isolation, responsive layouts and print output still need manual testing. Supabase sessions are currently stored in browser local storage, so the account feature should not be used for sensitive information.
