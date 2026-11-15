@@ -441,7 +441,9 @@ export function parseCardogChassisResponse(payload, chassis) {
   const make = selected ? formatRegistryMake(readField(selected, "makeRef")) : "";
   const modelsEn = selected ? readStringArray(selected.modelsEn) : [];
   const modelsJa = selected ? readStringArray(selected.modelsJa) : [];
-  const model = modelsEn.length === 1 ? modelsEn[0] : "";
+  // Cardog notes that modelsEn is not index-aligned with modelsJa. Auto-fill
+  // only when both sources expose exactly one model name.
+  const model = modelsEn.length === 1 && modelsJa.length === 1 ? modelsEn[0] : "";
   const engines = selected && Array.isArray(selected.engines)
     ? selected.engines.filter(isRecord)
     : [];
@@ -464,7 +466,6 @@ export function parseCardogChassisResponse(payload, chassis) {
     const code = readField(selected, "code");
     const serial = readField(response, "serial");
     const typeApprovals = readStringArray(selected.typeApprovals);
-    const possibleModels = modelsEn.length > 0 ? modelsEn : modelsJa;
     const emissions = Array.isArray(selected.emissions)
       ? selected.emissions.filter(isRecord)
       : [];
@@ -473,7 +474,8 @@ export function parseCardogChassisResponse(payload, chassis) {
     if (makerJa) fields.push({ label: "Manufacturer (MLIT record)", value: makerJa });
     if (code) fields.push({ label: "Japanese model code", value: code });
     if (serial) fields.push({ label: "Production serial", value: serial });
-    if (possibleModels.length > 0) fields.push({ label: "Model candidates", value: possibleModels.join(", ") });
+    if (modelsEn.length > 0) fields.push({ label: "Model names (English)", value: modelsEn.join(", ") });
+    if (modelsJa.length > 0) fields.push({ label: "Model names (Japanese)", value: modelsJa.join(", ") });
     if (typeApprovals.length > 0) fields.push({ label: "Type approvals", value: typeApprovals.join(", ") });
 
     if (emissions.length > 0) {
