@@ -207,6 +207,22 @@ test("uses engine displacement in litres when the exact cc value is unavailable"
   assert.equal(response.result.vehicle.engineCc, 2500);
 });
 
+test("rounds fractional NHTSA DisplacementCC values to whole cubic centimetres", () => {
+  const response = parseNhtsaVinResponse({
+    Results: [{
+      Make: "HONDA",
+      Model: "Accord",
+      ModelYear: "2003",
+      DisplacementCC: "2998.832712"
+    }]
+  }, "1HGCM82633A004352");
+
+  assert.equal(response.result.vehicle.engineCc, 2999);
+  assert.ok(response.result.fields.some((field) =>
+    field.label === "Engine capacity" && field.value === "2,999 cm³"
+  ));
+});
+
 test("recognizes a battery electric vehicle without inventing an engine size", () => {
   const response = parseNhtsaVinResponse({
     Results: [{

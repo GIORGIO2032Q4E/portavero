@@ -1,3 +1,5 @@
+import { normalizeEngineCapacityCc } from "./vehicle-import-inputs.mjs";
+
 /**
  * Check the shape of a standard 17-character VIN before sending it to vPIC.
  * This checks the character format only; it does not prove that the VIN exists.
@@ -138,8 +140,9 @@ function getVehicleFromVpic(row) {
     ? modelYearValue
     : null;
   const displacementL = readPositiveNumber(row, "DisplacementL");
-  const engineCc = readPositiveNumber(row, "DisplacementCC") ??
-    (displacementL !== null ? Math.round(displacementL * 1000) : null);
+  const reportedCc = readPositiveNumber(row, "DisplacementCC");
+  const engineCc = normalizeEngineCapacityCc(reportedCc) ??
+    normalizeEngineCapacityCc(displacementL !== null ? displacementL * 1000 : null);
   const primaryFuelType = readField(row, "FuelTypePrimary");
   const secondaryFuelType = readField(row, "FuelTypeSecondary");
   const electrificationLevel = readField(row, "ElectrificationLevel");

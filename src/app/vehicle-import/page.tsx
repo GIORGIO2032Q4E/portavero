@@ -7,7 +7,7 @@ import { calculateVehicleTaxes } from "@/lib/vehicle-tax.mjs";
 import NumberField from "@/components/NumberField";
 import { STANDARD_VEHICLE_FEES_GEL, summarizeVehicleImportCosts } from "@/lib/vehicle-import-costs.mjs";
 import { validateJapaneseChassis, validateVin } from "@/lib/vin.mjs";
-import { getVehicleAge, hasValidManufactureYear } from "@/lib/vehicle-import-inputs.mjs";
+import { getEngineCapacityForVin, getVehicleAge, hasValidManufactureYear } from "@/lib/vehicle-import-inputs.mjs";
 import { getEngineCapacityForSelection, getManualVehicleTypeSelection, getVinPowertrain, normalizeVinSteering } from "@/lib/vehicle-selection.mjs";
 
 const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
@@ -114,9 +114,7 @@ export default function VehicleImportPage() {
         .sort((a, b) => normalizeVehicleName(b.name).length - normalizeVehicleName(a.name).length)[0];
       const modelYear = Number(params.get("year"));
       const capacityValue = Number(params.get("engineCc"));
-      const capacity = Number.isFinite(capacityValue) && capacityValue > 0 && capacityValue <= 100000
-        ? capacityValue
-        : null;
+      const capacity = getEngineCapacityForVin(capacityValue);
       const powertrain = getVinPowertrain({
         primaryFuelType: params.get("fuelPrimary") ?? params.get("fuel") ?? "",
         secondaryFuelType: params.get("fuelSecondary") ?? "",
@@ -149,7 +147,7 @@ export default function VehicleImportPage() {
         if (modelYear > new Date().getFullYear()) setDeclarationYear(modelYear);
       }
       setEngineId(matchingEngine?.id ?? "");
-      setEngineCc(isElectric ? null : capacity);
+      setEngineCc(isElectric ? null : getEngineCapacityForVin(capacity, matchingEngine?.cc));
       setHybrid(isHybrid);
       setLookupElectric(isElectric);
       setLookupFuelNeedsConfirmation(effectiveFuelNeedsConfirmation);
