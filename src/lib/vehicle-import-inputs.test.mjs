@@ -34,3 +34,10 @@ test("prefers a matched catalogue engine capacity over a rounded VIN figure", ()
   assert.equal(getEngineCapacityForVin(2998.832712, null), 2999);
   assert.equal(getEngineCapacityForVin(2998.832712, 0), 2999);
 });
+
+
+test("does not infer engine capacity from the catalogue when VIN data omits displacement", () => {
+  assert.equal(getEngineCapacityForVin(null, 2997), null);
+  assert.equal(getEngineCapacityForVin(0, 2997), null);
+  assert.equal(getEngineCapacityForVin("2998", 2997), null);
+});
