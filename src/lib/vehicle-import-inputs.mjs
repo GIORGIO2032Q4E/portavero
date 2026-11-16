@@ -29,8 +29,10 @@ export function normalizeEngineCapacityCc(value) {
  * @returns {number|null}
  */
 export function getEngineCapacityForVin(reportedCapacity, catalogueCapacity = null) {
-  return normalizeEngineCapacityCc(catalogueCapacity) ??
-    normalizeEngineCapacityCc(reportedCapacity);
+  const normalizedReportedCapacity = normalizeEngineCapacityCc(reportedCapacity);
+  if (normalizedReportedCapacity === null) return null;
+
+  return normalizeEngineCapacityCc(catalogueCapacity) ?? normalizedReportedCapacity;
 }
 
 /**
