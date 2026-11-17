@@ -478,3 +478,42 @@ test("does not infer an English model from a partial non-aligned model list", as
   assert.ok(result.result.fields.some((field) => field.label === "Model names (English)" && field.value === "Model A"));
   assert.ok(result.result.fields.some((field) => field.label === "Model names (Japanese)" && field.value.includes("モデルB")));
 });
+
+
+test("detects hybrid powertrains when NHTSA reports the type in the fuel field", () => {
+  for (const fuel of ["Hybrid", "Gasoline/Electric", "Plug-in Hybrid"]) {
+    const response = parseNhtsaVinResponse({
+      Results: [{
+        Make: "Toyota",
+        Model: "Prius",
+        ModelYear: "2020",
+        FuelTypePrimary: fuel
+      }]
+    }, "JTDBR32E720123456");
+
+    assert.equal(response.result.vehicle.isElectric, false, fuel);
+    assert.equal(response.result.vehicle.isHybrid, true, fuel);
+    assert.equal(
+      response.result.vehicle.isPlugInHybrid,
+      /plug.?in/i.test(fuel),
+      fuel
+    );
+  }
+});
+
+test("detects a combined gasoline-electric CarsXE fuel description as hybrid", async () => {
+  const { parseCarsXeVinResponse } = await import("./vin.mjs");
+  const result = parseCarsXeVinResponse({
+    success: true,
+    attributes: {
+      make: "Toyota",
+      model: "Prius",
+      year: "2020",
+      fuel_type: "Gasoline/Electric"
+    }
+  }, "JTDBR32E720123456");
+
+  assert.equal(result.result.vehicle.isElectric, false);
+  assert.equal(result.result.vehicle.isHybrid, true);
+  assert.equal(result.result.vehicle.isPlugInHybrid, false);
+});

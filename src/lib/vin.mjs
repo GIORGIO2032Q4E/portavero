@@ -150,7 +150,7 @@ function getVehicleFromVpic(row) {
   const allFuelText = [primaryFuelType, secondaryFuelType, electrificationLevel].join(" ").toLowerCase();
   const hasElectric = /electric|battery|bev/.test(allFuelText);
   const hasCombustion = /gasoline|petrol|diesel|ethanol|lpg|propane|cng|natural gas|hydrogen/.test(allFuelText);
-  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test(electrificationLevel.toLowerCase());
+  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test(allFuelText);
   const pureElectricLevel = /battery electric|bev|pure electric|all electric/.test(electrificationLevel.toLowerCase());
   const isElectric = pureElectricLevel || (hasElectric && !hasCombustion && !hybridLevel);
   const isHybrid = !isElectric && (hybridLevel || (hasElectric && hasCombustion));
@@ -171,7 +171,7 @@ function getVehicleFromVpic(row) {
         : "",
     isElectric,
     isHybrid,
-    isPlugInHybrid: /plug.?in|phev/i.test(electrificationLevel),
+    isPlugInHybrid: /plug.?in|phev/i.test(allFuelText),
     series: readField(row, "Series") || readField(row, "Series2"),
     trim: readField(row, "Trim") || readField(row, "Trim2")
   };
@@ -278,7 +278,7 @@ export function parseCarsXeVinResponse(payload, vin) {
     steering: "",
     isElectric,
     isHybrid,
-    isPlugInHybrid: /plug.?in|phev/i.test(primaryFuelType),
+    isPlugInHybrid: /plug.?in|phev/i.test(fuelText),
     series: readField(attributes, "series"),
     trim: ""
   };
