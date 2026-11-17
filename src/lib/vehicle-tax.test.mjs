@@ -148,5 +148,5 @@ test("hybrid reduction requires confirmed left-hand steering", () => {
   assert.equal(missingSteering.rate, 1.5);
   assert.equal(missingSteering.excise, 3000);
   assert.equal(rightSteering.rate, 4.5);
-  assert.equal(leftSteering.rate, 0.6);
+  assert.ok(Math.abs(leftSteering.rate - 0.6) < 1e-9);
 });
