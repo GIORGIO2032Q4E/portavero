@@ -71,7 +71,7 @@ export function calculateVehicleTaxes({
 
   if (!isElectric && !classicCar) {
     if (steering === "right") rate *= 3;
-    else if (hybrid && rateAge <= 6) rate *= 0.4;
+    else if (steering === "left" && hybrid && rateAge <= 6) rate *= 0.4;
   }
 
   const excise = eligibleYear && validEngine && validVehicleType
