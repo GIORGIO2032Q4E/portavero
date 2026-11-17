@@ -264,8 +264,11 @@ export function parseCarsXeVinResponse(payload, vin) {
     : null;
   const primaryFuelType = readField(attributes, "fuel_type");
   const fuelText = primaryFuelType.toLowerCase();
-  const isElectric = /\b(electric|battery electric|bev)\b/.test(fuelText);
-  const isHybrid = !isElectric && /hybrid|phev|hev|mhev|plug.?in/.test(fuelText);
+  const hasElectric = /electric|battery|bev/.test(fuelText);
+  const hasCombustion = /gasoline|petrol|diesel|ethanol|lpg|propane|cng|natural gas|hydrogen/.test(fuelText);
+  const hybridLevel = /hybrid|phev|hev|mhev|plug.?in/.test(fuelText);
+  const isElectric = !hybridLevel && hasElectric && !hasCombustion;
+  const isHybrid = !isElectric && (hybridLevel || (hasElectric && hasCombustion));
   const vehicle = {
     make,
     model,
