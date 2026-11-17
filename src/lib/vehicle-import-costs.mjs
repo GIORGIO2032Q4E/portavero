@@ -10,7 +10,7 @@ export const VEHICLE_IMPORT_COST_KEYS = [
 
 /**
  * Snapshot of the seven standard vehicle-clearance and registration fees
- * listed by the Georgian Revenue Service, reviewed on 8 November 2026.
+ * listed by the Georgian Revenue Service, reviewed on 9 November 2026.
  * This is not a live lookup; verify the current fee schedule before use.
  *
  * Source: https://www.rs.ge/CarClearance-en
