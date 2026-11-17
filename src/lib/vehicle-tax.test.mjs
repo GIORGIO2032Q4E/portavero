@@ -136,3 +136,17 @@ test("electric vehicle excise follows steering and selected regime", () => {
   assert.equal(rightCurrent.excise, 3000);
   assert.equal(rightPrevious.excise, 1600);
 });
+
+test("hybrid reduction requires confirmed left-hand steering", () => {
+  const unknownSteering = calculate({ steering: "", hybrid: true });
+  const missingSteering = calculate({ steering: null, hybrid: true });
+  const rightSteering = calculate({ steering: "right", hybrid: true });
+  const leftSteering = calculate({ steering: "left", hybrid: true });
+
+  assert.equal(unknownSteering.rate, 1.5);
+  assert.equal(unknownSteering.excise, 3000);
+  assert.equal(missingSteering.rate, 1.5);
+  assert.equal(missingSteering.excise, 3000);
+  assert.equal(rightSteering.rate, 4.5);
+  assert.ok(Math.abs(leftSteering.rate - 0.6) < 1e-9);
+});
