@@ -482,24 +482,7 @@ export default function VehicleImportPage() {
             )}
           </section>
 
-          <aside className="panel result-panel" id="estimate-result">
-            <span className="result-label">Known total so far</span>
-            <div className="result-total" role="status" aria-live="polite">{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Complete details"}</div>
-            <p>{canShowTaxEstimate ? `${year} manufacture year · ${declarationYear} declaration year` : "Complete the required vehicle details to calculate the taxes and total."} The total includes GEL 480 in standard fees and only the costs entered below.</p>
-            <div className="estimate-cost-progress">
-              <span>Additional cost categories entered</span>
-              <strong>{7 - result.unknownCosts} of 7</strong>
-            </div>
-            <div className="result-lines">
-              <div className="result-line"><span>Estimated excise tax</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? money(result.excise) : "Confirm car details"}</strong></div>
-              <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
-              <div className="result-line"><span>Transport and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
-              <div className="result-line"><span>Estimated import duty</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
-              <div className="result-line"><span>Standard listed clearance and registration fees</span><strong>{money(result.officialFees)}</strong></div>
-              <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
-            </div>
-            <div className="disclaimer">{(result.invalidCosts.length > 0 || hasInvalidCostField) && <><strong>One of the amounts needs checking.</strong> Portavero cannot safely calculate the total until you fix the invalid entry. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "Blank costs are not included, so this is not the final price of the car." : "You've entered an amount for every additional cost."} The total includes GEL 480 in listed standard fees. A broker, storage, special handling, vehicle classification or transitional rules may add costs or change the tax amount.</div>
-          </aside>
+
           </div>
         </div>
       </section>
@@ -550,6 +533,34 @@ export default function VehicleImportPage() {
               <a href="#estimate-result" className="button button-dark">Review updated total <span aria-hidden="true">↑</span></a>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="section estimate-review-section">
+        <div className="container">
+          <div className="section-heading">
+            <span className="eyebrow">03 · Review your estimate</span>
+            <h2>Your import estimate</h2>
+            <p>Review the estimated taxes, standard fees and costs you entered. The total updates whenever you change a vehicle detail or amount.</p>
+          </div>
+                    <aside className="panel result-panel" id="estimate-result">
+            <span className="result-label">Known total so far</span>
+            <div className="result-total" role="status" aria-live="polite">{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Complete details"}</div>
+            <p>{canShowTaxEstimate ? `${year} manufacture year · ${declarationYear} declaration year` : "Complete the required vehicle details to calculate the taxes and total."} The total includes GEL 480 in standard fees and only the costs entered below.</p>
+            <div className="estimate-cost-progress">
+              <span>Additional cost categories entered</span>
+              <strong>{7 - result.unknownCosts} of 7</strong>
+            </div>
+            <div className="result-lines">
+              <div className="result-line"><span>Estimated excise tax</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? money(result.excise) : "Confirm car details"}</strong></div>
+              <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
+              <div className="result-line"><span>Origin transport, shipping and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
+              <div className="result-line"><span>Estimated import duty</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
+              <div className="result-line"><span>Standard clearance and registration fees</span><strong>{money(result.officialFees)}</strong></div>
+              <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
+            </div>
+            <div className="disclaimer">{(result.invalidCosts.length > 0 || hasInvalidCostField) && <><strong>One of the amounts needs checking.</strong> Portavero cannot safely calculate the total until you fix the invalid entry. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "Blank costs are not included, so this is not the final price of the car." : "You've entered an amount for every additional cost."} The total includes GEL 480 in listed standard fees. A broker, storage, special handling, vehicle classification or transitional rules may add costs or change the tax amount.</div>
+          </aside>
         </div>
       </section>
 
