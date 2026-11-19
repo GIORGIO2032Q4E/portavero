@@ -332,16 +332,21 @@ export default function VehicleImportPage() {
           <span className="eyebrow">Vehicle import planner</span>
           <h1>{vehicleIdentifier ? "Import estimate for this car" : "Estimate the cost of importing a car."}</h1>
           <p>{vehicleIdentifier ? "Available details from the vehicle lookup have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Start with a VIN check or enter the vehicle details manually. Check specifications against the car’s documents, fill in anything missing, then add its purchase, auction, shipping and local delivery costs."}</p>
-          <div className="hero-actions calculator-actions">
+          <div className="hero-actions planner-quick-actions">
             <button type="button" className="button button-dark" onClick={saveDraft} disabled={hasInvalidCostField}>Save draft on this device</button>
-            {savedDraftAvailable && <button type="button" className="button button-outline" onClick={loadDraft}>Load saved draft</button>}
-            {savedDraftAvailable && <button type="button" className="button button-outline" onClick={deleteDraft}>Delete saved draft</button>}
-            <button type="button" className="button button-outline print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
-            <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Official tax calculator ↗</a>
-            <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
+            <details className="planner-more-actions">
+              <summary>More actions</summary>
+              <div className="planner-more-actions-menu">
+                {savedDraftAvailable && <button type="button" className="button button-outline" onClick={loadDraft}>Load saved draft</button>}
+                {savedDraftAvailable && <button type="button" className="button button-outline" onClick={deleteDraft}>Delete saved draft</button>}
+                <button type="button" className="button button-outline print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
+                <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Official tax calculator ↗</a>
+                <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
+              </div>
+            </details>
           </div>
           {draftMessage && <p className="draft-status" role="status" aria-live="polite">{draftMessage}</p>}
-          <p className="draft-privacy-note">Saved drafts stay in this browser on this device. They are not uploaded to Portavero or linked to an account.</p>
+          <p className="draft-privacy-note">Drafts stay in this browser on this device. They are not uploaded to an account.</p>
         </div>
       </section>
 
@@ -359,11 +364,19 @@ export default function VehicleImportPage() {
             <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge === null ? "age not available" : `${vehicleAge} year(s)`}</strong></div>
             <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : steering === "left" ? "Left-hand drive" : "Steering not confirmed"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
           </div>
+          <nav className="estimate-stepper" aria-label="Estimate sections">
+            <a href="#vehicle-details"><span>01</span><strong>Vehicle details</strong></a>
+            <a href="#import-costs"><span>02</span><strong>Import costs</strong></a>
+            <a href="#estimate-result"><span>03</span><strong>Review total</strong></a>
+          </nav>
           <div className="tool-layout">
-          <section className="panel vehicle-panel">
+          <section className="panel vehicle-panel" id="vehicle-details">
             <div className="vehicle-section-heading"><span className="step-chip">01</span><div><span className="eyebrow">Start with the car</span><h2>Identify your vehicle</h2></div></div>
-            <p className="panel-intro">This planner covers selected passenger cars under HS 8703. It does not cover every vehicle or tax exception, so check unusual cases with the Revenue Service.</p>
-            <div className="notice"><strong>Important:</strong> This planner only covers selected passenger cars under HS 8703. It does not determine the car's tariff classification, cover every exemption or confirm transitional eligibility. It also does not include the separate sports-car excise treatment in Article 188(9). Electric and classic-car calculations are limited to the cases shown here. Check special cases with the Revenue Service.</div>
+            <p className="panel-intro">Choose the car's exact details from its documents. The estimate updates as you make changes.</p>
+            <details className="scope-details">
+              <summary>What this estimate covers</summary>
+              <p>This planner covers selected passenger cars under HS 8703. It does not determine tariff classification, cover every exemption or confirm transitional eligibility. It also excludes the separate sports-car excise treatment in Article 188(9). Electric and classic-car calculations are limited to the cases shown here. Check unusual cases with the Revenue Service.</p>
+            </details>
             {vehicleIdentifier && <div className="notice" role="status"><strong>Details loaded from vehicle lookup for {identifiedVehicleName}.</strong> {engineCc === null && !isElectric ? "The lookup did not identify a single engine size. Enter it from the car's documents. " : "The available engine data has been filled in. Check it against the vehicle documents. "} {validSteering ? "Steering side was filled in automatically; verify it against the vehicle." : "Choose the steering side because it could not be identified."}</div>}
             <div className="form-grid">
               <div className="field">
@@ -469,19 +482,21 @@ export default function VehicleImportPage() {
             )}
           </section>
 
-          <aside className="panel result-panel" aria-live="polite">
-            <span className="result-label">Estimated excise</span>
-            <div className="result-total">{canShowTaxEstimate && !result.invalidTaxAmounts ? money(result.excise) : "Check details"}</div>
-            <p>{canShowTaxEstimate ? (isElectric ? `${year} model year · electric vehicle` : `${year} model year · declaration ${declarationYear} · ${vehicleAge} year(s) old · ${(engineCc ?? 0).toLocaleString("en-US")} cm³`) : "Check the car details and any special rules."}</p>
+          <aside className="panel result-panel" id="estimate-result">
+            <span className="result-label">Known total so far</span>
+            <div className="result-total" role="status" aria-live="polite">{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Complete details"}</div>
+            <p>{canShowTaxEstimate ? `${year} manufacture year · ${declarationYear} declaration year` : "Complete the required vehicle details to calculate the taxes and total."} The total includes GEL 480 in standard fees and only the costs entered below.</p>
+            <div className="estimate-cost-progress">
+              <span>Additional cost categories entered</span>
+              <strong>{7 - result.unknownCosts} of 7</strong>
+            </div>
             <div className="result-lines">
-              <div className="result-line"><span>Excise rule</span><strong>{canShowTaxEstimate ? (isElectric ? (steering === "right" ? (preAprilRegime ? "Previous rate × 2,000" : "GEL 3,000 fixed") : "GEL 0") : classicCar ? "GEL 1.00 / cm³" : `${money(result.rate)} / cm³`) : "Confirm car details"}</strong></div>
+              <div className="result-line"><span>Estimated excise tax</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? money(result.excise) : "Confirm car details"}</strong></div>
               <div className="result-line"><span>Purchase and auction</span><strong>{enteredGroup([purchase, auction])}</strong></div>
               <div className="result-line"><span>Transport and insurance</span><strong>{enteredGroup([inland, shipping, insurance])}</strong></div>
               <div className="result-line"><span>Estimated import duty</span><strong>{canShowTaxEstimate && !result.invalidTaxAmounts ? (isElectric ? "Exempt for EVs" : money(result.importDuty)) : "Check details"}</strong></div>
               <div className="result-line"><span>Standard listed clearance and registration fees</span><strong>{money(result.officialFees)}</strong></div>
               <div className="result-line"><span>Port and local delivery</span><strong>{enteredGroup([port, delivery])}</strong></div>
-              <div className="result-line"><span>Other costs you entered</span><strong>{result.knownCosts === null ? "Check details" : money(result.knownCosts)}</strong></div>
-              <div className="result-line result-line-total"><span>Known costs so far, estimated taxes and standard fees</span><strong>{canShowTaxEstimate && result.total !== null && !result.invalidAmounts ? money(result.total) : "Check details"}</strong></div>
             </div>
             <div className="disclaimer">{(result.invalidCosts.length > 0 || hasInvalidCostField) && <><strong>One of the amounts needs checking.</strong> Portavero cannot safely calculate the total until you fix the invalid entry. </>}<strong>{result.unknownCosts} of 7 cost categories still unknown.</strong> {result.unknownCosts > 0 ? "Blank costs are not included, so this is not the final price of the car." : "You've entered an amount for every additional cost."} The total includes GEL 480 in listed standard fees. A broker, storage, special handling, vehicle classification or transitional rules may add costs or change the tax amount.</div>
           </aside>
@@ -489,22 +504,50 @@ export default function VehicleImportPage() {
         </div>
       </section>
 
-      <section className="section section-tint">
+      <section className="section section-tint" id="import-costs">
         <div className="container">
-          <div className="section-heading">
-            <span className="eyebrow">Add the costs you know</span>
-            <h2>Add the other costs</h2>
-            <p>Enter amounts in GEL. Convert foreign-currency quotes using an exchange rate you have checked. Leave a cost blank until you know it; blank does not mean free.</p>
+          <div className="section-heading cost-section-heading">
+            <span className="eyebrow">02 · Add your costs</span>
+            <h2>What will it cost to get the car here?</h2>
+            <p>Enter the amounts you know in GEL. Use the exchange rate from your quote or bank for foreign-currency prices. Leave unknown costs blank.</p>
           </div>
-          <div className="panel">
-            <div className="form-grid">
-              <NumberField id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} onValidityChange={(valid) => handleCostFieldValidity("purchase", valid)} />
-              <NumberField id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} onValidityChange={(valid) => handleCostFieldValidity("auction", valid)} />
-              <NumberField id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} onValidityChange={(valid) => handleCostFieldValidity("inland", valid)} />
-              <NumberField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} onValidityChange={(valid) => handleCostFieldValidity("shipping", valid)} />
-              <NumberField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} onValidityChange={(valid) => handleCostFieldValidity("insurance", valid)} />
-              <NumberField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} onValidityChange={(valid) => handleCostFieldValidity("port", valid)} />
-              <NumberField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} onValidityChange={(valid) => handleCostFieldValidity("delivery", valid)} hint="Exclude standard registration and clearance fees already counted above." />
+          <div className="panel cost-entry-panel">
+            <div className="cost-groups">
+              <section className="cost-group" aria-labelledby="purchase-cost-heading">
+                <div className="cost-group-heading">
+                  <span>01</span>
+                  <div><h3 id="purchase-cost-heading">Purchase and auction</h3><p>What you pay to buy the car</p></div>
+                </div>
+                <div className="cost-fields">
+                  <NumberField id="purchase" label="Vehicle purchase price (GEL)" value={purchase} onChange={setPurchase} onValidityChange={(valid) => handleCostFieldValidity("purchase", valid)} />
+                  <NumberField id="auction" label="Auction / buyer fees (GEL)" value={auction} onChange={setAuction} onValidityChange={(valid) => handleCostFieldValidity("auction", valid)} />
+                </div>
+              </section>
+              <section className="cost-group" aria-labelledby="transport-cost-heading">
+                <div className="cost-group-heading">
+                  <span>02</span>
+                  <div><h3 id="transport-cost-heading">Transport to Georgia</h3><p>From the seller to the destination port</p></div>
+                </div>
+                <div className="cost-fields">
+                  <NumberField id="inland" label="Origin inland transport (GEL)" value={inland} onChange={setInland} onValidityChange={(valid) => handleCostFieldValidity("inland", valid)} />
+                  <NumberField id="shipping" label="International shipping (GEL)" value={shipping} onChange={setShipping} onValidityChange={(valid) => handleCostFieldValidity("shipping", valid)} />
+                  <NumberField id="insurance" label="Insurance (GEL)" value={insurance} onChange={setInsurance} onValidityChange={(valid) => handleCostFieldValidity("insurance", valid)} />
+                </div>
+              </section>
+              <section className="cost-group" aria-labelledby="arrival-cost-heading">
+                <div className="cost-group-heading">
+                  <span>03</span>
+                  <div><h3 id="arrival-cost-heading">Arrival and delivery</h3><p>Port handling and local transport</p></div>
+                </div>
+                <div className="cost-fields">
+                  <NumberField id="port" label="Port, broker and storage (GEL)" value={port} onChange={setPort} onValidityChange={(valid) => handleCostFieldValidity("port", valid)} />
+                  <NumberField id="delivery" label="Local delivery / other costs (GEL)" value={delivery} onChange={setDelivery} onValidityChange={(valid) => handleCostFieldValidity("delivery", valid)} hint="Exclude standard registration and clearance fees already counted above." />
+                </div>
+              </section>
+            </div>
+            <div className="cost-entry-footer">
+              <p>Blank costs are not treated as free. Your known total updates as you enter each amount.</p>
+              <a href="#estimate-result" className="button button-dark">Review updated total <span aria-hidden="true">↑</span></a>
             </div>
           </div>
         </div>
