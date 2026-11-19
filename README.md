@@ -23,6 +23,10 @@ It is a planning tool, not a vehicle-history report, shipping quote, customs bro
 
 A blank cost is not treated as free. The displayed total is only as complete as the details and rules available for the vehicle.
 
+### Save an estimate draft
+
+The vehicle-import planner can store one draft when the user selects **Save draft on this device**. It includes the selected vehicle details and entered cost amounts, and can be loaded or deleted from the same planner. Draft data stays in that browser's local storage on that device; it is not sent to Portavero's server, synced across devices or attached to an account. Do not use this feature on a shared browser profile for information you do not want other profile users to see.
+
 ## What the current version includes
 
 | Area | Current behaviour | Important limitation |
