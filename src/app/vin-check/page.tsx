@@ -284,11 +284,10 @@ export default function VinCheckPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="source-note">Data source{result.sources.length === 1 ? "" : "s"}: {result.sources.length > 0 ? result.sources.join(" + ") : "VIN decoder"}.</p>
                   {result.identifierType === "vin" ? (
-                    <p className="source-note">The international VIN provider {result.internationalProviderConfigured ? "is configured as a fallback when the first source has gaps." : "is not configured yet. Non-U.S. VIN coverage may therefore remain limited."} Confirm all returned details against the car and its documents.</p>
+                    <p className="source-note">Coverage varies by vehicle market and the records available for that VIN. Some non-U.S. vehicles may return fewer details. Check every result against the car and its documents.</p>
                   ) : (
-                    <p className="source-note">Japanese chassis details come from published MLIT recall and fuel-economy records through Cardog. The result may describe possible models and engines, not an exact trim or individual vehicle history. {result.cardogConfigured ? "The Japanese chassis provider is configured." : "The Japanese chassis provider is not configured."}</p>
+                    <p className="source-note">Japanese chassis records can list possible models and engine variants rather than one exact vehicle configuration. Confirm the model, engine and manufacture year from the vehicle documents.</p>
                   )}
                   <p className="source-note">Identifier submitted: <code>{result.identifier}</code></p>
                   <p className="source-note">The calculator carries over only unambiguous make, model and engine details. Manufacture year, steering side and any uncertain engine variant must be confirmed from the vehicle documents.</p>
