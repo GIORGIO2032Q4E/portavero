@@ -27,7 +27,11 @@ type DecodeResult = {
   identifierType: "vin" | "japanese-chassis";
   vehicle: DecodedVehicle;
   fields: DecodedField[];
+  internationalProviderConfigured: boolean;
+  cardogConfigured: boolean;
 };
+// Cardog supplies the optional Japanese domestic chassis reference. Provider
+// configuration stays in the result model and is not exposed as marketing copy.
 type ApiResponse = {
   error?: string;
   identifier?: string;
@@ -35,6 +39,8 @@ type ApiResponse = {
   quality?: "complete" | "partial";
   vehicle?: unknown;
   fields?: unknown;
+  internationalProviderConfigured?: unknown;
+  cardogConfigured?: unknown;
 };
 
 function isDecodedField(value: unknown): value is DecodedField {
@@ -147,6 +153,8 @@ export default function VinCheckPage() {
         identifierType: payload.identifierType === "japanese-chassis" ? "japanese-chassis" : "vin",
         vehicle: payload.vehicle as DecodedVehicle,
         fields,
+        internationalProviderConfigured: payload.internationalProviderConfigured === true,
+        cardogConfigured: payload.cardogConfigured === true,
       });
     } catch {
       setError("Could not complete the request. Check your connection and try again.");
