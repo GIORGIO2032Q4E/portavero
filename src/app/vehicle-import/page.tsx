@@ -14,6 +14,41 @@ const revenueServiceUrl = "https://www.rs.ge/CarClearance-en";
 const standardStateFees = STANDARD_VEHICLE_FEES_GEL;
 type CostFieldKey = "purchase" | "auction" | "inland" | "shipping" | "insurance" | "port" | "delivery";
 
+type SavedEstimateDraft = {
+  savedAt: string;
+  year: number | null;
+  declarationYear: number;
+  makeName: string;
+  modelName: string;
+  engineId: string;
+  engineCc: number | null;
+  steering: string;
+  hybrid: boolean;
+  classicCar: boolean;
+  preAprilRegime: boolean;
+  purchase: number | null;
+  auction: number | null;
+  inland: number | null;
+  shipping: number | null;
+  insurance: number | null;
+  port: number | null;
+  delivery: number | null;
+  vehicleIdentifier: string;
+  identifiedVehicleName: string;
+  lookupElectric: boolean;
+  lookupFuelNeedsConfirmation: boolean;
+};
+
+const SAVED_ESTIMATE_KEY = "portavero.vehicle-import-draft.v1";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function validSavedAmount(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
 const normalizeVehicleName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const vinMakeAliases: Record<string, string> = {
@@ -70,6 +105,8 @@ export default function VehicleImportPage() {
   const [identifiedVehicleName, setIdentifiedVehicleName] = useState("");
   const [lookupElectric, setLookupElectric] = useState(false);
   const [lookupFuelNeedsConfirmation, setLookupFuelNeedsConfirmation] = useState(false);
+  const [savedDraftAvailable, setSavedDraftAvailable] = useState(false);
+  const [draftMessage, setDraftMessage] = useState("");
   const [invalidCostFields, setInvalidCostFields] = useState<Record<CostFieldKey, boolean>>({
     purchase: false,
     auction: false,
@@ -156,6 +193,90 @@ export default function VehicleImportPage() {
     }
   }, []);
 
+  useEffect(() => {
+    try {
+      setSavedDraftAvailable(Boolean(window.localStorage.getItem(SAVED_ESTIMATE_KEY)));
+    } catch {
+      setSavedDraftAvailable(false);
+    }
+  }, []);
+
+  function saveDraft() {
+    if (hasInvalidCostField) {
+      setDraftMessage("Fix the highlighted amount fields before saving this draft.");
+      return;
+    }
+
+    const draft: SavedEstimateDraft = {
+      savedAt: new Date().toISOString(),
+      year, declarationYear, makeName, modelName, engineId, engineCc, steering,
+      hybrid, classicCar, preAprilRegime, purchase, auction, inland, shipping,
+      insurance, port, delivery, vehicleIdentifier, identifiedVehicleName,
+      lookupElectric, lookupFuelNeedsConfirmation
+    };
+
+    try {
+      window.localStorage.setItem(SAVED_ESTIMATE_KEY, JSON.stringify(draft));
+      setSavedDraftAvailable(true);
+      setDraftMessage("Draft saved on this device. It is not uploaded to an account.");
+    } catch {
+      setDraftMessage("This browser could not save the draft. Check its storage settings.");
+    }
+  }
+
+  function loadDraft() {
+    try {
+      const raw = window.localStorage.getItem(SAVED_ESTIMATE_KEY);
+      if (!raw) {
+        setSavedDraftAvailable(false);
+        setDraftMessage("There is no saved draft on this device.");
+        return;
+      }
+      const value: unknown = JSON.parse(raw);
+      if (!isRecord(value) || typeof value.savedAt !== "string") {
+        throw new Error("Invalid saved draft");
+      }
+
+      const savedYear = validSavedAmount(value.year);
+      const savedDeclarationYear = validSavedAmount(value.declarationYear);
+      setYear(savedYear !== null && Number.isInteger(savedYear) && savedYear >= 1960 && savedYear <= new Date().getFullYear() + 2 ? savedYear : null);
+      setDeclarationYear(savedDeclarationYear !== null && Number.isInteger(savedDeclarationYear) && savedDeclarationYear >= 2000 && savedDeclarationYear <= 2200 ? savedDeclarationYear : new Date().getFullYear());
+      setMakeName(typeof value.makeName === "string" ? value.makeName.slice(0, 80) : "");
+      setModelName(typeof value.modelName === "string" ? value.modelName.slice(0, 80) : "");
+      setEngineId(typeof value.engineId === "string" ? value.engineId.slice(0, 100) : "");
+      setEngineCc(validSavedAmount(value.engineCc));
+      setSteering(value.steering === "left" || value.steering === "right" ? value.steering : "");
+      setHybrid(value.hybrid === true);
+      setClassicCar(value.classicCar === true);
+      setPreAprilRegime(value.preAprilRegime === true);
+      setPurchase(validSavedAmount(value.purchase));
+      setAuction(validSavedAmount(value.auction));
+      setInland(validSavedAmount(value.inland));
+      setShipping(validSavedAmount(value.shipping));
+      setInsurance(validSavedAmount(value.insurance));
+      setPort(validSavedAmount(value.port));
+      setDelivery(validSavedAmount(value.delivery));
+      setVehicleIdentifier(typeof value.vehicleIdentifier === "string" ? value.vehicleIdentifier.slice(0, 34) : "");
+      setIdentifiedVehicleName(typeof value.identifiedVehicleName === "string" ? value.identifiedVehicleName.slice(0, 160) : "");
+      setLookupElectric(value.lookupElectric === true);
+      setLookupFuelNeedsConfirmation(value.lookupFuelNeedsConfirmation === true);
+      setInvalidCostFields({ purchase: false, auction: false, inland: false, shipping: false, insurance: false, port: false, delivery: false });
+      setDraftMessage("Saved draft loaded. Check the vehicle details before relying on the estimate.");
+    } catch {
+      setDraftMessage("The saved draft could not be read. Remove it and save a new one.");
+    }
+  }
+
+  function deleteDraft() {
+    try {
+      window.localStorage.removeItem(SAVED_ESTIMATE_KEY);
+      setSavedDraftAvailable(false);
+      setDraftMessage("Saved draft removed from this device.");
+    } catch {
+      setDraftMessage("This browser could not remove the saved draft.");
+    }
+  }
+
   const selectedMake = vehicleCatalog.find((make) => make.name === makeName);
   const selectedModel = selectedMake?.models.find((model) => model.name === modelName);
   const selectedEngine = selectedModel?.engines.find((engine) => engine.id === engineId);
@@ -211,11 +332,16 @@ export default function VehicleImportPage() {
           <span className="eyebrow">Vehicle import planner</span>
           <h1>{vehicleIdentifier ? "Import estimate for this car" : "Estimate the cost of importing a car."}</h1>
           <p>{vehicleIdentifier ? "Available details from the vehicle lookup have been added below. Check them against the car and its documents, fill in anything missing, then add the costs you know." : "Start with a VIN check or enter the vehicle details manually. Check specifications against the car’s documents, fill in anything missing, then add its purchase, auction, shipping and local delivery costs."}</p>
-          <div className="hero-actions">
-            <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Open official Revenue Service calculator ↗</a>
+          <div className="hero-actions calculator-actions">
+            <button type="button" className="button button-dark" onClick={saveDraft} disabled={hasInvalidCostField}>Save draft on this device</button>
+            {savedDraftAvailable && <button type="button" className="button button-outline" onClick={loadDraft}>Load saved draft</button>}
+            {savedDraftAvailable && <button type="button" className="button button-outline" onClick={deleteDraft}>Delete saved draft</button>}
+            <button type="button" className="button button-outline print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
+            <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Official tax calculator ↗</a>
             <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
-            <button type="button" className="button button-dark print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
           </div>
+          {draftMessage && <p className="draft-status" role="status" aria-live="polite">{draftMessage}</p>}
+          <p className="draft-privacy-note">Saved drafts stay in this browser on this device. They are not uploaded to Portavero or linked to an account.</p>
         </div>
       </section>
 
