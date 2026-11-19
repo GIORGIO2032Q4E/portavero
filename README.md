@@ -32,6 +32,7 @@ A blank cost is not treated as free. The displayed total is only as complete as 
 | Vehicle catalogue | Provides a searchable list of common makes, models and engine variants used to help identify a vehicle. | It is a curated reference, not a complete global database or proof of the engine fitted to a specific car. |
 | Shipping guide | Helps users review a carrier's route, inclusions, exclusions, timing and additional charges. The quote comparison uses values entered by the user. | It does not contact carriers, retrieve live freight prices or verify a provider's offer. |
 | About and How it works | Explains the reason for the project, the workflow, calculation scope and data limitations. | These pages explain the implementation; they do not replace official guidance. |
+| Vehicle estimate draft | Lets the user explicitly save, load or delete one vehicle-import draft in the current browser. | Stored locally in browser storage on that device only. It is not synced, backed up or linked to an account. |
 | Legacy account area | Preserves access to account authentication and older general-import estimates where the Supabase project is configured. | The current vehicle-import planner does not save estimates to an account. Old general-import estimates are not compatible with the current planner. Sessions are stored in browser storage, not HttpOnly cookies. |
 
 ### Routes
@@ -131,6 +132,7 @@ These are the rules currently encoded in the project, not a binding interpretati
 - A standard VIN is sent from the Portavero server route to NHTSA vPIC and may also be sent to CarsXE when `CARSXE_API_KEY` is configured and NHTSA leaves important gaps.
 - A Japanese domestic frame/chassis number is sent to Cardog only when that identifier type is selected and `CARDOG_API_KEY` is configured.
 - Shipping quotes are entered by the user. Portavero does not send them to shipping companies.
+- The planner can save one draft in the current browser only after the user presses Save. The draft stays in that browser's local storage on that device; it is not uploaded, synced or linked to an account. Anyone with access to that browser profile may be able to read it.
 - The current planner does not save estimates to a user account. The account page relates to older saved estimates.
 - The legacy account feature uses Supabase when configured. Its session is held in browser storage rather than an HttpOnly cookie. Do not use it on shared or untrusted devices or store sensitive data in estimate names.
 - The project uses Vercel for hosting. Hosting providers may process request and security information under their own terms.
@@ -227,7 +229,7 @@ A deployment marked READY confirms that Vercel completed the deployment process.
 4. Tax calculations cover selected passenger-car cases and do not confirm classification or transitional eligibility.
 5. The GEL 480 standard-fee amount is a stored snapshot, not live data.
 6. Shipping prices and exchange rates must be checked and entered by the user.
-7. The current planner does not save an estimate to a user account. The account area is retained for legacy estimates.
+7. The current planner can save one draft locally in the current browser, but it does not sync estimates to an account or another device.
 8. The account session implementation uses browser storage rather than an HttpOnly cookie.
 9. Browser-level and authenticated account testing must be repeated against the exact release before those flows can be described as verified.
 
