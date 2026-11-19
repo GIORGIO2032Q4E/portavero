@@ -41,6 +41,9 @@ assert.match(vinPage, /Japanese domestic frame\/chassis number/i);
 assert.match(vinPage, /Cardog/i);
 assert.match(vinPage, /identifierType/);
 assert.match(vinPage, /internationalProviderConfigured/);
+assert.match(vinPage, /identifier-status/);
+assert.match(vinPage, /Use these details in the import estimate/);
+assert.doesNotMatch(vinPage, /NHTSA vPIC|CarsXE|Cardog Japanese chassis lookup/);
 assert.doesNotMatch(readme, /General import calculator \|/i);
 assert.doesNotMatch(readme, /Vehicle comparison \|/i);
 assert.doesNotMatch(readme, /Shipping quote comparison \|/i);
@@ -71,6 +74,6 @@ assert.match(account, /href="\/vehicle-import"/);
 
 assert.match(home, /Check a car's VIN/i);
 assert.match(vinPage, /vehicle details/i);
-assert.match(planner, /Known costs so far/i);
+assert.match(planner, /Known total so far/i);
 
 output.log("Documentation consistency checks passed.");

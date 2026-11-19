@@ -27,10 +27,11 @@ type DecodeResult = {
   identifierType: "vin" | "japanese-chassis";
   vehicle: DecodedVehicle;
   fields: DecodedField[];
-  sources: string[];
   internationalProviderConfigured: boolean;
   cardogConfigured: boolean;
 };
+// Cardog supplies the optional Japanese domestic chassis reference. Provider
+// configuration stays in the result model and is not exposed as marketing copy.
 type ApiResponse = {
   error?: string;
   identifier?: string;
@@ -38,7 +39,6 @@ type ApiResponse = {
   quality?: "complete" | "partial";
   vehicle?: unknown;
   fields?: unknown;
-  sources?: unknown;
   internationalProviderConfigured?: unknown;
   cardogConfigured?: unknown;
 };
@@ -79,6 +79,19 @@ export default function VinCheckPage() {
   const [loading, setLoading] = useState(false);
 
   const checkedInput = validateVin(vin);
+  const activeValidation = identifierType === "vin" ? checkedInput : validateJapaneseChassis(vin);
+  const normalizedIdentifierLength = identifierType === "vin"
+    ? checkedInput.vin.length
+    : validateJapaneseChassis(vin).chassis.length;
+  const identifierStatus = !vin.trim()
+    ? "Waiting for number"
+    : activeValidation.valid
+      ? "Ready to check"
+      : identifierType === "vin"
+        ? normalizedIdentifierLength < 17
+          ? `${normalizedIdentifierLength} of 17 characters entered`
+          : "Check the characters"
+        : "Check the CODE-SERIAL format";
   const expectedUsCheckDigit = identifierType === "vin" && market === "us" && checkedInput.valid
     ? calculateUsVinCheckDigit(checkedInput.vin)
     : null;
@@ -140,9 +153,6 @@ export default function VinCheckPage() {
         identifierType: payload.identifierType === "japanese-chassis" ? "japanese-chassis" : "vin",
         vehicle: payload.vehicle as DecodedVehicle,
         fields,
-        sources: Array.isArray(payload.sources)
-          ? payload.sources.filter((source): source is string => typeof source === "string")
-          : [],
         internationalProviderConfigured: payload.internationalProviderConfigured === true,
         cardogConfigured: payload.cardogConfigured === true,
       });
@@ -214,18 +224,28 @@ export default function VinCheckPage() {
                     autoCapitalize="characters"
                     spellCheck={false}
                     placeholder={identifierType === "vin" ? "e.g. 1HGCM82633A004352" : "e.g. ZRR80-0143041"}
-                    aria-describedby="identifier-help"
+                    aria-describedby="identifier-help identifier-status"
                     required
                   />
-                  {identifierType === "vin" ? (
-                    <small id="identifier-help">Enter all 17 characters. Standard VINs do not use the letters I, O or Q. Do not add spaces or punctuation.</small>
-                  ) : (
-                    <small id="identifier-help">Enter the model/frame code and serial number with the hyphen, exactly as shown on the Japanese vehicle plate or export documents. Example: ZRR80-0143041.</small>
-                  )}
+                  <div className="identifier-assist">
+                    {identifierType === "vin" ? (
+                      <small id="identifier-help">Enter all 17 characters. Standard VINs do not use I, O or Q.</small>
+                    ) : (
+                      <small id="identifier-help">Enter the model/frame code and serial number with the hyphen, exactly as shown on the Japanese vehicle plate or export documents.</small>
+                    )}
+                    <span
+                      id="identifier-status"
+                      className={activeValidation.valid ? "identifier-status is-ready" : "identifier-status"}
+                    >
+                      {identifierType === "vin"
+                        ? `${normalizedIdentifierLength}/17${checkedInput.valid ? " · ready" : normalizedIdentifierLength === 17 ? " · check characters" : ""}`
+                        : identifierStatus}
+                    </span>
+                  </div>
                 </div>
 
                 {identifierType === "vin" && <div className="field">
-                  <label htmlFor="vin-market">Vehicle market for check-digit test</label>
+                  <label htmlFor="vin-market">Is this a U.S.-market vehicle?</label>
                   <select
                     id="vin-market"
                     value={market}
@@ -234,7 +254,7 @@ export default function VinCheckPage() {
                     <option value="unknown">Not sure / another market</option>
                     <option value="us">Built for the U.S. market</option>
                   </select>
-                  <small>The ninth character is checked only when you choose U.S. market. VIN rules can differ in other markets.</small>
+                  <small>Only select this for a car built for the U.S. market. The extra check is not a global VIN rule.</small>
                 </div>}
 
                 {expectedUsCheckDigit !== null && (
@@ -247,8 +267,9 @@ export default function VinCheckPage() {
                 )}
 
                 <div className="hero-actions">
-                  <button type="submit" className="button button-dark" disabled={loading}>
-                    {loading ? "Checking vehicle…" : identifierType === "vin" ? "Decode VIN" : "Check Japanese chassis"}
+                  <button type="submit" className="button button-dark lookup-submit" disabled={loading} aria-busy={loading}>
+                    {loading && <span className="loading-spinner" aria-hidden="true" />}
+                    {loading ? "Checking vehicle…" : identifierType === "vin" ? "Find vehicle details" : "Check chassis number"}
                   </button>
                   <button
                     type="button"
@@ -276,6 +297,10 @@ export default function VinCheckPage() {
                         ? <><strong>Vehicle details found.</strong> Compare them with the car and its documents before using the estimate.</>
                         : <><strong>Only some details were found.</strong> Some vehicle specifications may be missing. Check the information below against the car's documents.</>}
                   </div>
+                  <div className="vin-result-heading">
+                    <h3>{[result.vehicle.make, result.vehicle.model, result.vehicle.modelYear].filter(Boolean).join(" ") || "Vehicle details found"}</h3>
+                    <p>{result.identifierType === "japanese-chassis" ? "Available details linked to this frame number" : "Available technical details linked to this VIN"}</p>
+                  </div>
                   <div className="result-lines">
                     {result.fields.map((field) => (
                       <div className="result-line" key={field.label}>
@@ -291,14 +316,14 @@ export default function VinCheckPage() {
                   )}
                   <p className="source-note">Identifier submitted: <code>{result.identifier}</code></p>
                   <p className="source-note">The calculator carries over only unambiguous make, model and engine details. Manufacture year, steering side and any uncertain engine variant must be confirmed from the vehicle documents.</p>
-                  <Link href={getImportEstimateHref(result)} className="button button-dark">Continue to this car’s import estimate ↗</Link>
+                  <Link href={getImportEstimateHref(result)} className="button button-dark">Use these details in the import estimate ↗</Link>
                 </div>
               )}
             </section>
 
-            <aside className="panel result-panel">
-              <span className="eyebrow">Know what you are seeing</span>
-              <h2>A VIN decode is not a vehicle-history report.</h2>
+            <aside className="panel result-panel vin-limits-panel">
+              <span className="eyebrow">What this check can tell you</span>
+              <h2>Technical details, not vehicle history.</h2>
               <div className="result-lines">
                 <div className="result-line">
                   <span>VIN decoding</span>
@@ -330,7 +355,7 @@ export default function VinCheckPage() {
           <h2>What the lookup can return</h2>
           <p>A standard VIN may return make, model, model year, body type, engine capacity, fuel type, drive type and place of manufacture. A Japanese domestic chassis number can return model-code candidates, possible engines, type approvals and published production information when those records are available.</p>
           <p>This is not a report of accidents, ownership, title, mileage, servicing or auction history. Portavero does not search those records or show auction photos. No result does not mean the car is accident-free.</p>
-          <p>Standard VINs are checked with NHTSA vPIC and can use an optional CarsXE international fallback. Japanese domestic chassis numbers use a separate optional Cardog lookup based on Japan MLIT records. Coverage varies and a record may be partial or ambiguous. Neither path searches accident, title, ownership, odometer, service or auction history, and neither guarantees a vehicle has a clean history.</p>
+          <p>Standard VINs and Japanese domestic chassis numbers use different reference sources. Coverage varies by market and manufacturer, so a result may be partial or ambiguous. Neither lookup searches accident, title, ownership, odometer, service or auction history, and neither guarantees that a vehicle has a clean history.</p>
         </div>
       </section>
     </>
