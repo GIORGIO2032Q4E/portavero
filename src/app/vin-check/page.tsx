@@ -230,7 +230,9 @@ export default function VinCheckPage() {
                       className={activeValidation.valid ? "identifier-status is-ready" : "identifier-status"}
                       aria-live="polite"
                     >
-                      {identifierType === "vin" ? `${normalizedIdentifierLength}/17` : identifierStatus}
+                      {identifierType === "vin"
+                        ? `${normalizedIdentifierLength}/17${checkedInput.valid ? " · ready" : normalizedIdentifierLength === 17 ? " · check characters" : ""}`
+                        : identifierStatus}
                     </span>
                   </div>
                 }
