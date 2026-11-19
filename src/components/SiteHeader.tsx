@@ -6,6 +6,8 @@ import { useState } from "react";
 
 const navigation = [
   { href: "/vin-check", label: "VIN check" },
+  { href: "/vehicles", label: "Vehicle guide" },
+  { href: "/shipping", label: "Shipping" },
   { href: "/how-it-works", label: "How it works" },
 ];
 
