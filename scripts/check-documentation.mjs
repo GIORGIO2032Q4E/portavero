@@ -6,7 +6,7 @@ import { URL } from "node:url";
 
 const output = new Console(process.stdout, process.stderr);
 
-const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercelConfig, siteHeader] = await Promise.all([
+const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercelConfig, siteHeader, authClient, passwordResetRoute] = await Promise.all([
   readFile(new URL("../README.md", import.meta.url), "utf8"),
   readFile(new URL("../docs/MANUAL_QA.md", import.meta.url), "utf8"),
   readFile(new URL("../src/app/privacy-policy/page.tsx", import.meta.url), "utf8"),
@@ -16,7 +16,9 @@ const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercel
   readFile(new URL("../src/app/vin-check/page.tsx", import.meta.url), "utf8"),
   readFile(new URL("../src/app/vehicle-import/page.tsx", import.meta.url), "utf8"),
   readFile(new URL("../vercel.json", import.meta.url), "utf8"),
-  readFile(new URL("../src/components/SiteHeader.tsx", import.meta.url), "utf8")
+  readFile(new URL("../src/components/SiteHeader.tsx", import.meta.url), "utf8"),
+  readFile(new URL("../src/lib/auth.ts", import.meta.url), "utf8"),
+  readFile(new URL("../src/app/api/account/password-reset/route.ts", import.meta.url), "utf8")
 ]);
 
 assert.match(readme, /student-built project about one practical part of buying a car/i);
@@ -49,6 +51,12 @@ assert.match(siteHeader, /href: "\/account", label: "Sign in"/);
 assert.doesNotMatch(siteHeader, /Create account|mode=signup/);
 assert.match(account, /New to Portavero\? Create an account/);
 assert.match(account, /mode === "signup"/);
+assert.match(authClient, /\/api\/account\/password-reset/);
+assert.match(passwordResetRoute, /SUPABASE_SECRET_KEY/);
+assert.match(passwordResetRoute, /auth\/v1\/admin\/users/);
+assert.match(passwordResetRoute, /auth\/v1\/recover/);
+assert.match(passwordResetRoute, /user_not_found/);
+assert.match(passwordResetRoute, /rateLimited|isRateLimited/);
 assert.doesNotMatch(readme, /General import calculator \|/i);
 assert.doesNotMatch(readme, /Vehicle comparison \|/i);
 assert.doesNotMatch(readme, /Shipping quote comparison \|/i);
