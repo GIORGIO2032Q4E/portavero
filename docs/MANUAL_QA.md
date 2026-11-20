@@ -112,7 +112,11 @@ Compare expected results with the exact current implementation and official sour
 - [ ] Confirm the final label distinguishes known user-entered costs and selected estimates from a guaranteed final landed cost.
 - [ ] Confirm foreign-currency amounts are not silently converted. The user must enter a checked GEL equivalent.
 - [ ] Confirm that broker charges, storage, repair costs, special handling or other unentered items are not implied to be included.
-- [ ] Print or save the planner as PDF. Check selected vehicle details, tax notes, known costs, unknown categories and disclaimers for readability.
+- [ ] Select **Print Portavero document**. Confirm the print preview contains only the branded A4 report, not the website navigation or editable calculator form.
+- [ ] Confirm the report includes its generated reference/date, vehicle identifier and specifications, each entered cost, estimated taxes, the GEL 480 stored fee snapshot, the known total, missing cost categories, official source links and limitations.
+- [ ] Confirm missing costs are labelled **Not entered**, confirmed zero values remain GEL 0.00, and an invalid/incomplete vehicle configuration does not show a valid total.
+- [ ] Confirm both signature lines are blank, the report clearly says it is unsigned, and it does not imply official customs approval or a legally binding Portavero signature.
+- [ ] Save as PDF and inspect A4 page breaks, table alignment, readable amounts, source links and signature area.
 
 ## 7. Vehicle catalogue and shipping guide
 
