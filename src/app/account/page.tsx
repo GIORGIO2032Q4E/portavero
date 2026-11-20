@@ -58,7 +58,7 @@ export default function AccountPage() {
         setRecoveryMode(true);
         setMessage("Choose a new password for your account.");
       } else if (params.get("reset") === "1") {
-        setMessage(`Password reset link sent to ${email.trim()}. Check your inbox and spam folder.`);
+        setMessage("If you requested a password reset, check your inbox for the recovery link.");
       }
       await refreshAccount();
     }
