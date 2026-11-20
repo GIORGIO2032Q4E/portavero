@@ -19,6 +19,7 @@ import {
 
 export default function AccountPage() {
   const [session, setSession] = useState<PortaveroSession | null>(null);
+  const [checkingAccount, setCheckingAccount] = useState(true);
   const [estimates, setEstimates] = useState<CloudEstimate[]>([]);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -33,16 +34,24 @@ export default function AccountPage() {
   const configured = isAuthConfigured();
 
   const refreshAccount = useCallback(async () => {
-    const current = await getSession();
-    setSession(current);
-    if (current) {
-      try {
-        setEstimates(await listCloudEstimates());
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not load saved estimates.");
+    try {
+      const current = await getSession();
+      setSession(current);
+      if (current) {
+        try {
+          setEstimates(await listCloudEstimates());
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Could not load saved estimates.");
+        }
+      } else {
+        setEstimates([]);
       }
-    } else {
+    } catch (e) {
+      setSession(null);
       setEstimates([]);
+      setError(e instanceof Error ? e.message : "Could not check your account.");
+    } finally {
+      setCheckingAccount(false);
     }
   }, []);
 
@@ -155,6 +164,13 @@ export default function AccountPage() {
               <div className="notice">Do not put a Supabase service-role key in browser code or commit secrets to GitHub.</div>
               <Link href="/" className="button button-dark">Go to home</Link>
             </section>
+          ) : checkingAccount ? (
+            <section className="panel account-panel account-loading-panel" role="status" aria-live="polite">
+              <span className="eyebrow">Account access</span>
+              <h2>Checking your session</h2>
+              <p>Loading your account details securely.</p>
+              <div className="account-loading-indicator" aria-hidden="true"><span /></div>
+            </section>
           ) : session ? (
             <section className="panel account-panel">
               <div className="account-heading">
@@ -162,6 +178,7 @@ export default function AccountPage() {
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
               <p>These estimates were saved in an earlier version of Portavero. They can be reviewed and deleted here, but cannot be loaded into the current planner.</p>
+              {error && <p className="account-error" role="alert">{error}</p>}
               <h3>Saved estimates ({estimates.length})</h3>
               {estimates.length === 0 ? <p className="empty-state">There are no estimates saved to this account yet.</p> : (
                 <div className="account-estimate-list">
