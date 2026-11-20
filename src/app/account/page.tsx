@@ -48,12 +48,16 @@ export default function AccountPage() {
 
   useEffect(() => {
     async function initialise() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("mode") === "signup") setMode("signup");
+      else if (params.get("mode") === "signin") setMode("signin");
+
       const recovery = await setRecoverySessionFromUrlHash();
       if (recovery) {
         setRecoverySession(recovery);
         setRecoveryMode(true);
         setMessage("Choose a new password for your account.");
-      } else if (new URLSearchParams(window.location.search).get("reset") === "1") {
+      } else if (params.get("reset") === "1") {
         setMessage("If the email address matches an account, a password reset link will arrive shortly.");
       }
       await refreshAccount();
@@ -132,15 +136,15 @@ export default function AccountPage() {
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Account</span>
-          <h1>{session ? "Your saved estimates." : "Legacy account access."}</h1>
-          <p>Sign in to view older estimates saved to your account in a previous version of Portavero. The current vehicle-import planner does not save estimates to this account area. Older general-import estimates can be reviewed and deleted, but they cannot be loaded into the current planner.</p>
+          <h1>{session ? "Your account." : "Sign in or create an account."}</h1>
+          <p>Sign in to access estimates saved to your account in an earlier version of Portavero. New vehicle-import drafts stay in this browser and are not uploaded to your account.</p>
         </div>
       </section>
       <section className="section">
         <div className="container account-layout">
           {!configured ? (
             <section className="panel account-panel">
-              <h2>Legacy account access is not configured.</h2>
+              <h2>Account access is not configured.</h2>
               <p>Account sign-in uses Supabase. To turn it on, the project URL and publishable key need to be added to the site settings.</p>
               <ol>
                 <li>Create a project at <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">Supabase</a>.</li>
@@ -157,7 +161,7 @@ export default function AccountPage() {
                 <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Signed-in account"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
-              <p>These are legacy estimates from an earlier version of Portavero. They can be reviewed and deleted here, but they are not compatible with the current vehicle-import planner.</p>
+              <p>These are estimates from an earlier version of Portavero. They can be reviewed and deleted here, but they are not compatible with the current vehicle-import planner.</p>
               <h3>Saved estimates ({estimates.length})</h3>
               {estimates.length === 0 ? <p className="empty-state">There are no estimates saved to this account yet.</p> : (
                 <div className="account-estimate-list">
@@ -176,7 +180,7 @@ export default function AccountPage() {
           ) : (
             <section className="panel account-panel">
               <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create an account for the retained account area. The current vehicle-import planner does not save estimates to it." : "Sign in to view older estimates saved to your account in a previous version."}</p>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create a Portavero account. The current vehicle-import planner saves drafts on this device, not to your account." : "Sign in to access any estimates saved to your account in an earlier version of Portavero."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
                 {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
