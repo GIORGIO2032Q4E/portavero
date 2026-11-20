@@ -132,7 +132,10 @@ The account page is retained for older saved estimates. The current vehicle-impo
 
 - [ ] Without Supabase configuration, confirm the page explains that account functions are not configured.
 - [ ] Use a dedicated test project and test mailbox. Do not use a real user's account.
-- [ ] Test account creation, email confirmation, sign-in, sign-out and password recovery.
+- [ ] Test account creation, email confirmation, sign-in and sign-out.
+- [ ] Submit a password reset for a non-existent email and confirm a clear not-found error is shown and no email is sent.
+- [ ] Submit a password reset for an existing test account and confirm the reset email reaches its mailbox, the link opens the new-password form and the password can be changed.
+- [ ] Confirm password reset fails clearly when the private server key or email provider is not configured.
 - [ ] Confirm older saved records can be listed and deleted.
 - [ ] Confirm the interface does not imply old general-import records can be loaded into the current vehicle planner.
 - [ ] Check row-level security with two separate test users. Confirm one user cannot read, update or delete the other user's records.
