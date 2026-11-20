@@ -3115,3 +3115,429 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .account-loading-indicator span { animation: none; width: 100%; }
   .account-estimate, .cost-group { transition: none; }
 }
+
+
+/* Dedicated, branded A4 estimate document */
+.portavero-print-document {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 13mm;
+  }
+
+  html,
+  body {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #17251d !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .site-header,
+  .site-footer,
+  .skip-link {
+    display: none !important;
+  }
+
+  .vehicle-import-page {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .vehicle-import-page > *:not(.portavero-print-document) {
+    display: none !important;
+  }
+
+  .vehicle-import-page > .portavero-print-document {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #17251d !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 8.5pt !important;
+    line-height: 1.42 !important;
+  }
+
+  .portavero-print-document * {
+    box-sizing: border-box !important;
+  }
+
+  .portavero-document-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8mm !important;
+    padding: 0 0 5mm !important;
+    border-bottom: 2.2pt solid #244c38 !important;
+  }
+
+  .portavero-document-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 3mm !important;
+  }
+
+  .portavero-document-mark {
+    display: grid !important;
+    width: 13mm !important;
+    height: 13mm !important;
+    place-items: center !important;
+    border-radius: 3mm !important;
+    background: #244c38 !important;
+    color: #fff !important;
+    font-family: Georgia, serif !important;
+    font-size: 21pt !important;
+    font-weight: 700 !important;
+  }
+
+  .portavero-document-brand div,
+  .portavero-document-reference {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1mm !important;
+  }
+
+  .portavero-document-brand strong {
+    color: #244c38 !important;
+    font-size: 15pt !important;
+    letter-spacing: 1.8pt !important;
+  }
+
+  .portavero-document-brand span:last-child,
+  .portavero-document-reference span,
+  .portavero-document-kicker,
+  .portavero-document-section-heading > span,
+  .portavero-signature-block > span {
+    color: #647368 !important;
+    font-size: 6.5pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 1pt !important;
+  }
+
+  .portavero-document-reference {
+    align-items: flex-end !important;
+    text-align: right !important;
+  }
+
+  .portavero-document-reference strong {
+    color: #244c38 !important;
+    font-size: 9pt !important;
+    letter-spacing: .3pt !important;
+  }
+
+  .portavero-document-reference small {
+    color: #68766d !important;
+    font-size: 7pt !important;
+  }
+
+  .portavero-document-title {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 5mm !important;
+    margin: 5mm 0 !important;
+  }
+
+  .portavero-document-kicker {
+    display: block !important;
+    margin-bottom: 1.5mm !important;
+  }
+
+  .portavero-document-title h1 {
+    margin: 0 0 1.2mm !important;
+    color: #172d21 !important;
+    font-size: 19pt !important;
+    line-height: 1.12 !important;
+    letter-spacing: -.4pt !important;
+  }
+
+  .portavero-document-title p {
+    margin: 0 !important;
+    color: #536157 !important;
+    font-size: 8pt !important;
+  }
+
+  .portavero-document-status {
+    flex: 0 0 auto !important;
+    margin-top: 2mm !important;
+    padding: 2mm 2.5mm !important;
+    border: .7pt solid #b7c6b7 !important;
+    border-radius: 2mm !important;
+    color: #31553d !important;
+    font-size: 6.2pt !important;
+    font-weight: 700 !important;
+    letter-spacing: .35pt !important;
+  }
+
+  .portavero-document-status.is-incomplete {
+    border-color: #d5b993 !important;
+    background: #fbf5eb !important;
+    color: #76512a !important;
+  }
+
+  .portavero-document-section {
+    margin: 0 0 4mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .portavero-document-section-heading {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2.5mm !important;
+    margin: 0 0 2mm !important;
+    padding-bottom: 1.5mm !important;
+    border-bottom: .8pt solid #d6dfd6 !important;
+  }
+
+  .portavero-document-section-heading > span {
+    color: #b06d3d !important;
+  }
+
+  .portavero-document-section-heading h2,
+  .portavero-document-notes h2 {
+    margin: 0 !important;
+    color: #244c38 !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .portavero-document-section-heading small {
+    margin-left: auto !important;
+    color: #68766d !important;
+    font-size: 7pt !important;
+  }
+
+  .portavero-document-vehicle-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 2.5mm 4mm !important;
+    padding: 3mm !important;
+    border: .7pt solid #dce4da !important;
+    border-radius: 2mm !important;
+    background: #f8faf6 !important;
+  }
+
+  .portavero-document-vehicle-grid div {
+    display: flex !important;
+    min-width: 0 !important;
+    flex-direction: column !important;
+    gap: .7mm !important;
+  }
+
+  .portavero-document-vehicle-grid span {
+    color: #68766d !important;
+    font-size: 6.8pt !important;
+  }
+
+  .portavero-document-vehicle-grid strong {
+    color: #1d2e23 !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .portavero-document-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    font-size: 7.8pt !important;
+  }
+
+  .portavero-document-table th,
+  .portavero-document-table td {
+    padding: 1.55mm 2mm !important;
+    border-bottom: .5pt solid #e1e6e0 !important;
+    color: #26372c !important;
+    text-align: left !important;
+    vertical-align: top !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .portavero-document-table thead th {
+    background: #edf2eb !important;
+    color: #405647 !important;
+    font-size: 6.7pt !important;
+    letter-spacing: .5pt !important;
+    text-transform: uppercase !important;
+  }
+
+  .portavero-document-table th:first-child,
+  .portavero-document-table td:first-child {
+    width: 54% !important;
+  }
+
+  .portavero-document-table th:nth-child(2),
+  .portavero-document-table td:nth-child(2) {
+    width: 25% !important;
+    text-align: right !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+
+  .portavero-document-table th:nth-child(3),
+  .portavero-document-table td:nth-child(3) {
+    width: 21% !important;
+    text-align: right !important;
+    color: #647368 !important;
+    font-size: 6.8pt !important;
+  }
+
+  .portavero-document-table .portavero-document-subtotal td {
+    border-top: 1pt solid #c7d3c6 !important;
+    font-weight: 700 !important;
+  }
+
+  .portavero-document-table tfoot th,
+  .portavero-document-table tfoot td {
+    padding-top: 2.6mm !important;
+    padding-bottom: 2.6mm !important;
+    border-top: 1.3pt solid #244c38 !important;
+    border-bottom: 1.3pt solid #244c38 !important;
+    background: #f0f5ed !important;
+    color: #1d432e !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+  }
+
+  .portavero-document-table tfoot td:nth-child(2) {
+    font-size: 11pt !important;
+  }
+
+  .portavero-document-completeness {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: .8mm !important;
+    margin-top: 2mm !important;
+    padding: 2.2mm 2.7mm !important;
+    border-left: 2pt solid #b06d3d !important;
+    background: #faf7f1 !important;
+    color: #514638 !important;
+    font-size: 7pt !important;
+  }
+
+  .portavero-document-completeness strong {
+    color: #57452f !important;
+  }
+
+  .portavero-document-notes {
+    margin: 0 0 3mm !important;
+    padding: 2.5mm 3mm !important;
+    border: .6pt solid #e0e5dd !important;
+    border-radius: 2mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .portavero-document-notes ul {
+    margin: 1.5mm 0 1.5mm !important;
+    padding-left: 4.5mm !important;
+  }
+
+  .portavero-document-notes li {
+    margin: 0 0 .8mm !important;
+    color: #4d5a50 !important;
+    font-size: 6.8pt !important;
+    line-height: 1.35 !important;
+  }
+
+  .portavero-document-sources {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: baseline !important;
+    gap: 1mm 2mm !important;
+    margin: 1.5mm 0 0 !important;
+    color: #657268 !important;
+    font-size: 6.4pt !important;
+  }
+
+  .portavero-document-sources a {
+    color: #315b42 !important;
+    text-decoration: underline !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .portavero-document-signatures {
+    margin: 0 0 3mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .portavero-signature-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10mm !important;
+    margin-top: 3mm !important;
+  }
+
+  .portavero-signature-block {
+    display: flex !important;
+    min-height: 22mm !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1mm !important;
+  }
+
+  .portavero-signature-block > strong {
+    color: #26392c !important;
+    font-size: 8.5pt !important;
+  }
+
+  .portavero-signature-line {
+    width: 100% !important;
+    height: 8mm !important;
+    margin-top: 1mm !important;
+    border-bottom: .8pt solid #748277 !important;
+  }
+
+  .portavero-signature-block small {
+    color: #68766d !important;
+    font-size: 6.5pt !important;
+  }
+
+  .portavero-document-unsigned-note {
+    margin: 1mm 0 0 !important;
+    color: #7b5c3c !important;
+    font-size: 6.2pt !important;
+    line-height: 1.3 !important;
+  }
+
+  .portavero-document-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: baseline !important;
+    gap: 1mm 3mm !important;
+    margin-top: 3mm !important;
+    padding-top: 2mm !important;
+    border-top: .7pt solid #d8e0d6 !important;
+    color: #657268 !important;
+    font-size: 6.5pt !important;
+  }
+
+  .portavero-document-footer strong {
+    color: #244c38 !important;
+    letter-spacing: 1pt !important;
+  }
+
+  .portavero-document-footer small {
+    flex: 1 0 100% !important;
+    font-size: 6pt !important;
+  }
+
+  .portavero-print-document a {
+    color: #244c38 !important;
+    text-decoration: underline !important;
+  }
+}
