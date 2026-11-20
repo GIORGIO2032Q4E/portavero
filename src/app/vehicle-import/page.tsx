@@ -107,6 +107,7 @@ export default function VehicleImportPage() {
   const [lookupFuelNeedsConfirmation, setLookupFuelNeedsConfirmation] = useState(false);
   const [savedDraftAvailable, setSavedDraftAvailable] = useState(false);
   const [draftMessage, setDraftMessage] = useState("");
+  const [documentMeta, setDocumentMeta] = useState({ reference: "", issuedAt: "" });
   const [invalidCostFields, setInvalidCostFields] = useState<Record<CostFieldKey, boolean>>({
     purchase: false,
     auction: false,
@@ -125,6 +126,21 @@ export default function VehicleImportPage() {
   }
 
   useEffect(() => {
+    const createdAt = new Date();
+    const datePart = [
+      createdAt.getFullYear(),
+      String(createdAt.getMonth() + 1).padStart(2, "0"),
+      String(createdAt.getDate()).padStart(2, "0")
+    ].join("");
+    const referenceSuffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+    setDocumentMeta({
+      reference: `PVR-${datePart}-${referenceSuffix}`,
+      issuedAt: createdAt.toLocaleString("en-GB", {
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      })
+    });
+
     const params = new URLSearchParams(window.location.search);
     const incomingVin = params.get("vin") ?? "";
     const incomingChassis = params.get("chassis") ?? "";
@@ -325,8 +341,168 @@ export default function VehicleImportPage() {
     };
   }, [year, declarationYear, steering, hybrid, classicCar, preAprilRegime, isElectric, engineCc, purchase, auction, inland, shipping, insurance, port, delivery, hasInvalidCostField]);
 
+  const printableVehicleName = identifiedVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Vehicle not identified";
+  const printableEngine = selectedEngine?.label ?? (
+    isElectric
+      ? "Electric powertrain"
+      : engineCc === null
+        ? "Not entered"
+        : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`
+  );
+  const printableSteering = steering === "right"
+    ? "Right-hand drive"
+    : steering === "left"
+      ? "Left-hand drive"
+      : "Not confirmed";
+  const printableFuel = isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid / other";
+  const printableTotalAvailable = canShowTaxEstimate && result.total !== null && !result.invalidAmounts;
+  const printableStatus = !printableTotalAvailable
+    ? "INCOMPLETE · REVIEW REQUIRED"
+    : result.unknownCosts > 0
+      ? "PARTIAL ESTIMATE"
+      : "ALL COST CATEGORIES ENTERED";
+  const missingCostLabels = [
+    purchase === null ? "Vehicle purchase price" : null,
+    auction === null ? "Auction fees" : null,
+    inland === null ? "Inland transport" : null,
+    shipping === null ? "International shipping" : null,
+    insurance === null ? "Insurance" : null,
+    port === null ? "Port, broker and storage" : null,
+    delivery === null ? "Local delivery / other costs" : null
+  ].filter((label): label is string => label !== null);
+
   return (
     <div className="vehicle-import-page">
+    <article className="portavero-print-document" aria-label="Printable Portavero vehicle import estimate">
+      <header className="portavero-document-header">
+        <div className="portavero-document-brand">
+          <span className="portavero-document-mark" aria-hidden="true">P</span>
+          <div>
+            <strong>PORTAVERO</strong>
+            <span>VEHICLE IMPORT ESTIMATE</span>
+          </div>
+        </div>
+        <div className="portavero-document-reference">
+          <span>DOCUMENT REFERENCE</span>
+          <strong>{documentMeta.reference || "Preparing document"}</strong>
+          <small>Issued {documentMeta.issuedAt || "on document generation"}</small>
+        </div>
+      </header>
+
+      <div className="portavero-document-title">
+        <div>
+          <span className="portavero-document-kicker">VEHICLE IMPORT PLANNING REPORT</span>
+          <h1>Vehicle import cost estimate</h1>
+          <p>Prepared from the vehicle details and cost information entered into Portavero.</p>
+        </div>
+        <span className={`portavero-document-status ${printableTotalAvailable ? "is-ready" : "is-incomplete"}`}>{printableStatus}</span>
+      </div>
+
+      <section className="portavero-document-section">
+        <div className="portavero-document-section-heading">
+          <span>01</span>
+          <h2>Vehicle identification</h2>
+        </div>
+        <div className="portavero-document-vehicle-grid">
+          <div><span>Vehicle</span><strong>{printableVehicleName}</strong></div>
+          <div><span>VIN / chassis number</span><strong>{vehicleIdentifier || "Not provided"}</strong></div>
+          <div><span>Manufacture year</span><strong>{year ?? "Not entered"}</strong></div>
+          <div><span>Engine / powertrain</span><strong>{printableEngine}</strong></div>
+          <div><span>Declaration year / vehicle age</span><strong>{declarationYear} / {vehicleAge === null ? "Age unavailable" : `${vehicleAge} year(s)`}</strong></div>
+          <div><span>Steering / fuel</span><strong>{printableSteering} · {printableFuel}</strong></div>
+          {classicCar && <div><span>Vehicle classification selection</span><strong>Classic-car rate selected; legal classification must be verified</strong></div>}
+        </div>
+      </section>
+
+      <section className="portavero-document-section">
+        <div className="portavero-document-section-heading">
+          <span>02</span>
+          <h2>Cost and tax breakdown</h2>
+          <small>All amounts in Georgian lari (GEL)</small>
+        </div>
+        <table className="portavero-document-table">
+          <thead>
+            <tr><th scope="col">Description</th><th scope="col">Amount</th><th scope="col">Basis</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Vehicle purchase price</td><td>{purchase === null ? "Not entered" : money(purchase)}</td><td>User entry</td></tr>
+            <tr><td>Auction fees</td><td>{auction === null ? "Not entered" : money(auction)}</td><td>User entry</td></tr>
+            <tr><td>Inland transport to export port</td><td>{inland === null ? "Not entered" : money(inland)}</td><td>User entry</td></tr>
+            <tr><td>International shipping</td><td>{shipping === null ? "Not entered" : money(shipping)}</td><td>User entry</td></tr>
+            <tr><td>Insurance</td><td>{insurance === null ? "Not entered" : money(insurance)}</td><td>User entry</td></tr>
+            <tr><td>Port, broker and storage</td><td>{port === null ? "Not entered" : money(port)}</td><td>User entry</td></tr>
+            <tr><td>Local delivery / other costs</td><td>{delivery === null ? "Not entered" : money(delivery)}</td><td>User entry</td></tr>
+            <tr className="portavero-document-subtotal"><td>Entered vehicle and logistics costs</td><td>{result.knownCosts === null ? "Check entries" : money(result.knownCosts)}</td><td>User-entered subtotal</td></tr>
+            <tr><td>Estimated excise tax</td><td>{canShowTaxEstimate && !result.invalidTaxAmounts ? money(result.excise) : "Not calculated"}</td><td>Portavero calculation</td></tr>
+            <tr><td>Estimated import duty</td><td>{canShowTaxEstimate && !result.invalidTaxAmounts ? (isElectric ? "Exempt for electric vehicles" : money(result.importDuty)) : "Not calculated"}</td><td>Portavero calculation</td></tr>
+            <tr><td>Standard clearance and registration fees</td><td>{money(result.officialFees)}</td><td>Stored fee snapshot</td></tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">{result.unknownCosts > 0 ? "Known total so far" : "Estimated total"}</th>
+              <td>{printableTotalAvailable ? money(result.total as number) : "Not available"}</td>
+              <td>GEL</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div className="portavero-document-completeness">
+          <strong>{result.unknownCosts} of 7 cost categories not entered</strong>
+          {missingCostLabels.length > 0
+            ? <span>Still missing: {missingCostLabels.join(", ")}.</span>
+            : <span>All seven cost categories have an entered value, including any confirmed zero amounts.</span>}
+        </div>
+      </section>
+
+      <section className="portavero-document-notes">
+        <h2>Important information and limitations</h2>
+        <ul>
+          <li>This is an informational planning estimate, not a customs assessment, commercial invoice, shipping quote or guarantee of the final amount payable.</li>
+          <li>Blank cost categories are excluded from the known total. Broker charges, storage, repairs, special handling, classification decisions and other unentered costs may increase the final amount.</li>
+          <li>Tax calculations cover only the vehicle cases supported by this version of Portavero. Vehicle classification, transitional eligibility and unusual cases must be checked with the Revenue Service.</li>
+          <li>The standard GEL 480 fee amount is a stored snapshot, not a live fee lookup. Verify current fees and tax treatment before purchase, bidding or shipping.</li>
+        </ul>
+        <p className="portavero-document-sources">
+          Reference sources:
+          <a href="https://new.matsne.gov.ge/en/document/view/1043717">Tax Code of Georgia, Articles 188, 197 and 199</a>
+          <span>·</span>
+          <a href="https://www.rs.ge/CarClearance-en">Revenue Service Auto/Moto Levy Calculator</a>
+          <span>·</span>
+          <a href="https://voice.rs.ge/Default.aspx?id=3874">Revenue Service notice on the 2 April 2026 change</a>
+        </p>
+      </section>
+
+      <section className="portavero-document-signatures">
+        <div className="portavero-document-section-heading">
+          <span>03</span>
+          <h2>Review and signature</h2>
+        </div>
+        <div className="portavero-signature-grid">
+          <div className="portavero-signature-block">
+            <span>PREPARED BY</span>
+            <strong>Portavero</strong>
+            <div className="portavero-signature-line" />
+            <small>Authorized representative signature</small>
+            <small>Date: __________________________</small>
+          </div>
+          <div className="portavero-signature-block">
+            <span>REVIEWED BY</span>
+            <strong>Vehicle owner / reviewer</strong>
+            <div className="portavero-signature-line" />
+            <small>Name and signature</small>
+            <small>Date: __________________________</small>
+          </div>
+        </div>
+        <p className="portavero-document-unsigned-note">This report is generated automatically from the information entered into Portavero. It carries no digital signature, certification or official customs approval until reviewed and signed by an authorized person.</p>
+      </section>
+
+      <footer className="portavero-document-footer">
+        <strong>PORTAVERO</strong>
+        <span>portavero.vercel.app</span>
+        <span>{documentMeta.reference}</span>
+        <small>Document reference for this generated estimate only. Not a customs declaration or transaction number.</small>
+      </footer>
+    </article>
+
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Vehicle import planner</span>
@@ -339,7 +515,7 @@ export default function VehicleImportPage() {
               <div className="planner-more-actions-menu">
                 {savedDraftAvailable && <button type="button" className="button button-outline" onClick={loadDraft}>Load saved draft</button>}
                 {savedDraftAvailable && <button type="button" className="button button-outline" onClick={deleteDraft}>Delete saved draft</button>}
-                <button type="button" className="button button-outline print-trigger" onClick={() => window.print()}>Print or save as PDF</button>
+                <button type="button" className="button button-outline print-trigger" onClick={() => window.print()}>Print Portavero document</button>
                 <a href={revenueServiceUrl} target="_blank" rel="noreferrer" className="button button-outline">Official tax calculator ↗</a>
                 <Link href="/how-it-works" className="button button-outline">How estimates work</Link>
               </div>
@@ -352,18 +528,6 @@ export default function VehicleImportPage() {
 
       <section className="section">
         <div className="container">
-          <div className="print-report-meta">
-            <strong>Portavero · Vehicle import estimate</strong>
-            <span>All amounts are shown in Georgian lari (GEL).</span>
-          </div>
-          <div className="print-vehicle-summary">
-            <div><span>Vehicle</span><strong>{identifiedVehicleName || [makeName, modelName].filter(Boolean).join(" ") || "Not selected"}</strong></div>
-            {vehicleIdentifier && <div><span>Vehicle identifier</span><strong>{vehicleIdentifier}</strong></div>}
-            <div><span>Engine / powertrain</span><strong>{selectedEngine?.label ?? (engineCc === null ? "Not entered" : `${engineCc.toLocaleString("en-US")} cm³ · manual entry`)}</strong></div>
-            <div><span>Manufacture year</span><strong>{year ?? "Not entered"}</strong></div>
-            <div><span>Declaration year / age</span><strong>{declarationYear} · {vehicleAge === null ? "age not available" : `${vehicleAge} year(s)`}</strong></div>
-            <div><span>Configuration</span><strong>{steering === "right" ? "Right-hand drive" : steering === "left" ? "Left-hand drive" : "Steering not confirmed"} · {isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid"}{classicCar ? " · classic-car rate" : ""}</strong></div>
-          </div>
           <nav className="estimate-stepper" aria-label="Estimate sections">
             <a href="#vehicle-details"><span>01</span><strong>Vehicle details</strong></a>
             <a href="#import-costs"><span>02</span><strong>Import costs</strong></a>
