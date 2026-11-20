@@ -354,7 +354,7 @@ export default function VehicleImportPage() {
     : steering === "left"
       ? "Left-hand drive"
       : "Not confirmed";
-  const printableFuel = isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid / other";
+  const printableFuel = lookupFuelNeedsConfirmation ? "Not confirmed" : isElectric ? "Electric" : hybrid ? "Hybrid" : "Non-hybrid / other";
   const printableTotalAvailable = canShowTaxEstimate && result.total !== null && !result.invalidAmounts;
   const printableStatus = !printableTotalAvailable
     ? "INCOMPLETE · REVIEW REQUIRED"
@@ -410,6 +410,7 @@ export default function VehicleImportPage() {
           <div><span>Engine / powertrain</span><strong>{printableEngine}</strong></div>
           <div><span>Declaration year / vehicle age</span><strong>{declarationYear} / {vehicleAge === null ? "Age unavailable" : `${vehicleAge} year(s)`}</strong></div>
           <div><span>Steering / fuel</span><strong>{printableSteering} · {printableFuel}</strong></div>
+          <div><span>Excise regime selected</span><strong>{preAprilRegime ? "Previous rates; transitional eligibility must be verified" : "Current rates"}</strong></div>
           {classicCar && <div><span>Vehicle classification selection</span><strong>Classic-car rate selected; legal classification must be verified</strong></div>}
         </div>
       </section>
