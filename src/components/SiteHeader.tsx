@@ -9,6 +9,8 @@ const navigation = [
   { href: "/vehicles", label: "Vehicle guide" },
   { href: "/shipping", label: "Shipping" },
   { href: "/how-it-works", label: "How it works" },
+  { href: "/account", label: "Sign in" },
+  { href: "/account?mode=signup", label: "Create account" },
 ];
 
 export default function SiteHeader() {
@@ -44,12 +46,14 @@ export default function SiteHeader() {
           aria-label="Main navigation"
         >
           {navigation.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            const active = item.href === "/account?mode=signup"
+              ? false
+              : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 href={item.href}
                 key={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
+                aria-current={active ? "page" : undefined}
                 className={active ? "nav-link is-active" : "nav-link"}
                 onClick={closeMenu}
               >
