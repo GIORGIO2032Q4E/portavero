@@ -56,6 +56,8 @@ The vehicle-import planner can store one draft when the user selects **Save draf
 
 The former `/calculator` and `/compare` paths redirect to `/vehicle-import` for compatibility. The USD/GEL converter has been removed.
 
+Password recovery checks account existence on the server before requesting a reset email. It requires a private `SUPABASE_SECRET_KEY` (or the legacy `SUPABASE_SERVICE_ROLE_KEY`) in the deployment environment, with a working Supabase Auth email provider. Never expose either key with a `NEXT_PUBLIC_` prefix.
+
 ## Technical structure
 
 The application uses the Next.js App Router. Page components collect input and present results. Reusable VIN parsing, provider merging, validation and calculation logic lives in JavaScript modules so it can be tested with Node's built-in test runner.

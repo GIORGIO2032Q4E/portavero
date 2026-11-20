@@ -58,7 +58,7 @@ export default function AccountPage() {
         setRecoveryMode(true);
         setMessage("Choose a new password for your account.");
       } else if (params.get("reset") === "1") {
-        setMessage("If the email address matches an account, a password reset link will arrive shortly.");
+        setMessage("If you requested a password reset, check your inbox for the recovery link.");
       }
       await refreshAccount();
     }
@@ -81,7 +81,7 @@ export default function AccountPage() {
         setMessage("Password updated. Sign in with your new password.");
       } else if (resetMode) {
         await sendPasswordReset(email.trim());
-        setMessage("If the email address matches an account, a password reset link will arrive shortly.");
+        setMessage(`Password reset link sent to ${email.trim()}. Check your inbox and spam folder.`);
       } else if (mode === "signup") {
         const result = await signUp(email.trim(), password);
         if (result.session) {
@@ -180,7 +180,7 @@ export default function AccountPage() {
           ) : (
             <section className="panel account-panel">
               <div className="account-heading"><div><span className="eyebrow">Account access</span><h2>{recoveryMode ? "Choose a new password" : resetMode ? "Reset your password" : mode === "signup" ? "Create your account" : "Welcome back"}</h2></div></div>
-              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "We will email you a password reset link if this address has an account." : mode === "signup" ? "Create a Portavero account. The current vehicle-import planner saves drafts on this device, not to your account." : "Sign in to access any estimates saved to your account in an earlier version of Portavero."}</p>
+              <p>{recoveryMode ? "Set a new password to finish recovering your account." : resetMode ? "Enter the email address on your account. We will check it and send a password reset link when an account is found." : mode === "signup" ? "Create a Portavero account. The current vehicle-import planner saves drafts on this device, not to your account." : "Sign in to access any estimates saved to your account in an earlier version of Portavero."}</p>
               <form className="account-form" onSubmit={handleSubmit}>
                 {!recoveryMode && <div className="field"><label htmlFor="account-email">Email address</label><input id="account-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></div>}
                 {recoveryMode ? <div className="field"><label htmlFor="new-account-password">New password</label><input id="new-account-password" type="password" autoComplete="new-password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><small>Use at least 8 characters.</small></div> : !resetMode && <div className="field"><label htmlFor="account-password">Password</label><input id="account-password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /><small>Use at least 8 characters. Portavero never stores your password in its own database.</small></div>}
