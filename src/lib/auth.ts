@@ -178,17 +178,23 @@ export async function setRecoverySessionFromUrlHash() {
 }
 
 export async function sendPasswordReset(email: string) {
-  const { url, key } = config();
-  const redirect = typeof window !== "undefined" ? `${window.location.origin}/account?reset=1` : undefined;
-  const response = await fetch(`${url}/auth/v1/recover${redirect ? `?redirect_to=${encodeURIComponent(redirect)}` : ""}`, {
+  const response = await fetch("/api/account/password-reset", {
     method: "POST",
-    headers: { apikey: key, "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email.trim() }),
     cache: "no-store"
   });
+  const result = await response.json().catch(() => ({})) as Record<string, unknown>;
+
   if (!response.ok) {
-    const result = await response.json().catch(() => ({})) as Record<string, unknown>;
-    throw new Error(typeof result.message === "string" ? result.message : "Could not send password reset email.");
+    const message = typeof result.error === "string"
+      ? result.error
+      : "Password reset could not be completed. Please try again.";
+    throw new Error(message);
+  }
+
+  if (result.status !== "sent") {
+    throw new Error("Password reset could not be completed. Please try again.");
   }
 }
 
