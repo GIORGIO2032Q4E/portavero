@@ -161,7 +161,7 @@ export default function AccountPage() {
                 <div><span className="eyebrow">Signed in</span><h2>{session.user.email ?? "Signed-in account"}</h2></div>
                 <button type="button" className="button button-outline" disabled={busy} onClick={handleSignOut}>Sign out</button>
               </div>
-              <p>These are estimates from an earlier version of Portavero. They can be reviewed and deleted here, but they are not compatible with the current vehicle-import planner.</p>
+              <p>These estimates were saved in an earlier version of Portavero. They can be reviewed and deleted here, but cannot be loaded into the current vehicle-import planner.</p>
               <h3>Saved estimates ({estimates.length})</h3>
               {estimates.length === 0 ? <p className="empty-state">There are no estimates saved to this account yet.</p> : (
                 <div className="account-estimate-list">
