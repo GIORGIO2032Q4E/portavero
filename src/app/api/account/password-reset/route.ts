@@ -66,12 +66,18 @@ async function accountExists(
     url.searchParams.set("page", String(page));
     url.searchParams.set("per_page", String(usersPerPage));
 
+    const adminHeaders: Record<string, string> = {
+      apikey: adminKey,
+      Accept: "application/json"
+    };
+    // New sb_secret_ keys are API keys, not JWTs. Only send them via apikey.
+    // Legacy service_role keys are JWTs and also need the Bearer header.
+    if (!adminKey.startsWith("sb_secret_")) {
+      adminHeaders.Authorization = `Bearer ${adminKey}`;
+    }
+
     const response = await fetch(url, {
-      headers: {
-        apikey: adminKey,
-        Authorization: `Bearer ${adminKey}`,
-        Accept: "application/json"
-      },
+      headers: adminHeaders,
       cache: "no-store",
       signal: AbortSignal.timeout(Math.min(5000, remainingMs))
     });
@@ -100,11 +106,11 @@ export async function POST(request: Request) {
   const rawEmail = isRecord(body) && typeof body.email === "string" ? body.email : "";
   const email = normaliseEmail(rawEmail);
 
-  if (!email || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ code: "invalid_email", error: "Enter a valid email address." }, 400);
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\\/+$/, "");
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
   const publicKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const adminKey = process.env.SUPABASE_SECRET_KEY ||
@@ -149,7 +155,7 @@ export async function POST(request: Request) {
     }, 404);
   }
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\\/+$/, "");
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\/+$/, "");
   const redirectTo = new URL("/account?reset=1", siteUrl);
   const recoveryUrl = new URL(`${supabaseUrl}/auth/v1/recover`);
   recoveryUrl.searchParams.set("redirect_to", redirectTo.toString());
@@ -159,7 +165,6 @@ export async function POST(request: Request) {
       method: "POST",
       headers: {
         apikey: publicKey,
-        Authorization: `Bearer ${publicKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ email }),
