@@ -6,7 +6,7 @@ import { URL } from "node:url";
 
 const output = new Console(process.stdout, process.stderr);
 
-const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercelConfig] = await Promise.all([
+const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercelConfig, siteHeader] = await Promise.all([
   readFile(new URL("../README.md", import.meta.url), "utf8"),
   readFile(new URL("../docs/MANUAL_QA.md", import.meta.url), "utf8"),
   readFile(new URL("../src/app/privacy-policy/page.tsx", import.meta.url), "utf8"),
@@ -15,7 +15,8 @@ const [readme, manualQa, privacy, terms, account, home, vinPage, planner, vercel
   readFile(new URL("../src/app/page.tsx", import.meta.url), "utf8"),
   readFile(new URL("../src/app/vin-check/page.tsx", import.meta.url), "utf8"),
   readFile(new URL("../src/app/vehicle-import/page.tsx", import.meta.url), "utf8"),
-  readFile(new URL("../vercel.json", import.meta.url), "utf8")
+  readFile(new URL("../vercel.json", import.meta.url), "utf8"),
+  readFile(new URL("../src/components/SiteHeader.tsx", import.meta.url), "utf8")
 ]);
 
 assert.match(readme, /student-built project about one practical part of buying a car/i);
@@ -44,6 +45,9 @@ assert.match(vinPage, /internationalProviderConfigured/);
 assert.match(vinPage, /identifier-status/);
 assert.match(vinPage, /Use these details in the import estimate/);
 assert.doesNotMatch(vinPage, /NHTSA vPIC|CarsXE|Cardog Japanese chassis lookup/);
+assert.match(siteHeader, /href: "\/account", label: "Sign in"/);
+assert.match(siteHeader, /href: "\/account\?mode=signup", label: "Create account"/);
+assert.match(account, /get\("mode"\) === "signup"/);
 assert.doesNotMatch(readme, /General import calculator \|/i);
 assert.doesNotMatch(readme, /Vehicle comparison \|/i);
 assert.doesNotMatch(readme, /Shipping quote comparison \|/i);
