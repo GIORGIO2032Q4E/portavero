@@ -236,6 +236,8 @@ export default function VinCheckPage() {
                     <span
                       id="identifier-status"
                       className={activeValidation.valid ? "identifier-status is-ready" : "identifier-status"}
+                      aria-live="polite"
+                      aria-atomic="true"
                     >
                       {identifierType === "vin"
                         ? `${normalizedIdentifierLength}/17${checkedInput.valid ? " · ready" : normalizedIdentifierLength === 17 ? " · check characters" : ""}`
@@ -275,7 +277,7 @@ export default function VinCheckPage() {
                     type="button"
                     className="button button-outline"
                     onClick={() => { setVin(""); setResult(null); setError(""); }}
-                    disabled={loading}
+                    disabled={loading || (!vin && !result && !error)}
                   >
                     Clear
                   </button>

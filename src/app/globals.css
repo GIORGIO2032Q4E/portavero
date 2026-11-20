@@ -2973,3 +2973,145 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) {
   .simple-tool-row, .simple-tool-row > a, .button { transition: none !important; }
 }
+
+
+/* Second UX pass: calm loading, clearer estimate navigation and better touch targets. */
+.account-loading-panel {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.account-loading-indicator {
+  width: min(100%, 340px);
+  height: 7px;
+  margin-top: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e9eee5;
+}
+.account-loading-indicator span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #416e4d, #9db77d);
+  animation: account-loading-travel 1.3s ease-in-out infinite;
+}
+@keyframes account-loading-travel {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(250%); }
+}
+.account-panel .account-error { margin: 14px 0; }
+.account-estimate {
+  padding: 16px 14px;
+  border-radius: 11px;
+  transition: background-color .18s ease, border-color .18s ease;
+}
+.account-estimate:hover { background: #f8faf5; }
+.account-estimate-actions .button { min-height: 42px; }
+.text-button {
+  min-height: 38px;
+  border-radius: 7px;
+}
+.text-button:focus-visible {
+  outline: 3px solid #bd713e;
+  outline-offset: 4px;
+}
+.vin-check .identifier-status { min-height: 28px; }
+.vin-result {
+  padding: clamp(17px, 2.2vw, 24px);
+  border: 1px solid #dce5d9;
+  background: #fffefa;
+}
+.vin-result > .button { margin-top: 12px; }
+.vin-result .source-note { max-width: 70ch; }
+.vehicle-import-page .estimate-stepper {
+  position: sticky;
+  top: 86px;
+  z-index: 12;
+  padding: 10px;
+  border: 1px solid rgba(209, 221, 206, .9);
+  border-radius: 15px;
+  background: rgba(246, 248, 242, .92);
+  box-shadow: 0 8px 22px rgba(24, 53, 37, .06);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+.vehicle-import-page .estimate-stepper a {
+  min-height: 52px;
+  border-color: #d4dfd1;
+  background: rgba(255, 255, 252, .9);
+}
+.vehicle-import-page .estimate-stepper a:focus-visible {
+  outline: 3px solid #bd713e;
+  outline-offset: 2px;
+}
+.vehicle-import-page #vehicle-details,
+.vehicle-import-page #import-costs,
+.vehicle-import-page #estimate-result {
+  scroll-margin-top: 150px;
+}
+.cost-entry-panel {
+  border-color: #d8e3d5;
+  border-radius: 19px;
+  background: #fffefa;
+  box-shadow: 0 16px 40px rgba(24, 53, 37, .07);
+}
+.cost-group {
+  border-color: #dbe5d8;
+  border-radius: 15px;
+  background: linear-gradient(155deg, #fffefa 0%, #f8faf5 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 5px 16px rgba(24, 53, 37, .035);
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.cost-group:hover {
+  border-color: #b7cbb1;
+  box-shadow: 0 10px 24px rgba(24, 53, 37, .07);
+  transform: translateY(-2px);
+}
+.cost-group-heading > span {
+  border-radius: 9px;
+  background: linear-gradient(145deg, #edf4e6, #dfead6);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.cost-entry-footer {
+  align-items: center;
+  padding-top: 22px;
+}
+.cost-entry-footer > p { max-width: 46ch; line-height: 1.6; }
+.vehicle-import-page .field input,
+.vehicle-import-page .field select,
+.vehicle-panel .field input,
+.vehicle-panel .field select {
+  min-height: 50px;
+}
+.vehicle-import-page .field select:disabled {
+  color: #78847b;
+  background-color: #f0f3ee;
+  cursor: not-allowed;
+}
+#estimate-result .result-total { font-variant-numeric: tabular-nums; }
+@media (max-width: 980px) {
+  .vehicle-import-page .estimate-stepper {
+    position: static;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+@media (max-width: 700px) {
+  .vehicle-import-page .estimate-stepper a { min-height: 48px; }
+  .cost-entry-panel { border-radius: 15px; }
+  .cost-group:hover { transform: none; }
+}
+@media (max-width: 520px) {
+  .account-loading-panel { min-height: 225px; }
+  .account-switches { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .vehicle-import-page .estimate-stepper { margin-bottom: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-loading-indicator span { animation: none; width: 100%; }
+  .account-estimate, .cost-group { transition: none; }
+}
